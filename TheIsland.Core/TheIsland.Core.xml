@@ -1,0 +1,69 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TheIsland.Core</name>
+    </assembly>
+    <members>
+        <member name="P:TheIsland.Core.Classes.DUClient.RestDuClientFactory">
+            <summary>
+            Gets rest Client.
+            </summary>
+        </member>
+        <member name="F:TheIsland.Core.Classes.DUClient.serviceProvider">
+            <summary>
+            Service Provider.
+            </summary>
+        </member>
+        <member name="F:TheIsland.Core.Classes.DUClient.orleans">
+            <summary>
+            Orleans.
+            </summary>
+        </member>
+        <member name="F:TheIsland.Core.Classes.DUClient.dataAccessor">
+            <summary>
+            Data Accessor.
+            </summary>
+        </member>
+        <member name="P:TheIsland.Core.Classes.DUClient.Bot">
+            <summary>
+             Gets the bot itself.
+            </summary>
+        </member>
+        <member name="M:TheIsland.Core.Classes.DUClient.CreateUser(System.String,TheIsland.Core.Settings.DualUniverseSettings,System.Boolean)">
+            <summary>
+            Logins As Bot.
+            </summary>
+            <param name="prefix"></param>
+            <param name="settings"></param>
+            <param name="allowExisting"></param>
+            <returns></returns>
+        </member>
+        <member name="M:TheIsland.Core.Classes.DUClient.Setup">
+            <summary>
+            Configure the App.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TheIsland.Core.Classes.DUClient.Start">
+            <summary>
+            Simple Start Function
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TheIsland.Core.Classes.DUClient.Loop">
+            <summary>
+            Loop Function.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TheIsland.Core.Classes.DUClient.SafeLoop(System.Func{System.Threading.Tasks.Task},System.Int32,System.Func{System.Threading.Tasks.Task})">
+            <summary>
+            A Safe loop with a reconnect.
+            </summary>
+            <param name="action"></param>
+            <param name="exceptionDelayMs"></param>
+            <param name="reconnect"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>

@@ -1,0 +1,119 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TheIsland.Website</name>
+    </assembly>
+    <members>
+        <member name="M:TheIsland.Website.Services.SQL.IEntityRepository`1.AddAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Adds the item asynchronous.
+            </summary>
+            <param name="item">The item.</param>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:TheIsland.Website.Services.SQL.IEntityRepository`1.AddAsync(System.Collections.Generic.IEnumerable{`0},System.Threading.CancellationToken)">
+            <summary>
+            Adds the items asynchronous.
+            </summary>
+            <param name="items">The items.</param>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:TheIsland.Website.Services.SQL.IEntityRepository`1.GetAsync(System.Threading.CancellationToken)">
+            <summary>
+            Gets all the items asynchronous.
+            </summary>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns>Task&lt;IEnumerable&lt;TValue&gt;&gt;.</returns>
+        </member>
+        <member name="M:TheIsland.Website.Services.SQL.IEntityRepository`1.GetAsync(System.Collections.Generic.IEnumerable{System.Double},System.Threading.CancellationToken)">
+            <summary>
+            Gets the items with the specified keys asynchronous.
+            </summary>
+            <param name="keys">The keys.</param>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns>Task&lt;IEnumerable&lt;TValue&gt;&gt;.</returns>
+        </member>
+        <member name="M:TheIsland.Website.Services.SQL.IEntityRepository`1.GetAsync(System.Double,System.Threading.CancellationToken)">
+            <summary>
+            Gets the item with the specified key asynchronous.
+            </summary>
+            <param name="key">The key.</param>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns>Task&lt;TValue&gt;.</returns>
+        </member>
+        <member name="M:TheIsland.Website.Services.SQL.IEntityRepository`1.RemoveAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Removes the item asynchronous.
+            </summary>
+            <param name="item">The item.</param>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns>Task&lt;System.Boolean&gt;.</returns>
+        </member>
+        <member name="M:TheIsland.Website.Services.SQL.IEntityRepository`1.RemoveAsync(System.Double,System.Threading.CancellationToken)">
+            <summary>
+            Removes the item with the specified key asynchronous.
+            </summary>
+            <param name="key">The key.</param>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns>Task&lt;System.Boolean&gt;.</returns>
+        </member>
+        <member name="M:TheIsland.Website.Services.SQL.IEntityRepository`1.RemoveAsync(System.Collections.Generic.IEnumerable{System.Double},System.Threading.CancellationToken)">
+            <summary>
+            Removes the items with the specified keys asynchronous.
+            </summary>
+            <param name="keys">The keys.</param>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns>Task&lt;System.Double&gt;.</returns>
+        </member>
+        <member name="M:TheIsland.Website.Services.SQL.IEntityRepository`1.RemoveAsync(System.Collections.Generic.IEnumerable{`0},System.Threading.CancellationToken)">
+            <summary>
+            Removes the items asynchronous.
+            </summary>
+            <param name="items">The items.</param>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns>Task&lt;System.Double&gt;.</returns>
+        </member>
+        <member name="M:TheIsland.Website.Services.SQL.IEntityRepository`1.UpdateAsync(System.Collections.Generic.IEnumerable{`0},System.Threading.CancellationToken)">
+            <summary>
+            Updates the items asynchronous.
+            </summary>
+            <param name="items">The items.</param>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns>Task&lt;System.Double&gt;.</returns>
+        </member>
+        <member name="M:TheIsland.Website.Services.SQL.IEntityRepository`1.UpdateAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Updates the item asynchronous.
+            </summary>
+            <param name="item">The item.</param>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns>Task&lt;System.Boolean&gt;.</returns>
+        </member>
+        <member name="M:TheIsland.Website.Startup.#ctor(Microsoft.AspNetCore.Hosting.IWebHostEnvironment)">
+            <summary>
+            Initializes a new instance of the <see cref="T:TheIsland.Website.Startup"/> class.
+            </summary>
+            <param name="env">
+            The env.
+            </param>
+        </member>
+        <member name="P:TheIsland.Website.Startup.SiteSettings">
+            <summary>
+            Gets or sets the site settings.
+            </summary>
+            <value>The setup settings.</value>
+        </member>
+        <member name="P:TheIsland.Website.Startup.Configuration">
+            <summary>
+            Gets the configuration.
+            </summary>
+        </member>
+        <member name="P:TheIsland.Website.Startup.HostingEnvironment">
+            <summary>
+            Gets the current HostingEnvironment.
+            </summary>
+        </member>
+    </members>
+</doc>

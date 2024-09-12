@@ -1,0 +1,128 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<CodeAnalysisRuleSet>../theisland.ruleset</CodeAnalysisRuleSet>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<DocumentationFile>TheIsland.Core.xml</DocumentationFile>
+		<Optimize>false</Optimize>
+		<DefineConstants>DEBUG;TRACE</DefineConstants>
+		<WarningsAsErrors />
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+		<DocumentationFile>TheIsland.Core.xml</DocumentationFile>
+		<Optimize>true</Optimize>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<WarningsAsErrors />
+	</PropertyGroup>
+
+	<ItemGroup>
+		<Compile Remove="NQLibs\**" />
+		<Content Remove="NQLibs\**" />
+		<EmbeddedResource Remove="NQLibs\**" />
+		<None Remove="NQLibs\**" />
+	</ItemGroup>
+	<ItemGroup>
+		<AdditionalFiles Include="../stylecop.json" Link="stylecop.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</AdditionalFiles>
+		<AdditionalFiles Include="../theisland.ruleset" Link="theisland.ruleset">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</AdditionalFiles>
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="AsyncFixer" Version="1.6.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="ConfigureAwaitChecker.Analyzer" Version="5.0.0.1">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="CsvHelper" Version="28.0.1" />
+		<PackageReference Include="FluentMigrator" Version="5.2.0" />
+		<PackageReference Include="FluentMigrator.Runner" Version="5.2.0" />
+		<PackageReference Include="FluentMigrator.Runner.Postgres" Version="5.2.0" />
+		<PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
+		<PackageReference Include="Grpc.Core" Version="2.40.0" />
+		<PackageReference Include="Grpc.Core.Api" Version="2.65.0" />
+		<PackageReference Include="Grpc.Net.ClientFactory" Version="2.23.2" />
+		<PackageReference Include="Microsoft.Orleans.Core" Version="3.6.5" />
+		<PackageReference Include="Microsoft.Orleans.Core.Abstractions" Version="3.6.5" />
+		<PackageReference Include="prometheus-net" Version="6.0.0" />
+		<PackageReference Include="prometheus-net.AspNetCore" Version="6.0.0" />
+		<PackageReference Include="YamlDotNet" Version="12.0.0" />
+		<PackageReference Include="Serilog" Version="2.10.0" />
+		<PackageReference Include="Microsoft.Orleans.Clustering.AdoNet" Version="3.6.5" />
+		<PackageReference Include="StackExchange.Redis" Version="2.0.601" />
+		<PackageReference Include="Microsoft.Toolkit.HighPerformance" Version="7.1.0" />
+		<PackageReference Include="InfluxDB.LineProtocol" Version="1.1.1" />
+		<PackageReference Include="MathNet.Spatial" Version="0.6.0" />
+		<PackageReference Include="MongoDB.Driver" Version="2.19.0.0" />
+		<PackageReference Include="Serilog.Extensions.Logging" Version="2.0.0" />
+		<PackageReference Include="Serilog.Sinks.File" Version="5.0.0" />
+		<PackageReference Include="Serilog.Sinks.Console" Version="4.1.0" />
+		<PackageReference Include="Dapper" Version="2.1.35" />
+		<PackageReference Include="System.Text.Json" Version="8.0.4" />
+		<PackageReference Include="System.Diagnostics.DiagnosticSource" Version="8.0.1" />
+		<PackageReference Include="Npgsql" Version="6.0.11" />
+		<PackageReference Include="Google.Protobuf" Version="3.21.9" />
+		<PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+	<ItemGroup>
+		<Reference Include="Backend">
+			<HintPath>NQLibs\Backend.dll</HintPath>
+		</Reference>
+		<Reference Include="Backend.PubSub">
+			<HintPath>NQLibs\Backend.PubSub.dll</HintPath>
+		</Reference>
+		<Reference Include="Backend.Telemetry">
+			<HintPath>NQLibs\Backend.Telemetry.dll</HintPath>
+		</Reference>
+		<Reference Include="BotLib">
+			<HintPath>NQLibs\BotLib.dll</HintPath>
+		</Reference>
+		<Reference Include="Interfaces">
+			<HintPath>NQLibs\Interfaces.dll</HintPath>
+		</Reference>
+		<Reference Include="NQutils">
+			<HintPath>NQLibs\NQutils.dll</HintPath>
+		</Reference>
+		<Reference Include="Router">
+			<HintPath>NQLibs\Router.dll</HintPath>
+		</Reference>
+		<Reference Include="Router.Orleans">
+			<HintPath>NQLibs\Router.Orleans.dll</HintPath>
+		</Reference>
+	</ItemGroup>
+	<ItemGroup>
+		<None Update="dual.yaml">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+		<None Update="libgrpc_csharp_ext.x64.so">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
+	</ItemGroup>
+	<!-- https://github.com/dotnet/efcore/issues/15047 -->
+	<Target Name="AddAssemblyAliasToReactiveAsync" AfterTargets="ResolveAssemblyReferences">
+		<ItemGroup>
+			<ReferencePath Condition=" '%(FileName)' == 'System.Interactive.Async' ">
+				<Aliases>reactive</Aliases>
+			</ReferencePath>
+		</ItemGroup>
+	</Target>
+	<ItemGroup>
+		<AdditionalFiles Include="../theisland.ruleset" Link="theisland.ruleset">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</AdditionalFiles>
+	</ItemGroup>
+</Project>
