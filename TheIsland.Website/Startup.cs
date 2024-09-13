@@ -10,10 +10,11 @@ namespace TheIsland.Website
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.IdentityModel.Logging;
     using TheIsland.Core.Classes;
+    using TheIsland.Core.Services;
+    using TheIsland.Core.Services.SQL;
     using TheIsland.Core.Settings;
     using TheIsland.Website.Classes;
     using TheIsland.Website.Interfaces;
-    using TheIsland.Website.Services.SQL;
 
     public class Startup
     {
@@ -81,10 +82,13 @@ namespace TheIsland.Website
                         user.GetString("avatar"),
                         (user.GetString("avatar") ?? string.Empty).StartsWith("a_") ? "gif" : "png"));
             });
-            services.AddSingleton<DualUniverseSettings>(SiteSettings.DualUniverse);
             services.AddSingleton<IDUClient, DUClient>();
+            services.AddSingleton<DualUniverseSettings>(SiteSettings.DualUniverse);
             services.AddSingleton<UserMappingRepository>(new UserMappingRepository(SiteSettings.Postgres));
             services.AddSingleton<PlayerRepository>(new PlayerRepository(SiteSettings.Postgres));
+            services.AddSingleton<LinkTokenRepository>(new LinkTokenRepository(SiteSettings.Postgres));
+            services.AddSingleton<PlayerLinkingService>();
+            services.AddSingleton<IIngameMessaging, IngameMessaging>();
             services.AddMvc();
         }
 

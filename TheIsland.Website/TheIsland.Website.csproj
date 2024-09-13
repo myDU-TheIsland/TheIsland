@@ -58,13 +58,13 @@
 		</PackageReference>
 	</ItemGroup>
 	<ItemGroup>
-	  <Folder Include="Models\" />
+	  <None Include="..\.editorconfig" Link=".editorconfig" />
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\TheIsland.Core\TheIsland.Core.csproj" />
 	</ItemGroup>
 	<ItemGroup>
-	  <Content Update="appsettings.json">
+	  <Content Update="website.json">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
 	</ItemGroup>

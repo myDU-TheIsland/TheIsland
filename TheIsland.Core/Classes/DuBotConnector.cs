@@ -64,21 +64,18 @@ namespace TheIsland.Core.Classes
             Config.ReadYamlFile("mod", "./dual.yaml");
             this._dualUniverseSettings = settings;
             this.Setup().Wait();
-            this.Bot = this.CreateUser(string.Empty, settings).GetAwaiter().GetResult();
+            this.Bot = this.CreateUser(settings).GetAwaiter().GetResult();
         }
 
         /// <summary>
         /// Logins As Bot.
         /// </summary>
-        /// <param name="prefix"></param>
         /// <param name="settings"></param>
-        /// <param name="allowExisting"></param>
         /// <returns></returns>
-        private Task<Client> CreateUser(string prefix, DualUniverseSettings settings, bool allowExisting = false)
+        private Task<Client> CreateUser(DualUniverseSettings settings)
         {
-            string username = prefix;
             LoginInformations pi = LoginInformations.BotLogin(settings.IngameName, settings.BotUser, settings.BotPassword);
-            return Client.FromFactory(RestDuClientFactory, pi, allowExising: allowExisting);
+            return Client.FromFactory(RestDuClientFactory, pi, allowExising: true);
         }
 
         /// <summary>
@@ -181,7 +178,7 @@ namespace TheIsland.Core.Classes
                     channel = MessageChannelType.PRIVATE,
                     targetId = who,
                 },
-                message = "You wanted to talk to me?",
+                message = message,
             });
         }
     }

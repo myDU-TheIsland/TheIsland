@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - TheIsland.Website</title>
+    <title>@ViewData["Title"] - TheIsland</title>
     <!--     Fonts and icons     -->
     <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
     <!-- Nucleo Icons -->
@@ -17,9 +17,9 @@
     <link id="pagestyle" href="~/css/argon-dashboard.min.css?v=2.0.5" rel="stylesheet" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+<body class="g-sidenav-show g-sidenav-hidden dark-version bg-gray-600">
+    <main class="main-content position-relative border-radius-lg ">
+        <nav class="navbar navbar-main navbar-expand-lg  px-0 mx-4 shadow-none border-radius-xl z-index-sticky ">
             <div class="container-fluid">
                 <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">The Island by Honjo</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
@@ -32,42 +32,63 @@
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Markets</a>
+                        </li>
+                        @if (User?.Identity?.IsAuthenticated ?? false)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Blueprints</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Find My Item</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Help Desk</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-white" asp-area="" asp-controller="User" asp-action="Link">Link Account</a>
+                            </li>
+                        }
+                        <li class="nav-item">
+                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-white" href"="https://discord.gg/6zsBcDX5Rz" target="_blank">Join Discord</a>
                         </li>
                     </ul>
                 </div>
-                <div class="collapse navbar-collapse mt-sm-0 mt-2 me-md-0 me-sm-4" id="navbar">
-                    <div class="ms-md-auto pe-md-3 d-flex align-items-center hidden">
-                        <div class="input-group">
-                            <span class="input-group-text text-body"><i class="fas fa-search" aria-hidden="true"></i></span>
-                            <input type="text" class="form-control" placeholder="Type here..." onfocus="focused(this)" onfocusout="defocused(this)">
-                        </div>
-                    </div>
+                <div class="collapse navbar-collapse" id="navbar">
                     <ul class="navbar-nav justify-content-end">
                         @if (User?.Identity?.IsAuthenticated ?? false)
                         {
-                            <li class="nav-item d-flex align-items-center">
-                                @{
-                                    string userAvatar = Context.User.Claims.FirstOrDefault(item => item.Type == "urn:discord:avatar:url")?.Value ?? string.Empty;
-                                }
-                                @if (!string.IsNullOrEmpty(userAvatar))
-                                {
-                                    <img class="avatar avatar-sm rounded-circle" src="@(userAvatar) " />
-                                }
-                                <span class="d-sm-inline d-none">Hello, @(Context.User.Identities.FirstOrDefault()?.Name ?? "Opps")</span>
-                            </li>
-                            <li class="nav-item d-flex align-items-center">
-                                <a asp-controller="Authentication" asp-action="Signout" class="nav-link font-weight-bold">
-                                    <span class="d-sm-inline d-none">Sign Out</span>
+                            <li class="nav-item dropdown pe-2 d-flex align-items-center">
+                                <a data-bs-toggle="dropdown" href="#loginMenu" class="nav-link" aria-controls="loginMenu" role="button">
+                                    @{
+                                        string userAvatar = Context.User.Claims.FirstOrDefault(item => item.Type == "urn:discord:avatar:url")?.Value ?? string.Empty;
+                                    }
+                                    @if (!string.IsNullOrEmpty(userAvatar))
+                                    {
+                                        <img class="avatar avatar-sm rounded-circle" src="@(userAvatar) " />
+                                    }
+                                    <span class="d-sm-inline d-none text-white">Hello, @(Context.User.Identities.FirstOrDefault()?.Name ?? "Opps")</span>
                                 </a>
-                            </li>
+                                <ul class="dropdown-menu dropdown-menu-end px-2 py-3 me-sm-n4 hidden" aria-labelledby="dropdownMenuButton" data-bs-popper="static">
+                                    <li class="mb-2">
+                                        <div class="d-flex py-1">
+                                            <a asp-controller="Authentication" asp-action="SignOutCurrentUser" class="dropdown-item border-radius-md">
+                                                <span class="d-sm-inline d-none text-white">Sign Out</span>
+                                            </a>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </li>                            
                         }
                         else
                         {
                             <li class="nav-item d-flex align-items-center">
-                                <a asp-controller="Authentication" asp-action="Signin" class="nav-link font-weight-bold px-0"c>
+                                <a asp-controller="Authentication" asp-action="Signin" class="nav-link font-weight-bold px-0">
                                     <i class="fa fa-user me-sm-1" aria-hidden="true"></i>
-                                    <span class="d-sm-inline d-none">Sign In</span>
+                                    <span class="d-sm-inline d-none text-white">Sign In</span>
                                 </a>
                             </li>
                         }
@@ -75,18 +96,11 @@
                 </div>
             </div>
         </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
+        <div class="container-fluid py-4">
             @RenderBody()
-        </main>
-    </div>
-
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; @(DateTime.Now.Year) - V0.Design - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
-    </footer>
+    </main>
+    
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>

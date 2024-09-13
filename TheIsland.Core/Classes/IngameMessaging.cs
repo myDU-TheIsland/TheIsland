@@ -2,11 +2,15 @@
 // Copyright (c) Paul Layne. All rights reserved.
 // </copyright>
 
-namespace TheIsland.Website.Classes
+namespace TheIsland.Core.Classes
 {
     using System.Threading.Tasks;
     using TheIsland.Core.Classes;
-    using TheIsland.Website.Interfaces;
+
+    public interface IIngameMessaging
+    {
+        Task SendMessage(ulong who, string message);
+    }
 
     public class IngameMessaging : IIngameMessaging
     {

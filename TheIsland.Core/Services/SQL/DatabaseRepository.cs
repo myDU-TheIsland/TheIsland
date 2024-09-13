@@ -2,7 +2,7 @@
 // Copyright (c) Paul Layne. All rights reserved.
 // </copyright>
 
-namespace TheIsland.Website.Services.SQL
+namespace TheIsland.Core.Services.SQL
 {
     using System.Collections.Generic;
     using System.Data.Common;
@@ -10,8 +10,8 @@ namespace TheIsland.Website.Services.SQL
     using System.Threading.Tasks;
     using Dapper.Contrib.Extensions;
     using Npgsql;
-    using TheIsland.Website.Classes;
-    using TheIsland.Website.Services.SQL.Entities;
+    using TheIsland.Core.Services.SQL.Entities;
+    using TheIsland.Core.Settings;
 
     public interface IEntityRepository<TValue> where TValue : DatabaseEntity, new()
     {

@@ -2,15 +2,15 @@
 // Copyright (c) Paul Layne. All rights reserved.
 // </copyright>
 
-namespace TheIsland.Website.Services.SQL.Entities
+namespace TheIsland.Core.Services.SQL.Entities
 {
     using Dapper.Contrib.Extensions;
 
     [Table("public.player")]
     public class Player : DatabaseEntity
     {
-        public bool Connected { get; set; }
+        public bool connected { get; set; }
 
-        public string Display_Name { get; set; } = string.Empty;
+        public string display_name { get; set; } = string.Empty;
     }
 }

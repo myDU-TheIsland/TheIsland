@@ -5,8 +5,7 @@
 namespace TheIsland.Website.Controllers.Api
 {
     using Microsoft.AspNetCore.Mvc;
-    using TheIsland.Core.Classes;
-    using TheIsland.Website.Services.SQL;
+    using TheIsland.Core.Services.SQL;
 
     [Area("Api")]
     public class UserController : Controller

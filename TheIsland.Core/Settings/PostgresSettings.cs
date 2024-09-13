@@ -2,7 +2,7 @@
 // Copyright (c) Paul Layne. All rights reserved.
 // </copyright>
 
-namespace TheIsland.Website.Classes
+namespace TheIsland.Core.Settings
 {
     public class PostgresSettings
     {
