@@ -9,6 +9,6 @@ namespace TheIsland.Core.Services.SQL.Entities
     public class DatabaseEntity
     {
         [Key]
-        public double Id { get; set; } = 0;
+        public double id { get; set; } = 0;
     }
 }

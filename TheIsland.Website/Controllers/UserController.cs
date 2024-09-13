@@ -51,7 +51,7 @@ namespace TheIsland.Website.Controllers
                 return this.RedirectToAction("Link", model);
             }
 
-            var result = await this._playerLinkingService.SendToken(player.Id, discordId).ConfigureAwait(false);
+            var result = await this._playerLinkingService.SendToken(player.id, discordId).ConfigureAwait(false);
 
             if (!result)
             {

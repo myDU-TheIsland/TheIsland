@@ -158,7 +158,7 @@ namespace TheIsland.Core.Services.SQL
 
             using (DbConnection databaseConnection = this.GetConnection())
             {
-                return (await databaseConnection.GetAllAsync<TValue>().ConfigureAwait(false)).Where(item => Enumerable.Contains<double>(keys, item.Id)).ToArray();
+                return (await databaseConnection.GetAllAsync<TValue>().ConfigureAwait(false)).Where(item => Enumerable.Contains<double>(keys, item.id)).ToArray();
             }
         }
 
@@ -182,7 +182,7 @@ namespace TheIsland.Core.Services.SQL
         {
             using (DbConnection databaseConnection = this.GetConnection())
             {
-                TValue itemToDelete = new TValue { Id = key };
+                TValue itemToDelete = new TValue { id = key };
                 return await databaseConnection.DeleteAsync(itemToDelete).ConfigureAwait(false);
             }
         }
@@ -191,7 +191,7 @@ namespace TheIsland.Core.Services.SQL
         {
             using (DbConnection databaseConnection = this.GetConnection())
             {
-                TValue[] itemsToDelete = keys.Select(key => new TValue { Id = key }).ToArray();
+                TValue[] itemsToDelete = keys.Select(key => new TValue { id = key }).ToArray();
                 return await databaseConnection.DeleteAsync(itemsToDelete).ConfigureAwait(false);
             }
         }

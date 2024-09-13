@@ -5,9 +5,6 @@
 namespace TheIsland.Core.Services
 {
     using System;
-    using System.Collections.Generic;
-    using System.Linq;
-    using System.Text;
     using System.Threading.Tasks;
     using TheIsland.Core.Classes;
     using TheIsland.Core.Services.SQL;
@@ -67,7 +64,7 @@ namespace TheIsland.Core.Services
             var newEntry = new UserMapping { discord_id = result.discord_id, dual_id = result.player_id };
 
             await this._userMappingRepository.AddAsync(newEntry).ConfigureAwait(false);
-            await this._linkTokenRepository.RemoveAsync(result).ConfigureAwait(false);
+            await this._linkTokenRepository.RemoveAsync(result.id).ConfigureAwait(false);
 
             return true;
         }
@@ -80,6 +77,18 @@ namespace TheIsland.Core.Services
         public async Task<bool> HasPlayerMapping(double discordId)
         {
             var result = await this._userMappingRepository.FindByDiscordId(discordId).ConfigureAwait(false);
+
+            if (result != null)
+            {
+                var linkResult = await this._linkTokenRepository.FindByPlayerId(result.dual_id).ConfigureAwait(false);
+
+                if (linkResult != null)
+                {
+                    // clean up result.
+                    await this._linkTokenRepository.RemoveAsync(linkResult.id).ConfigureAwait(false);
+                }
+            }
+
             return result != null;
         }
     }
