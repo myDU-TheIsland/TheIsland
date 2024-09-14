@@ -174,8 +174,28 @@ namespace TheIsland.Core.Classes
             }
         }
 
+        private async Task ConnectionTest()
+        {
+            try 
+            {
+                await this.Bot.Req.Ping().ConfigureAwait(false);
+            }
+            catch (NQutils.Exceptions.BusinessException be) when (be.error.code == NQ.ErrorCode.InvalidSession)
+            {
+                Console.WriteLine("reconnecting");
+                await this.CreateUser(this._dualUniverseSettings);
+                await Task.Delay(10000).ConfigureAwait(false);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine($"Exception in mod action: {e}\n{e.StackTrace}");
+                await Task.Delay(10000).ConfigureAwait(false);
+            }
+
+        }
         public async Task SendMessage(ulong who, string message)
         {
+            await this.ConnectionTest();
             await this.Bot.Req.ChatMessageSend(new NQ.MessageContent
             {
                 channel = new NQ.MessageChannel
@@ -190,6 +210,7 @@ namespace TheIsland.Core.Classes
 
         public async Task<string> ImportBP(ulong playerId, byte[] bp)
         {
+            await this.ConnectionTest();
             BlueprintId bpId = 0;
             try
             {

@@ -7,7 +7,9 @@ namespace TheIsland.Website
     using System.Globalization;
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.AspNetCore.Authentication.Cookies;
+    using Microsoft.AspNetCore.Http.Features;
     using Microsoft.AspNetCore.HttpOverrides;
+    using Microsoft.AspNetCore.Server.Kestrel.Core;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.IdentityModel.Logging;
     using TheIsland.Core.Classes;
@@ -60,6 +62,16 @@ namespace TheIsland.Website
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.Configure<KestrelServerOptions>(options =>
+            {
+                options.Limits.MaxRequestBodySize = int.MaxValue;
+            });
+            services.Configure<FormOptions>(options =>
+            {
+                options.ValueLengthLimit = int.MaxValue;
+                options.MultipartBodyLengthLimit = int.MaxValue; // if don't set default value is: 128 MB
+                options.MultipartHeadersLengthLimit = int.MaxValue;
+            });
             services.AddRouting();
 
             services.AddAuthentication(options =>

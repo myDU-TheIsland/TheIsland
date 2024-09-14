@@ -37,21 +37,25 @@
                         </li> *@
                         @if (User?.Identity?.IsAuthenticated ?? false)
                         {
-                            <li class="nav-item">
-                                <a class="nav-link text-white" asp-area="" asp-controller="User" asp-action="ImportBP">Blueprints</a>
-                            </li>
-                           @*  <li class="nav-item">
-                                <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Find My Item</a>
-                            </li> *@
-                            @* <li class="nav-item">
-                                <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Help Desk</a>
-                            </li> *@
                             @if (!await _playerLinkingService.HasPlayerMapping(double.Parse(Context.User.Claims.FirstOrDefault(item => item.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value ?? "-1")).ConfigureAwait(false))
                             {
                                 <li class="nav-item">
                                     <a class="nav-link text-white" asp-area="" asp-controller="User" asp-action="Link">Link Account</a>
-                                </li>  
+                                </li>
+                            }else{
+                                <li class="nav-item">
+                                    <a class="nav-link text-white" asp-area="" asp-controller="User" asp-action="ImportBP">Blueprints</a>
+                                </li>
+                                @*  <li class="nav-item">
+                                <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Find My Item</a>
+                                </li> *@
+                                        @* <li class="nav-item">
+                                <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Help Desk</a>
+                                </li> *@
                             }
+                           
+                           
+                            
                         }
                         <li class="nav-item">
                             <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>

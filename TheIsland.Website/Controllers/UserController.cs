@@ -100,6 +100,7 @@ namespace TheIsland.Website.Controllers
         }
 
         [HttpGet]
+        [Authorize]
         public IActionResult ImportBP(ImportBPModel? model)
         {
             if (model == null)
@@ -111,6 +112,7 @@ namespace TheIsland.Website.Controllers
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> ImportBPFile(ImportBPModel model)
         {
             if (this.ModelState.IsValid && model.BluePrint != null)
