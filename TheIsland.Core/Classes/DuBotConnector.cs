@@ -211,29 +211,23 @@ namespace TheIsland.Core.Classes
             var pig = orleans.GetInventoryGrain(playerId);
             var itemStorage = serviceProvider.GetRequiredService<IItemStorageService>();
 
-            await using (var transaction = await itemStorage.MakeTransaction(Tag.HttpCall("importBP")))
+            var item = new ItemInfo
             {
-                var item = new ItemInfo
-                {
-                    type = serviceProvider.GetRequiredService<IGameplayBank>().GetDefinition("Blueprint").Id,
-                    id = bpId
-                };
-                item.properties.Add("name", new PropertyValue { stringValue = bpInfo.name });
-                item.properties.Add("size", new PropertyValue { intValue = (long)bpInfo.size.x });
-                item.properties.Add("static", new PropertyValue { boolValue = bpInfo.kind != ConstructKind.DYNAMIC });
-                item.properties.Add("kind", new PropertyValue { intValue = (int)bpInfo.kind });
+                type = serviceProvider.GetRequiredService<IGameplayBank>().GetDefinition("Blueprint").Id,
+                id = bpId
+            };
+            item.properties.Add("name", new PropertyValue { stringValue = bpInfo.name });
+            item.properties.Add("size", new PropertyValue { intValue = (long)bpInfo.size.x });
+            item.properties.Add("static", new PropertyValue { boolValue = bpInfo.kind != ConstructKind.DYNAMIC });
+            item.properties.Add("kind", new PropertyValue { intValue = (int)bpInfo.kind });
 
-                await pig.GiveOrTakeItems(transaction,
-                            new List<ItemAndQuantity>() {
-                            new ItemAndQuantity
-                            {
-                                item = item,
-                                quantity = 1,
-                            },
-                            },
-                            new());
-                await transaction.Commit();
-            }
+            await dataAccessor.PlayerInventoryGiveAsync(
+                    playerId,
+                    new ItemAndQuantity
+                    {
+                        item = item,
+                        quantity = 1,
+                    });
 
             return "Blueprint '" + bpInfo.name + "' imported and should be in your nano pack.";
         }
