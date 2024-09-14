@@ -91,5 +91,10 @@ namespace TheIsland.Core.Services
 
             return result != null;
         }
+
+        public Task<UserMapping?> GetPlayerMapping(double discordId)
+        {
+            return this._userMappingRepository.FindByDiscordId(discordId);
+        }
     }
 }

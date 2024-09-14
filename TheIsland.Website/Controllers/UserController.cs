@@ -8,15 +8,19 @@ namespace TheIsland.Website.Controllers
     using Microsoft.AspNetCore.Mvc;
     using TheIsland.Core.Classes;
     using TheIsland.Core.Services;
+    using TheIsland.Core.Services.SQL.Entities;
+    using TheIsland.Website.Classes;
     using TheIsland.Website.Models;
 
-    public class UserController : Controller
+    public class UserController : IslandController
     {
         private readonly PlayerLinkingService _playerLinkingService;
+        private readonly IDUClient _duClient;
 
-        public UserController(PlayerLinkingService playerLinkingService)
+        public UserController(PlayerLinkingService playerLinkingService, IDUClient client)
         {
             this._playerLinkingService = playerLinkingService;
+            this._duClient = client;
         }
 
         [HttpGet("~/link")]
@@ -40,8 +44,6 @@ namespace TheIsland.Website.Controllers
                 return this.RedirectToAction("Link", model);
             }
 
-            double discordId = double.Parse(this.HttpContext.User.Claims.FirstOrDefault(item => item.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value ?? "-1");
-
             // find the players id;
             var player = await this._playerLinkingService.FindPlayer(model.PlayerName).ConfigureAwait(false);
 
@@ -51,7 +53,7 @@ namespace TheIsland.Website.Controllers
                 return this.RedirectToAction("Link", model);
             }
 
-            var result = await this._playerLinkingService.SendToken(player.id, discordId).ConfigureAwait(false);
+            var result = await this._playerLinkingService.SendToken(player.id, this.DiscordId).ConfigureAwait(false);
 
             if (!result)
             {
@@ -95,6 +97,42 @@ namespace TheIsland.Website.Controllers
             }
 
             return this.RedirectToAction("Index", "Home");
+        }
+
+        [HttpGet]
+        public IActionResult ImportBP(ImportBPModel? model)
+        {
+            if (model == null)
+            {
+                model = new ImportBPModel();
+            }
+
+            return this.View(model);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> ImportBPFile(ImportBPModel model)
+        {
+            if (this.ModelState.IsValid && model.BluePrint != null)
+            {
+                UserMapping? result = await this._playerLinkingService.GetPlayerMapping(this.DiscordId).ConfigureAwait(false);
+                if (result == null)
+                {
+                    model.ErrorMessage = "Couldn't find your player account. Is it linked?";
+                    return this.RedirectToAction("ImportBP", model);
+                }
+
+                using (var ms = new MemoryStream())
+                {
+                    model.BluePrint.CopyTo(ms);
+                    var fileBytes = ms.ToArray();
+                    model.ErrorMessage = await this._duClient.ImportBP(Convert.ToUInt64(result.dual_id), fileBytes).ConfigureAwait(false);
+                    return this.RedirectToAction("ImportBP", model);
+                }
+            }
+
+            model.ErrorMessage = "Not sure whhat happened. Contact an admin";
+            return this.RedirectToAction("ImportBP", model);
         }
     }
 }

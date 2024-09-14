@@ -5,31 +5,35 @@
 namespace TheIsland.Core.Classes
 {
     using System;
-    using System.Linq;
     using System.Net.Http;
     using System.Threading.Tasks;
     using Backend;
+    using Backend.AWS;
     using Backend.Business;
+    using Backend.Database;
+    using Backend.Storage;
     using BotLib.BotClient;
     using BotLib.Generated;
     using BotLib.Protocols;
     using BotLib.Protocols.Queuing;
     using Microsoft.Extensions.DependencyInjection;
     using NQ;
-    using NQ.RDMS;
+    using NQ.Interfaces;
     using NQ.Router;
     using NQutils;
     using NQutils.Config;
-    using NQutils.Logging;
     using NQutils.Sql;
     using Orleans;
     using TheIsland.Core.Settings;
+    using static BotLib.Utils.BotSpawner;
 
     public interface IDUClient
     {
         Client Bot { get; }
 
         Task SendMessage(ulong who, string message);
+
+        Task<string> ImportBP(ulong playerId, byte[] bp);
     }
 
     public class DUClient : IDUClient
@@ -61,7 +65,7 @@ namespace TheIsland.Core.Classes
 
         public DUClient(DualUniverseSettings settings)
         {
-            Config.ReadYamlFile("mod", "./dual.yaml");
+            NQutils.Config.Config.ReadYamlFile("mod", "./dual.yaml");
             this._dualUniverseSettings = settings;
             this.Setup().Wait();
             this.Bot = this.CreateUser(settings).GetAwaiter().GetResult();
@@ -97,6 +101,7 @@ namespace TheIsland.Core.Classes
             services
             .AddSingleton<ISql, Sql>()
             .AddInitializableSingleton<IGameplayBank, GameplayBank>()
+            .AddSingleton<IItemStorageService, ItemStorageService>()
             .AddSingleton<ILocalizationManager, LocalizationManager>()
             .AddTransient<IDataAccessor, DataAccessor>()
             .AddOrleansClient("IntegrationTests")
@@ -180,6 +185,57 @@ namespace TheIsland.Core.Classes
                 },
                 message = message,
             });
+        }
+
+
+        public async Task<string> ImportBP(ulong playerId, byte[] bp)
+        {
+            BlueprintId bpId = 0;
+            try
+            {
+                bpId = await dataAccessor.BlueprintImport(bp, new NQ.EntityId { playerId = playerId });
+            }
+            catch (Exception exception)
+            {
+                return @$"Failed to import BP. ({exception.ToString()})";
+            }
+
+            var bpInfo = await orleans.GetBlueprintGrain().GetBlueprintInfo(bpId);
+            var bpModel = await serviceProvider.GetRequiredService<ISql>().Read(bpId);
+
+            if (bpModel.FreeDeploy && !await orleans.GetPlayerGrain(playerId).IsAdmin())
+            {
+                return "You are not allowed to import free deploy blueprints";
+            }
+
+            var pig = orleans.GetInventoryGrain(playerId);
+            var itemStorage = serviceProvider.GetRequiredService<IItemStorageService>();
+
+            await using (var transaction = await itemStorage.MakeTransaction(Tag.HttpCall("importBP")))
+            {
+                var item = new ItemInfo
+                {
+                    type = serviceProvider.GetRequiredService<IGameplayBank>().GetDefinition("Blueprint").Id,
+                    id = bpId
+                };
+                item.properties.Add("name", new PropertyValue { stringValue = bpInfo.name });
+                item.properties.Add("size", new PropertyValue { intValue = (long)bpInfo.size.x });
+                item.properties.Add("static", new PropertyValue { boolValue = bpInfo.kind != ConstructKind.DYNAMIC });
+                item.properties.Add("kind", new PropertyValue { intValue = (int)bpInfo.kind });
+
+                await pig.GiveOrTakeItems(transaction,
+                            new List<ItemAndQuantity>() {
+                            new ItemAndQuantity
+                            {
+                                item = item,
+                                quantity = 1,
+                            },
+                            },
+                            new());
+                await transaction.Commit();
+            }
+
+            return "Blueprint '" + bpInfo.name + "' imported and should be in your nano pack.";
         }
     }
 }

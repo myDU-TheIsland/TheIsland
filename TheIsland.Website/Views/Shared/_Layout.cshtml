@@ -32,20 +32,20 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
                         </li>
-                        <li class="nav-item">
+@*                         <li class="nav-item">
                             <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Markets</a>
-                        </li>
+                        </li> *@
                         @if (User?.Identity?.IsAuthenticated ?? false)
                         {
                             <li class="nav-item">
-                                <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Blueprints</a>
+                                <a class="nav-link text-white" asp-area="" asp-controller="User" asp-action="ImportBP">Blueprints</a>
                             </li>
-                            <li class="nav-item">
+                           @*  <li class="nav-item">
                                 <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Find My Item</a>
-                            </li>
-                            <li class="nav-item">
+                            </li> *@
+                            @* <li class="nav-item">
                                 <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Help Desk</a>
-                            </li>
+                            </li> *@
                             @if (!await _playerLinkingService.HasPlayerMapping(double.Parse(Context.User.Claims.FirstOrDefault(item => item.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value ?? "-1")).ConfigureAwait(false))
                             {
                                 <li class="nav-item">
