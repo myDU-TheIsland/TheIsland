@@ -122,13 +122,25 @@ namespace TheIsland.Website.Controllers
                     return this.RedirectToAction("ImportBP", model);
                 }
 
-                using (var ms = new MemoryStream())
+                foreach (var blueprint in model.BluePrint)
                 {
-                    model.BluePrint.CopyTo(ms);
-                    var fileBytes = ms.ToArray();
-                    model.ErrorMessage = await this._duClient.ImportBP(Convert.ToUInt64(result.dual_id), fileBytes).ConfigureAwait(false);
-                    return this.RedirectToAction("ImportBP", model);
+                    try
+                    {
+                        using (var ms = new MemoryStream())
+                        {
+                            blueprint.CopyTo(ms);
+                            var fileBytes = ms.ToArray();
+                            model.ErrorMessage += await this._duClient.ImportBP(Convert.ToUInt64(result.dual_id), fileBytes).ConfigureAwait(false) + "<br />";
+                        }
+                    }
+                    catch (Exception exception)
+                    {
+                        model.ErrorMessage += @$"Failed '{blueprint.FileName}' ({exception.Message}). <br />";
+                    }
+
                 }
+
+                return this.RedirectToAction("ImportBP", model);
             }
 
             model.ErrorMessage = "Not sure whhat happened. Contact an admin";

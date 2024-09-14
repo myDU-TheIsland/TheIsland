@@ -9,7 +9,7 @@ namespace TheIsland.Website.Models
 
     public class ImportBPModel
     {
-        public IFormFile? BluePrint { get; set; }
+        public List<IFormFile> BluePrint { get; set; } = new List<IFormFile>();
 
         public string ErrorMessage { get; set; } = string.Empty;
     }
