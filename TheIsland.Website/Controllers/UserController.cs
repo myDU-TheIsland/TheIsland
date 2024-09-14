@@ -137,13 +137,12 @@ namespace TheIsland.Website.Controllers
                     {
                         model.ErrorMessage += @$"Failed '{blueprint.FileName}' ({exception.Message}). <br />";
                     }
-
                 }
 
                 return this.RedirectToAction("ImportBP", model);
             }
 
-            model.ErrorMessage = "Not sure whhat happened. Contact an admin";
+            model.ErrorMessage = "Not sure what happened. Contact an admin";
             return this.RedirectToAction("ImportBP", model);
         }
     }
