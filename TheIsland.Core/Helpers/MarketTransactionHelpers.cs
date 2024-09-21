@@ -1,0 +1,39 @@
+﻿// <copyright file="MarketTransactionHelpers.cs" company="Paul Layne">
+// Copyright (c) Paul Layne. All rights reserved.
+// </copyright>
+
+namespace TheIsland.Core.Helpers
+{
+    using Newtonsoft.Json.Linq;
+    using TheIsland.Core.Services.SQL.Entities;
+
+    public static class MarketTransactionHelpers
+    {
+        public static MarketTransaction ToMarketTransaction(this DualMarketTransaction input)
+        {
+            MarketTransaction output = new MarketTransaction();
+            output.price = input.price;
+            output.type = input.original_buy_quantity > 0 ? TransactionType.BuyOrder : TransactionType.SellOrder;
+            output.quantity = input.original_buy_quantity;
+            output.creation_date = input.creation_date;
+            output.market_id = input.market_id;
+            output.item_id = input.item_type_id;
+            return output;
+        }
+
+        public static MarketTransaction ToMarketTransaction(this DualWalletTransaction input)
+        {
+            JObject json = JObject.Parse(input.payload);
+            MarketTransaction output = new MarketTransaction();
+
+            output.price = input.amount / 100;
+            output.type = output.price > 0 ? TransactionType.Sell : TransactionType.Buy;
+            output.quantity = double.Parse(json["market"]?["quantity"]?["quantity"]?.ToString() ?? "0");
+            output.creation_date = input.time;
+            output.market_id = double.Parse(json["market"]?["marketId"]?.ToString() ?? "0");
+            output.item_id = double.Parse(json["market"]?["itemType"]?.ToString() ?? "0");
+
+            return output;
+        }
+    }
+}

@@ -3,9 +3,5 @@
 }
 
 <div class="text-center">
-    @if (User?.Identity?.IsAuthenticated ?? false)
-    {
-        var userID = Context.User.Claims.FirstOrDefault(item => item.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value ?? "Can't Determine";
-        <h1>Welcome, @User.Identity.Name (@userID)</h1>
-    }
+    <img style='width: 800px; height: auto;' src='/img/theisle.png'>
 </div>

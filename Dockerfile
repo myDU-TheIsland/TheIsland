@@ -14,7 +14,7 @@ RUN dotnet build "./TheIsland.Website.csproj" -c $BUILD_CONFIGURATION -o /app/bu
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./TheIsland.Website.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:UseAppHost=false
-RUN rm /app/publish/dual.yaml /app/publish/website.json
+RUN rm /app/publish/dual.yaml /app/publish/websiteSettings.json /app/publish/marketBotSettings.json
 
 FROM base AS final
 ENV DOTNET_RUNNING_IN_CONTAINER=true

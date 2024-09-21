@@ -4,65 +4,6 @@
         <name>TheIsland.Core</name>
     </assembly>
     <members>
-        <member name="P:TheIsland.Core.Classes.DUClient.RestDuClientFactory">
-            <summary>
-            Gets rest Client.
-            </summary>
-        </member>
-        <member name="F:TheIsland.Core.Classes.DUClient.serviceProvider">
-            <summary>
-            Service Provider.
-            </summary>
-        </member>
-        <member name="F:TheIsland.Core.Classes.DUClient.orleans">
-            <summary>
-            Orleans.
-            </summary>
-        </member>
-        <member name="F:TheIsland.Core.Classes.DUClient.dataAccessor">
-            <summary>
-            Data Accessor.
-            </summary>
-        </member>
-        <member name="P:TheIsland.Core.Classes.DUClient.Bot">
-            <summary>
-             Gets the bot itself.
-            </summary>
-        </member>
-        <member name="M:TheIsland.Core.Classes.DUClient.CreateUser(TheIsland.Core.Settings.DualUniverseSettings)">
-            <summary>
-            Logins As Bot.
-            </summary>
-            <param name="settings"></param>
-            <returns></returns>
-        </member>
-        <member name="M:TheIsland.Core.Classes.DUClient.Setup">
-            <summary>
-            Configure the App.
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:TheIsland.Core.Classes.DUClient.Start">
-            <summary>
-            Simple Start Function
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:TheIsland.Core.Classes.DUClient.Loop">
-            <summary>
-            Loop Function.
-            </summary>
-            <returns></returns>
-        </member>
-        <member name="M:TheIsland.Core.Classes.DUClient.SafeLoop(System.Func{System.Threading.Tasks.Task},System.Int32,System.Func{System.Threading.Tasks.Task})">
-            <summary>
-            A Safe loop with a reconnect.
-            </summary>
-            <param name="action"></param>
-            <param name="exceptionDelayMs"></param>
-            <param name="reconnect"></param>
-            <returns></returns>
-        </member>
         <member name="M:TheIsland.Core.Services.SQL.IEntityRepository`1.AddAsync(`0,System.Threading.CancellationToken)">
             <summary>
             Adds the item asynchronous.
@@ -149,6 +90,32 @@
             <param name="item">The item.</param>
             <param name="cancellationToken">The cancellation token.</param>
             <returns>Task&lt;System.Boolean&gt;.</returns>
+        </member>
+        <member name="T:TheIsland.Core.Settings.MarketBotConfig">
+            <summary>
+            A class containing the config settings for this mod.
+            </summary>
+        </member>
+        <member name="P:TheIsland.Core.Settings.MarketBotConfig.BuyPrices">
+            <summary>
+            Gets or sets list of items to buy and the top price to pay.
+            </summary>
+        </member>
+        <member name="P:TheIsland.Core.Settings.MarketBotConfig.BuyRecursivePrices">
+            <summary>
+            Gets or sets list of items to recursively buy and the top price to pay.
+            </summary>
+        </member>
+        <member name="P:TheIsland.Core.Settings.MarketBotConfig.Planets">
+            <summary>
+            Gets or sets planets / parents to iterate over for markets.
+            </summary>
+        </member>
+        <member name="P:TheIsland.Core.Settings.MarketBotConfig.DaysToWaitBeforeExpiration">
+            <summary>
+            Gets or sets the numbers days to buy before expiration.
+            </summary>
+            <example> 1 means once its goes under 24hrs remaining itll buy if within the buy range.</example>
         </member>
     </members>
 </doc>

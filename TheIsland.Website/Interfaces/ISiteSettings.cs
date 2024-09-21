@@ -9,6 +9,10 @@ namespace TheIsland.Website.Interfaces
 
     public interface ISiteSettings
     {
+        string[] Admins { get; set; }
+
+        string[] ApiKey { get; set; }
+
         DiscordSettings Discord { get; set; }
 
         DualUniverseSettings DualUniverse { get; set; }

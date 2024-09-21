@@ -6,12 +6,12 @@ namespace TheIsland.Core.Settings
 {
     public class DualUniverseSettings
     {
-        public string BotUser { get; set; } = string.Empty;
-
-        public string BotPassword { get; set; } = string.Empty;
-
-        public string IngameName { get; set; } = string.Empty;
-
         public string QueueingURL { get; set; } = "http://localhost:9630";
+
+        public ulong[] MarketHeaderIds { get; set; } = { };
+
+        public BotSettings WebsiteBot { get; set; } = new BotSettings();
+
+        public BotSettings MarketBot { get; set; } = new BotSettings();
     }
 }

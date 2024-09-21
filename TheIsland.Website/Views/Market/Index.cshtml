@@ -1,0 +1,121 @@
+﻿@using System.Linq
+@using TheIsland.Core.Classes
+@inject TheIsland.Core.Classes.IDUClient _client
+@inject TheIsland.Core.Services.SQL.DualMarketRepository _marketRepo
+@model MarketModel
+@{
+    ViewData["Title"] = "Market Data";
+    var hierarchy = _client.GetMarketHierarchy();
+    var items = _client.GetItemsForSale().OrderBy(items => items.Value).ToDictionary();
+    var markets = (await _marketRepo.GetAsync().ConfigureAwait(false)).ToDictionary(key => key.id, value => value.name);
+    markets.Add(0, "All Markets");
+
+    var itemExists = items.ContainsKey(Model.ItemId);
+    var selectedMarket = markets[Model.MarketId];
+    var selectedItem = itemExists ? items[Model.ItemId] : string.Empty;
+}
+<div class="row">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body">
+                <div class="col-lg-5 col-md-6 col-sm-3">
+                    <select asp-for="ItemId" class="selectpicker" data-size="7" data-live-search="true" data-style="btn btn-primary btn-round" id="input-itemId">
+                        @foreach (var item in items)
+                        {
+                            <option value="@item.Key">@item.Value</option>
+                        }
+                    </select>
+                </div>
+                <div class="col-lg-5 col-md-6 col-sm-3">
+                    <select asp-for="MarketId" class="selectpicker" data-size="7" data-style="btn btn-primary btn-round" id="input-marketId">
+                        @foreach (var market in markets.OrderBy(item => item.Key).ToArray())
+                        {
+                            <option value="@market.Key">@market.Value</option>
+                        }
+                    </select>
+                </div>
+            </div>
+            <div class="card-footer">
+                <button type="button" class="btn btn-fill btn-primary" id="btnSearch">Search<div class="ripple-container"></div></button>
+            </div>
+        </div>
+    </div>
+    @if (itemExists)
+    {
+        string marketName = markets.ContainsKey(Model.MarketId) ? " @ " + markets[Model.MarketId] : string.Empty;
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header card-header-warning" id="graphHeader">
+                    @items[Model.ItemId] Prices (Last 72hrs)@marketName
+                </div>
+                <div class="card-body">
+                    <div id="chart_div" style="height: 500px"></div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+@section Head {
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+}
+@section Scripts {
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
+    <script>
+        $(function () {
+            $('#input-itemId').selectpicker();
+            $('#input-marketId').selectpicker();
+        });
+
+        $("#btnSearch").on("click", function () {
+            var itemId = $("#input-itemId").val();
+            var marketId = $("#input-marketId").val();
+            if (itemId == 0) return;
+            if (marketId == 0) {
+                return window.location.replace("/Market/" + itemId);
+            } else if (marketId > 0) {
+                return window.location.replace("/Market/" + itemId + "/" + marketId);
+            }
+        });
+
+    </script>
+    @if (itemExists)
+    {
+        <script type="text/javascript">
+            google.charts.load('current', { packages: ['corechart', 'line'] });
+
+            window.onload = drawChart;
+            window.onresize = drawChart;
+
+            function drawChart() {
+                var jsonData = $.ajax({
+                    url: "/Api/Market/Stats/Hourly/@Model.ItemId",
+                    dataType: "json",
+                    async: false
+                }).responseText;
+
+                var realData = JSON.parse(jsonData)
+
+                function castDate(item) {
+                    item.c[0].v = new Date(item.c[0].v);
+                }
+
+                realData.rows.forEach(castDate);
+                var data = new google.visualization.DataTable(realData);
+
+                var options = {
+                    series: {
+                        // Gives each series an axis name that matches the Y-axis below.
+                        0: { axis: 'Average Price' },
+                        1: { axis: 'Quantity Sold' }
+                    },
+                    tooltip: { trigger: 'selection' }
+                };
+
+                var chart = new google.charts.Line(document.getElementById('chart_div'));
+
+                chart.draw(data, options);
+            }
+        </script>
+    }
+}

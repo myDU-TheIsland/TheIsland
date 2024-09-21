@@ -17,7 +17,9 @@
 		<DefineConstants>DEBUG;TRACE</DefineConstants>
 		<WarningsAsErrors />
 	</PropertyGroup>
-
+	<PropertyGroup Condition="$(DESIGNERMODE) != ''">
+		<DefineConstants>DESIGNERMODE</DefineConstants>
+	</PropertyGroup>
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
 		<DocumentationFile> TheIsland.Website.xml</DocumentationFile>
 		<Optimize>true</Optimize>
@@ -49,10 +51,7 @@
 		</PackageReference>
 		<PackageReference Include="Dapper" Version="2.1.35" />
 		<PackageReference Include="Dapper.Contrib" Version="2.0.78" />
-		<PackageReference Include="Hangfire.AspNetCore" Version="1.8.14" />
-		<PackageReference Include="Hangfire.InMemory" Version="1.0.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.8" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.8" />
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
 		<PackageReference Include="Npgsql" Version="6.0.11" />
 		<PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
@@ -67,7 +66,7 @@
 	  <ProjectReference Include="..\TheIsland.Core\TheIsland.Core.csproj" />
 	</ItemGroup>
 	<ItemGroup>
-	  <Content Update="websiteSettings.json">
+	  <Content Update="website.json">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </Content>
 	</ItemGroup>

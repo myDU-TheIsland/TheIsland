@@ -4,7 +4,9 @@
 
 namespace TheIsland.Website
 {
+    using System;
     using System.Globalization;
+    using Hangfire;
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.AspNetCore.Authentication.Cookies;
     using Microsoft.AspNetCore.Http.Features;
@@ -17,6 +19,8 @@ namespace TheIsland.Website
     using TheIsland.Core.Services.SQL;
     using TheIsland.Core.Settings;
     using TheIsland.Website.Classes;
+    using TheIsland.Website.Framework.Activators;
+    using TheIsland.Website.Framework.Filters;
     using TheIsland.Website.Interfaces;
 
     public class Startup
@@ -31,8 +35,8 @@ namespace TheIsland.Website
         {
             IConfigurationBuilder builder = new ConfigurationBuilder()
                 .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("website.json", true, true)
-                .AddJsonFile($"website.{env.EnvironmentName}.json", true)
+                .AddJsonFile("websiteSettings.json", true, true)
+                .AddJsonFile($"websiteSettings.{env.EnvironmentName}.json", true)
                 .AddEnvironmentVariables();
 
             this.Configuration = builder.Build();
@@ -42,6 +46,19 @@ namespace TheIsland.Website
             SiteSettings setupSettings = new SiteSettings();
             this.Configuration.GetSection("Site").Bind(setupSettings);
             SiteSettings = setupSettings;
+
+            IConfigurationBuilder builder2 = new ConfigurationBuilder()
+                .SetBasePath(env.ContentRootPath)
+                .AddJsonFile("marketBotSettings.json", true, true)
+                .AddJsonFile($"marketBotSettings.{env.EnvironmentName}.json", true)
+                .AddEnvironmentVariables();
+
+            var botConfig = builder2.Build();
+
+            // Build settings object (pulls from appsettings.*)
+            MarketBotConfig marketBotConfig = new MarketBotConfig();
+            botConfig.Bind(marketBotConfig);
+            MarketBotConfig = marketBotConfig;
         }
 
         /// <summary>
@@ -49,6 +66,12 @@ namespace TheIsland.Website
         /// </summary>
         /// <value>The setup settings.</value>
         public static ISiteSettings SiteSettings { get; set; } = new SiteSettings();
+
+        /// <summary>
+        /// Gets or sets the site settings.
+        /// </summary>
+        /// <value>The setup settings.</value>
+        public static MarketBotConfig MarketBotConfig { get; set; } = new MarketBotConfig();
 
         /// <summary>
         /// Gets the configuration.
@@ -72,6 +95,7 @@ namespace TheIsland.Website
                 options.MultipartBodyLengthLimit = int.MaxValue; // if don't set default value is: 128 MB
                 options.MultipartHeadersLengthLimit = int.MaxValue;
             });
+            services.AddMemoryCache();
             services.AddRouting();
 
             services.AddAuthentication(options =>
@@ -95,18 +119,65 @@ namespace TheIsland.Website
                         user.GetString("avatar"),
                         (user.GetString("avatar") ?? string.Empty).StartsWith("a_") ? "gif" : "png"));
             });
+
+            services.AddAuthorization(options =>
+            {
+                options.AddPolicy("Admin", policy => policy.RequireClaim("nameidentifier", SiteSettings.Admins));
+            });
+
+            services.AddResponseCompression(options =>
+            {
+                options.EnableForHttps = true;
+            });
+
+            // settings
             services.AddSingleton<IDUClient, DUClient>();
-            services.AddSingleton<DualUniverseSettings>(SiteSettings.DualUniverse);
-            services.AddSingleton<UserMappingRepository>(new UserMappingRepository(SiteSettings.Postgres));
-            services.AddSingleton<PlayerRepository>(new PlayerRepository(SiteSettings.Postgres));
-            services.AddSingleton<LinkTokenRepository>(new LinkTokenRepository(SiteSettings.Postgres));
+            services.AddSingleton<ISiteSettings>(SiteSettings);
+            services.AddSingleton(SiteSettings.DualUniverse);
+            services.AddSingleton(MarketBotConfig);
+            services.AddSingleton<ApiKeyAuthorizationFilter>();
+
+            // repositories
+            services.AddSingleton(new DualMarketRepository(SiteSettings.Postgres));
+            services.AddSingleton(new DualMarketTransactionRepository(SiteSettings.Postgres));
+            services.AddSingleton(new DualWalletRepository(SiteSettings.Postgres));
+            services.AddSingleton(new LastReadRepository(SiteSettings.Postgres));
+            services.AddSingleton(new LinkTokenRepository(SiteSettings.Postgres));
+            services.AddSingleton(new MarketTransactionRepository(SiteSettings.Postgres));
+            services.AddSingleton(new PlayerRepository(SiteSettings.Postgres));
+            services.AddSingleton(new UserMappingRepository(SiteSettings.Postgres));
+
+            // services
+            services.AddSingleton<MarketService>();
+            services.AddSingleton<IImportMarketService, ImportMarketService>();
             services.AddSingleton<PlayerLinkingService>();
             services.AddSingleton<IIngameMessaging, IngameMessaging>();
-            services.AddMvc();
+            services.AddSingleton<PlayerLinkingService>();
+
+            if (!this.HostingEnvironment.IsDevelopment())
+            {
+                services.AddMvc().AddRazorRuntimeCompilation();
+            }
+            else
+            {
+                services.AddMvc();
+            }
+
+            services.AddHangfire(opts => opts
+               .SetDataCompatibilityLevel(CompatibilityLevel.Version_180)
+               .UseSimpleAssemblyNameTypeSerializer()
+               .UseRecommendedSerializerSettings()
+               .UseInMemoryStorage());
+
+            // Add the processing server as IHostedService
+            services.AddHangfireServer();
         }
 
-        public void Configure(IApplicationBuilder app)
+        public void Configure(IApplicationBuilder app, IServiceProvider serviceProvider)
         {
+            GlobalConfiguration.Configuration
+                .UseActivator(new HangfireActivator(serviceProvider));
+
             // Configure the HTTP request pipeline.
             if (!this.HostingEnvironment.IsDevelopment())
             {
@@ -140,6 +211,7 @@ namespace TheIsland.Website
             {
                 ForwardedHeaders = ForwardedHeaders.All,
             });
+            app.UseResponseCompression();
 
             app.UseEndpoints(endpoints =>
             {
@@ -149,7 +221,14 @@ namespace TheIsland.Website
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+
+                endpoints.MapHangfireDashboard();
             });
+
+            if (!this.HostingEnvironment.IsDevelopment())
+            {
+                RecurringJob.AddOrUpdate("buyStuff", (IDUClient client) => client.BuyStuff(0), "* * * * *");
+            }
         }
     }
 }

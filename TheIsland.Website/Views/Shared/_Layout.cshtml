@@ -6,112 +6,65 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] - TheIsland</title>
+    <meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
     <!--     Fonts and icons     -->
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
-    <!-- Nucleo Icons -->
-    <link href="~/css/nucleo-icons.css" rel="stylesheet" asp-append-version="true" />
-    <link href="~/css/nucleo-svg.css" rel="stylesheet" asp-append-version="true" />
-    <!-- Font Awesome Icons -->
-    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
-    <link href="~/css/nucleo-svg.css" rel="stylesheet" asp-append-version="true" />
+    <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
     <!-- CSS Files -->
-    <link id="pagestyle" href="~/css/argon-dashboard.min.css?v=2.0.5" rel="stylesheet" asp-append-version="true" />
-    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link href="~/css/material-dashboard.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/css/site.css" rel="stylesheet" asp-append-version="true" />
+    @await RenderSectionAsync("Head", required: false)
 </head>
-<body class="g-sidenav-show g-sidenav-hidden dark-version bg-gray-600">
-    <main class="main-content position-relative border-radius-lg ">
-        <nav class="navbar navbar-main navbar-expand-lg  px-0 mx-4 shadow-none border-radius-xl z-index-sticky ">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">The Island by Honjo</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+<body class="dark-edition off-canvas-sidebar" style="background-image: url('/img/starfield.jpg'); background-size: cover;">
+    <div class="wrapper wrapper-full-page">
+        <div>
+            <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+                <a class="navbar-brand" href="~/"><img src="/img/ninja-72.png"></a>
+
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav mr-auto">
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">About</a>
+                            <div class="dropdown-menu">
+                                @*<a class="dropdown-item" href="/theisle/thecommunity.html">The Community</a>*@
+                                <a class="dropdown-item" href="https://discord.gg/6zsBcDX5Rz" target="_blank">Our Discord</a>
+                            </div>
                         </li>
-@*                         <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Markets</a>
-                        </li> *@
-                        @if (User?.Identity?.IsAuthenticated ?? false)
-                        {
-                            @if (!await _playerLinkingService.HasPlayerMapping(double.Parse(Context.User.Claims.FirstOrDefault(item => item.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value ?? "-1")).ConfigureAwait(false))
-                            {
-                                <li class="nav-item">
-                                    <a class="nav-link text-white" asp-area="" asp-controller="User" asp-action="Link">Link Account</a>
-                                </li>
-                            }else{
-                                <li class="nav-item">
-                                    <a class="nav-link text-white" asp-area="" asp-controller="User" asp-action="ImportBP">Blueprints</a>
-                                </li>
-                                @*  <li class="nav-item">
-                                <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Find My Item</a>
-                                </li> *@
-                                        @* <li class="nav-item">
-                                <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Index">Help Desk</a>
-                                </li> *@
-                            }
-                           
-                           
-                            
-                        }
-                        <li class="nav-item">
-                            <a class="nav-link text-white" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-white" href="https://discord.gg/6zsBcDX5Rz" target="_blank">Join Discord</a>
-                        </li>
-                    </ul>
-                </div>
-                <div class="collapse navbar-collapse" id="navbar">
-                    <ul class="navbar-nav justify-content-end">
-                        @if (User?.Identity?.IsAuthenticated ?? false)
-                        {
-                            <li class="nav-item dropdown pe-2 d-flex align-items-center">
-                                <a data-bs-toggle="dropdown" href="#loginMenu" class="nav-link" aria-controls="loginMenu" role="button">
-                                    @{
-                                        string userAvatar = Context.User.Claims.FirstOrDefault(item => item.Type == "urn:discord:avatar:url")?.Value ?? string.Empty;
-                                    }
-                                    @if (!string.IsNullOrEmpty(userAvatar))
+
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">Site Ops</a>
+                            <div class="dropdown-menu">
+                                <a asp-controller="Market" asp-action="Index" asp-area="" class="dropdown-item">Market Data</a>
+                                @if (User?.Identity?.IsAuthenticated ?? false)
+                                {
+                                    @if (!await _playerLinkingService.HasPlayerMapping(double.Parse(Context.User.Claims.FirstOrDefault(item => item.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value ?? "-1")).ConfigureAwait(false))
                                     {
-                                        <img class="avatar avatar-sm rounded-circle" src="@(userAvatar) " />
+                                        <a class="dropdown-item" asp-area="" asp-controller="User" asp-action="Link">Link Account</a>
                                     }
-                                    <span class="d-sm-inline d-none text-white">Hello, @(Context.User.Identities.FirstOrDefault()?.Name ?? "Opps")</span>
-                                </a>
-                                <ul class="dropdown-menu dropdown-menu-end px-2 py-3 me-sm-n4 hidden" aria-labelledby="dropdownMenuButton" data-bs-popper="static">
-                                    <li class="mb-2">
-                                        <div class="d-flex py-1">
-                                            <a asp-controller="Authentication" asp-action="SignOutCurrentUser" class="dropdown-item border-radius-md">
-                                                <span class="d-sm-inline d-none text-white">Sign Out</span>
-                                            </a>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </li>                            
-                        }
-                        else
-                        {
-                            <li class="nav-item d-flex align-items-center">
-                                <a asp-controller="Authentication" asp-action="Signin" class="nav-link font-weight-bold px-0">
-                                    <i class="fa fa-user me-sm-1" aria-hidden="true"></i>
-                                    <span class="d-sm-inline d-none text-white">Sign In</span>
-                                </a>
-                            </li>
-                        }
+                                    else
+                                    {
+                                        <a class="dropdown-item" asp-area="" asp-controller="User" asp-action="ImportBP">Blueprints</a>
+                                    }
+                                    <a asp-controller="Authentication" asp-action="SignOutCurrentUser" class="dropdown-item">Logout</a>
+                                } else {
+                                    <a asp-controller="Authentication" asp-action="Signin" class="dropdown-item">Sign In</a>
+                                }
+                            </div>
+                        </li>
                     </ul>
                 </div>
-            </div>
-        </nav>
+            </nav>
+        </div>
         <div class="container-fluid py-4">
             @RenderBody()
         </div>
-    </main>
-    
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
-    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
+    </div>
+    <script src="~/js/core/jquery.min.js" asp-append-version="true"></script>
+    <script src="~/js/core/popper.min.js" asp-append-version="true"></script>
+    <script src="~/js/core/bootstrap-material-design.min.js" asp-append-version="true"></script>
+    <script src="~/js/plugins/perfect-scrollbar.jquery.min.js" asp-append-version="true"></script>
+    <script src="~/js/material-dashboard.min.js" asp-append-version="true"></script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -268,3 +268,5 @@ SoftripNext.STServerWeb.WebApi/[Ii]ssue[Mm]anager.json
 .idea/
 TheIsland.Website/website.json
 TheIsland.DiscordBot/discordbot.json
+TheIsland.Website/marketBotSettings.json
+TheIsland.Website/websiteSettings.json

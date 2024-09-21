@@ -18,6 +18,12 @@
             </summary>
             <value>The setup settings.</value>
         </member>
+        <member name="P:TheIsland.Website.Startup.MarketBotConfig">
+            <summary>
+            Gets or sets the site settings.
+            </summary>
+            <value>The setup settings.</value>
+        </member>
         <member name="P:TheIsland.Website.Startup.Configuration">
             <summary>
             Gets the configuration.
