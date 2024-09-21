@@ -4,6 +4,29 @@
         <name>TheIsland.Core</name>
     </assembly>
     <members>
+        <member name="M:TheIsland.Core.Helpers.ParallelizationHelpers.ForEachAsync``1(System.Collections.Generic.IEnumerable{``0},System.Int32,System.Func{``0,System.Threading.Tasks.Task},System.Threading.CancellationToken)">
+            <summary>
+            The for each async.
+            </summary>
+            <param name="source">
+            The source.
+            </param>
+            <param name="dop">
+            The dop.
+            </param>
+            <param name="body">
+            The body.
+            </param>
+            <param name="cancellationToken">
+            The cancellation token.
+            </param>
+            <typeparam name="T">
+            </typeparam>
+            <returns>
+            The <see cref="T:System.Threading.Tasks.Task"/>.
+            </returns>
+            <remarks>Referenced from https://blogs.msdn.microsoft.com/pfxteam/2012/03/05/implementing-a-simple-foreachasync-part-2/.</remarks>
+        </member>
         <member name="M:TheIsland.Core.Services.SQL.IEntityRepository`1.AddAsync(`0,System.Threading.CancellationToken)">
             <summary>
             Adds the item asynchronous.

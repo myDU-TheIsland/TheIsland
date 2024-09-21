@@ -154,7 +154,7 @@ namespace TheIsland.Website
             services.AddSingleton<IIngameMessaging, IngameMessaging>();
             services.AddSingleton<PlayerLinkingService>();
 
-            if (!this.HostingEnvironment.IsDevelopment())
+            if (this.HostingEnvironment.IsDevelopment())
             {
                 services.AddMvc().AddRazorRuntimeCompilation();
             }
@@ -228,6 +228,7 @@ namespace TheIsland.Website
             if (!this.HostingEnvironment.IsDevelopment())
             {
                 RecurringJob.AddOrUpdate("buyStuff", (IDUClient client) => client.BuyStuff(0), "* * * * *");
+                RecurringJob.AddOrUpdate("buyStuff", (IImportMarketService service) => service.ImportAsync(), "*/5 * * * *");
             }
         }
     }

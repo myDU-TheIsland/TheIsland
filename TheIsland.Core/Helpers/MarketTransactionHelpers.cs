@@ -5,10 +5,22 @@
 namespace TheIsland.Core.Helpers
 {
     using Newtonsoft.Json.Linq;
+    using NQ;
     using TheIsland.Core.Services.SQL.Entities;
 
     public static class MarketTransactionHelpers
     {
+        public static MarketTransaction ToMarketTransaction(this MarketOrder input)
+        {
+            MarketTransaction output = new MarketTransaction();
+            output.price = input.unitPrice;
+            output.type = input.buyQuantity > 0 ? TransactionType.BuyOrder : TransactionType.SellOrder;
+            output.quantity = input.buyQuantity;
+            output.market_id = input.marketId;
+            output.item_id = input.itemType;
+            return output;
+        }
+
         public static MarketTransaction ToMarketTransaction(this DualMarketTransaction input)
         {
             MarketTransaction output = new MarketTransaction();

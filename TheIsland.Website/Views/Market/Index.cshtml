@@ -1,52 +1,125 @@
 ﻿@using System.Linq
 @using TheIsland.Core.Classes
+@using TheIsland.Core.Services.SQL.Entities
 @inject TheIsland.Core.Classes.IDUClient _client
 @inject TheIsland.Core.Services.SQL.DualMarketRepository _marketRepo
+@inject TheIsland.Core.Services.MarketService _marketService
 @model MarketModel
 @{
     ViewData["Title"] = "Market Data";
-    var hierarchy = _client.GetMarketHierarchy();
+
     var items = _client.GetItemsForSale().OrderBy(items => items.Value).ToDictionary();
+
     var markets = (await _marketRepo.GetAsync().ConfigureAwait(false)).ToDictionary(key => key.id, value => value.name);
     markets.Add(0, "All Markets");
 
     var itemExists = items.ContainsKey(Model.ItemId);
     var selectedMarket = markets[Model.MarketId];
     var selectedItem = itemExists ? items[Model.ItemId] : string.Empty;
+    if (!_client.BuyPrices.TryGetValue(Convert.ToUInt64(Model.ItemId), out double botPurchasePrice))
+    {
+        botPurchasePrice = 0;
+    }
+    else
+    {
+        botPurchasePrice /= 100;
+    }
+
+    string graphHeader = markets.ContainsKey(Model.MarketId) ? " @ " + markets[Model.MarketId] : string.Empty;
 }
 <div class="row">
-    <div class="col-md-4">
+    <div class="col-md-12">
         <div class="card">
             <div class="card-body">
-                <div class="col-lg-5 col-md-6 col-sm-3">
-                    <select asp-for="ItemId" class="selectpicker" data-size="7" data-live-search="true" data-style="btn btn-primary btn-round" id="input-itemId">
-                        @foreach (var item in items)
-                        {
-                            <option value="@item.Key">@item.Value</option>
-                        }
-                    </select>
-                </div>
-                <div class="col-lg-5 col-md-6 col-sm-3">
-                    <select asp-for="MarketId" class="selectpicker" data-size="7" data-style="btn btn-primary btn-round" id="input-marketId">
-                        @foreach (var market in markets.OrderBy(item => item.Key).ToArray())
-                        {
-                            <option value="@market.Key">@market.Value</option>
-                        }
-                    </select>
-                </div>
-            </div>
-            <div class="card-footer">
+                <select asp-for="ItemId" class="selectpicker" data-size="7" data-live-search="true" data-style="btn btn-primary btn-round" id="input-itemId">
+                    @foreach (var item in items)
+                    {
+                        <option value="@item.Key">@item.Value</option>
+                    }
+                </select>
+                <select asp-for="MarketId" class="selectpicker" data-size="7" data-style="btn btn-primary btn-round" id="input-marketId">
+                    @foreach (var market in markets.OrderBy(item => item.Key).ToArray())
+                    {
+                        <option value="@market.Key">@market.Value</option>
+                    }
+                </select>
                 <button type="button" class="btn btn-fill btn-primary" id="btnSearch">Search<div class="ripple-container"></div></button>
             </div>
         </div>
     </div>
+</div>
+<div class="row">
     @if (itemExists)
     {
-        string marketName = markets.ContainsKey(Model.MarketId) ? " @ " + markets[Model.MarketId] : string.Empty;
-        <div class="col-md-8">
+        string varyByString = $@"{Model.ItemId}/{Model.MarketId}";
+
+        var orders = itemExists ? await this._marketService.GetAllActiveAsync(Model.MarketId, Model.ItemId).ConfigureAwait(false) : Enumerable.Empty<MarketTransaction>();
+        var buyOrders = orders.Where(item => item.type == TheIsland.Core.Services.SQL.Entities.TransactionType.BuyOrder);
+        var sellOrders = orders.Where(item => item.type == TheIsland.Core.Services.SQL.Entities.TransactionType.SellOrder);
+
+        <div class="col-md-5">
+            <div class="card">
+                <div class="card-header card-header-warning">
+                    Buy Orders
+                </div>
+                <div class="card-body">
+                    <table id="buyTable" class="table table-striped table-no-bordered table-hover" cellspacing="0" width="100%" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>Unit Price</th>
+                                <th>Quantity</th>
+                                <th>Market</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var buyOrder in buyOrders)
+                            {
+                                <tr>
+                                    <td>@(buyOrder.price / 100)</td>
+                                    <td>@Math.Abs(buyOrder.quantity)</td>
+                                    <td>@markets[buyOrder.market_id]</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-header card-header-warning">
+                    Sell Orders
+                </div>
+                <div class="card-body">
+                    <table id="sellTable" class="table table-striped table-no-bordered table-hover" cellspacing="0" width="100%" style="width:100%">
+                        <thead>
+                            <tr>
+                                <th>Unit Price</th>
+                                <th>Quantity</th>
+                                <th>Market</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var sellOrder in sellOrders)
+                            {
+                                <tr>
+                                    <td>@(sellOrder.price / 100)</td>
+                                    <td>@Math.Abs(sellOrder.quantity)</td>
+                                    <td>@markets[sellOrder.market_id]</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-7">
             <div class="card">
                 <div class="card-header card-header-warning" id="graphHeader">
-                    @items[Model.ItemId] Prices (Last 72hrs)@marketName
+                    @items[Model.ItemId] Prices (Last 72hrs)@graphHeader
+                    @if (botPurchasePrice > 0)
+                    {
+                        <div class="pull-right">(Honjos Minion is buying at <i>@botPurchasePrice quanta per unit</i>)</div>
+                    }
                 </div>
                 <div class="card-body">
                     <div id="chart_div" style="height: 500px"></div>
@@ -61,6 +134,7 @@
 @section Scripts {
     <!-- Latest compiled and minified JavaScript -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
+
     <script>
         $(function () {
             $('#input-itemId').selectpicker();
@@ -82,6 +156,15 @@
     @if (itemExists)
     {
         <script type="text/javascript">
+            var table = $('#buyTable').DataTable({
+                searching: false,
+                lengthChange: false
+            });
+            var table = $('#sellTable').DataTable({
+                searching: false,
+                lengthChange: false
+            });
+
             google.charts.load('current', { packages: ['corechart', 'line'] });
 
             window.onload = drawChart;

@@ -22,5 +22,20 @@ namespace TheIsland.Core.Services.SQL
                 return await databaseConnection.QueryAsync<DualMarketTransaction>("SELECT * FROM public.market_order WHERE owner_id not IN (1,7,3,2) and id > @Id;", new { Id = id }).ConfigureAwait(false);
             }
         }
+
+        public async Task<IEnumerable<DualMarketTransaction>> GetAllActiveAsync(double marketId, double itemId)
+        {
+            using (DbConnection databaseConnection = this.GetConnection())
+            {
+                if (marketId == 0)
+                {
+                    return await databaseConnection.QueryAsync<DualMarketTransaction>("SELECT * FROM public.market_order WHERE completion_date is null AND item_type_id = @ItemId;", new { ItemId = itemId }).ConfigureAwait(false);
+                }
+                else
+                {
+                    return await databaseConnection.QueryAsync<DualMarketTransaction>("SELECT * FROM public.market_order WHERE completion_date is null AND item_type_id = @ItemId AND market_id = @MarketId;", new { MarketId = marketId, ItemId = itemId }).ConfigureAwait(false);
+                }
+            }
+        }
     }
 }

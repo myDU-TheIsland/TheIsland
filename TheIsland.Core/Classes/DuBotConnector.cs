@@ -25,10 +25,11 @@ namespace TheIsland.Core.Classes
     using NQutils;
     using NQutils.Sql;
     using Orleans;
+    using TheIsland.Core.Helpers;
+    using TheIsland.Core.Services.SQL.Entities;
     using TheIsland.Core.Settings;
-    using YamlDotNet.Core.Tokens;
-    using static Backend.Fixture.Construct.Schema.ConstructFixtureV1;
-    using static BotLib.Utils.BotSpawner;
+    using static TheIsland.Core.Helpers.MarketTransactionHelpers;
+    using static TheIsland.Core.Helpers.ParallelizationHelpers;
 
     public interface IDUClient
     {
@@ -49,6 +50,8 @@ namespace TheIsland.Core.Classes
         List<MarketEntry> GetMarketHierarchy(bool forceRefresh = false);
 
         Dictionary<double, string> GetItemsForSale();
+
+        Task<IEnumerable<MarketTransaction>> GetMarketOrders(ulong marketId, ulong itemId);
 
         MarketBotConfig MarketBotConfig();
     }
@@ -309,6 +312,39 @@ namespace TheIsland.Core.Classes
             return this._marketBotConfig;
         }
 
+        public async Task<IEnumerable<MarketTransaction>> GetMarketOrders(ulong marketId, ulong itemId)
+        {
+            ConcurrentStack<MarketTransaction> output = new ConcurrentStack<MarketTransaction>();
+
+            await this.HelperBotConnectionTest().ConfigureAwait(false);
+
+            ulong[] itemTypes = { itemId };
+
+            var marketList = await this.MarketBot.Req.MarketGetList(0).ConfigureAwait(false);
+
+            await marketList.markets.ForEachAsync(32, async (MarketInfo market) =>
+            {
+                if (marketId != 0 && market.marketId != marketId)
+                {
+                    return;
+                }
+
+                var orders = await this.MarketBot.Req.MarketSelectItem(
+                    new MarketSelectRequest
+                    {
+                        marketIds = new List<ulong> { market.marketId },
+                        itemTypes = itemTypes.ToList(),
+                    }).ConfigureAwait(false);
+
+                if (orders.orders.Count > 0)
+                {
+                    output.PushRange(orders.orders.Select(item => item.ToMarketTransaction()).ToArray());
+                }
+            }).ConfigureAwait(false);
+
+            return output;
+        }
+
         public List<MarketEntry> GetMarketHierarchy(bool forceRefresh = false)
         {
             if (this._marketEntries.Count != 0 && !forceRefresh)
@@ -420,7 +456,15 @@ namespace TheIsland.Core.Classes
         {
             try
             {
-                await this.HelperBot.Req.Ping().ConfigureAwait(false);
+                await this.HelperBot.Req.ChatMessageSend(new NQ.MessageContent
+                {
+                    channel = new NQ.MessageChannel
+                    {
+                        channel = MessageChannelType.PRIVATE,
+                        targetId = 2,
+                    },
+                    message = "Hi From Helper Bot",
+                }).ConfigureAwait(false);
             }
             catch (NQutils.Exceptions.BusinessException be) when (be.error.code == NQ.ErrorCode.InvalidSession)
             {
@@ -439,7 +483,15 @@ namespace TheIsland.Core.Classes
         {
             try
             {
-                await this.MarketBot.Req.Ping().ConfigureAwait(false);
+                await this.MarketBot.Req.ChatMessageSend(new NQ.MessageContent
+                {
+                    channel = new NQ.MessageChannel
+                    {
+                        channel = MessageChannelType.PRIVATE,
+                        targetId = 2,
+                    },
+                    message = "Hi From Market Bot",
+                }).ConfigureAwait(false);
             }
             catch (NQutils.Exceptions.BusinessException be) when (be.error.code == NQ.ErrorCode.InvalidSession)
             {

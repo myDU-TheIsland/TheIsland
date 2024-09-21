@@ -10,7 +10,7 @@ namespace TheIsland.Core.Services
 
     public interface IImportMarketService
     {
-        Task<bool> ImportAsync(CancellationToken cancellationToken = default);
+        Task<bool> ImportAsync();
     }
 
     public class ImportMarketService : IImportMarketService
@@ -32,7 +32,7 @@ namespace TheIsland.Core.Services
             this._transactionRepository = transactionRepository;
         }
 
-        public async Task<bool> ImportAsync(CancellationToken cancellationToken = default)
+        public async Task<bool> ImportAsync()
         {
             // Check LastRead records exist
             await this.CheckLastReadRecordsAsync().ConfigureAwait(false);
