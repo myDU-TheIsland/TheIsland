@@ -7,10 +7,12 @@ namespace TheIsland.Website
     using System;
     using System.Globalization;
     using Hangfire;
+    using Hangfire.Dashboard;
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.AspNetCore.Authentication.Cookies;
     using Microsoft.AspNetCore.Http.Features;
     using Microsoft.AspNetCore.HttpOverrides;
+    using Microsoft.AspNetCore.Mvc.Filters;
     using Microsoft.AspNetCore.Server.Kestrel.Core;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.IdentityModel.Logging;
@@ -221,14 +223,18 @@ namespace TheIsland.Website
                 endpoints.MapControllerRoute(
                     name: "default",
                     pattern: "{controller=Home}/{action=Index}/{id?}");
+            });
 
-                endpoints.MapHangfireDashboard();
+            app.UseHangfireDashboard("/hangfire", new DashboardOptions
+            {
+                Authorization = new[] { new HangfireAuthenticationFilter() },
+                IsReadOnlyFunc = (DashboardContext context) => true,
             });
 
             if (!this.HostingEnvironment.IsDevelopment())
             {
-                RecurringJob.AddOrUpdate("buyStuff", (IDUClient client) => client.BuyStuff(0), "* * * * *");
-                RecurringJob.AddOrUpdate("buyStuff", (IImportMarketService service) => service.ImportAsync(), "*/5 * * * *");
+                RecurringJob.AddOrUpdate("buyStuff", (IDUClient client) => client.BuyStuff(0), Cron.Minutely);
+                RecurringJob.AddOrUpdate("importMarketData", (IImportMarketService service) => service.ImportAsync(), "*/5 * * * *");
             }
         }
     }
