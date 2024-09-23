@@ -5,23 +5,41 @@
 namespace TheIsland.Website.Controllers.Api
 {
     using Microsoft.AspNetCore.Mvc;
+    using TheIsland.Core.Classes;
     using TheIsland.Core.Services.SQL;
+    using TheIsland.Website.Framework.Attributes;
 
     [Area("Api")]
     public class UserController : Controller
     {
-        private readonly PlayerRepository _playerRepository;
+        private readonly DualPlayerRepository _playerRepository;
         private readonly UserMappingRepository _userMappingRepository;
+        private readonly IDUClient _client;
 
-        public UserController(PlayerRepository playerRepository, UserMappingRepository userMappingRepository)
+        public UserController(DualPlayerRepository playerRepository, UserMappingRepository userMappingRepository, IDUClient client)
         {
             this._playerRepository = playerRepository;
             this._userMappingRepository = userMappingRepository;
+            this._client = client;
         }
 
         public async Task<IActionResult> Index()
         {
             return this.Json(await this._playerRepository.GetAsync().ConfigureAwait(false));
+        }
+
+        [HttpGet]
+        [ApiKey]
+        public async Task<IActionResult> GiveQuantaToAll(double amount, string note)
+        {
+            return this.Json(await this._client.GiveAllQuanta(amount, note).ConfigureAwait(false));
+        }
+
+        [HttpGet]
+        [ApiKey]
+        public async Task<IActionResult> GiveTalentPointsToAll(double amount)
+        {
+            return this.Json(await this._client.GiveTalentPoints(amount).ConfigureAwait(false));
         }
     }
 }

@@ -12,12 +12,12 @@ namespace TheIsland.Core.Services
 
     public class PlayerLinkingService
     {
-        private readonly PlayerRepository _playerRepository;
+        private readonly DualPlayerRepository _playerRepository;
         private readonly LinkTokenRepository _linkTokenRepository;
         private readonly UserMappingRepository _userMappingRepository;
         private readonly IIngameMessaging _ingameMessaging;
 
-        public PlayerLinkingService(IIngameMessaging ingameMessaging, PlayerRepository playerRepository, LinkTokenRepository linkTokenRepository, UserMappingRepository userMappingRepository)
+        public PlayerLinkingService(IIngameMessaging ingameMessaging, DualPlayerRepository playerRepository, LinkTokenRepository linkTokenRepository, UserMappingRepository userMappingRepository)
         {
             this._playerRepository = playerRepository;
             this._linkTokenRepository = linkTokenRepository;
@@ -69,7 +69,7 @@ namespace TheIsland.Core.Services
             return true;
         }
 
-        public Task<Player?> FindPlayer(string playerName)
+        public Task<DualPlayer?> FindPlayer(string playerName)
         {
             return this._playerRepository.FindByDisplayName(playerName);
         }

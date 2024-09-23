@@ -25,7 +25,10 @@ namespace TheIsland.Core.Classes
     using NQutils;
     using NQutils.Sql;
     using Orleans;
+    using Serilog;
+    using StackExchange.Redis;
     using TheIsland.Core.Helpers;
+    using TheIsland.Core.Services.SQL;
     using TheIsland.Core.Services.SQL.Entities;
     using TheIsland.Core.Settings;
     using static TheIsland.Core.Helpers.MarketTransactionHelpers;
@@ -54,6 +57,10 @@ namespace TheIsland.Core.Classes
         Task<IEnumerable<MarketTransaction>> GetMarketOrders(ulong marketId, ulong itemId);
 
         MarketBotConfig MarketBotConfig();
+
+        Task<List<string>> GiveAllQuanta(double amount, string note);
+
+        Task<List<string>> GiveTalentPoints(double amount);
     }
 
     public class DUClient : IDUClient
@@ -68,6 +75,7 @@ namespace TheIsland.Core.Classes
 
         private readonly DualUniverseSettings _dualUniverseSettings;
         private readonly MarketBotConfig _marketBotConfig;
+        private readonly DualPlayerRepository _dualPlayerRepository;
 
         private List<MarketEntry> _marketEntries { get; set; } = new List<MarketEntry>();
 
@@ -81,8 +89,9 @@ namespace TheIsland.Core.Classes
 
         private ConcurrentDictionary<double, string> ItemsForSale { get; set; } = new ConcurrentDictionary<double, string>();
 
-        public DUClient(DualUniverseSettings settings, MarketBotConfig marketBotConfig)
+        public DUClient(DualUniverseSettings settings, MarketBotConfig marketBotConfig, DualPlayerRepository dualPlayerRepository)
         {
+            this._dualPlayerRepository = dualPlayerRepository;
             NQutils.Config.Config.ReadYamlFile("mod", "./dual.yaml");
             this._dualUniverseSettings = settings;
             this._marketBotConfig = marketBotConfig;
@@ -134,6 +143,117 @@ namespace TheIsland.Core.Classes
                 },
                 message = message,
             }).ConfigureAwait(false);
+        }
+
+        public async Task<List<string>> GiveTalentPoints(double amount)
+        {
+            List<string> log = new List<string>();
+
+            void logMessage(string input)
+            {
+                log.Add($@"{DateTime.Now} :: {input}");
+            }
+
+            try
+            {
+                var players = await this._dualPlayerRepository.GetAsync().ConfigureAwait(false);
+
+                await this.HelperBotConnectionTest().ConfigureAwait(false);
+
+                foreach (var player in players)
+                {
+                    if (player.admin || player.is_bot)
+                    {
+                        logMessage(@$"Skipping user '{player.display_name}', is a bot or admin!");
+                        continue;
+                    }
+
+                    var response = await this.DataAccessor.PlayerTalentAsync(Convert.ToUInt64(player.id)).ConfigureAwait(false);
+
+                    var currentAvail = response.pointsAcquired - response.pointsSpent;
+
+                    long settingTalentsTo = Convert.ToInt64(currentAvail + amount);
+
+                    logMessage(@$"Setting '{player.display_name}' available talent points to {settingTalentsTo}");
+
+                    await this.DataAccessor.PlayerTalentSetAvailableAsync(Convert.ToUInt64(player.id), settingTalentsTo).ConfigureAwait(false);
+                }
+
+                return log;
+            }
+            catch (Exception exception)
+            {
+                logMessage(@$"Exception: {exception}!");
+                return log;
+            }
+        }
+
+        public async Task<List<string>> GiveAllQuanta(double amount, string note)
+        {
+            List<string> log = new List<string>();
+
+            void logMessage(string input)
+            {
+                log.Add($@"{DateTime.Now} :: {input}");
+            }
+
+            try
+            {
+                double giveToPlayer = amount * 100;
+
+                var players = await this._dualPlayerRepository.GetAsync().ConfigureAwait(false);
+
+                await this.HelperBotConnectionTest().ConfigureAwait(false);
+
+                var wallet = await this.MarketBot.Req.GetWallet().ConfigureAwait(false);
+
+                var neededBalance = giveToPlayer * players.Count();
+
+                if (wallet == null)
+                {
+                    logMessage(@$"Wallet has came back null!");
+                    return log;
+                }
+
+                if (wallet.amount > neededBalance)
+                {
+                    logMessage(@$"Wallet has enough to do this transaction.");
+                }
+                else
+                {
+                    logMessage(@$"Wallet has {wallet.amount} and needs {neededBalance}!");
+                    return log;
+                }
+
+                foreach (var player in players)
+                {
+                    if (player.admin || player.is_bot)
+                    {
+                        logMessage(@$"Skipping user '{player.display_name}', is a bot or admin!");
+                        continue;
+                    }
+
+                    string reason = string.IsNullOrEmpty(note) ? "Thank You For Playing" : note;
+
+                    logMessage(@$"Sending Quanta to '{player.display_name}'!");
+
+                    await this.HelperBot.Req.WalletTransferRequest(new WalletTransfer()
+                    {
+                        amount = Convert.ToUInt64(giveToPlayer),
+                        toWallet = new EntityId() { playerId = Convert.ToUInt64(player.id) },
+                        fromWallet = new EntityId() { playerId = this.HelperBot.PlayerId },
+                        reason = reason,
+                    }).ConfigureAwait(false);
+                }
+
+                logMessage(@$"GiveAllUsers Complete!");
+                return log;
+            }
+            catch (Exception exception)
+            {
+                logMessage(@$"Exception: {exception}!");
+                return log;
+            }
         }
 
         public async Task<string> ImportBP(ulong playerId, byte[] bp)

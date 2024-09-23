@@ -146,7 +146,7 @@ namespace TheIsland.Website
             services.AddSingleton(new LastReadRepository(SiteSettings.Postgres));
             services.AddSingleton(new LinkTokenRepository(SiteSettings.Postgres));
             services.AddSingleton(new MarketTransactionRepository(SiteSettings.Postgres));
-            services.AddSingleton(new PlayerRepository(SiteSettings.Postgres));
+            services.AddSingleton(new DualPlayerRepository(SiteSettings.Postgres));
             services.AddSingleton(new UserMappingRepository(SiteSettings.Postgres));
 
             // services
