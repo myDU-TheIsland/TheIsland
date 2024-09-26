@@ -146,7 +146,7 @@ namespace TheIsland.Core.Services
 
                     if (avgPer < this._dualClient.BuyPrices[itemId])
                     {
-                        avgPer = this._dualClient.BuyPrices[itemId] * this._marketBotConfig.MarketMarkUp;
+                        avgPer = (this._dualClient.BuyPrices[itemId] / 100) * this._marketBotConfig.MarketMarkUp;
                     }
 
                     logMessage($@"Selling item  {itemId} @ {avgPer}, quantity {marketQty}!");

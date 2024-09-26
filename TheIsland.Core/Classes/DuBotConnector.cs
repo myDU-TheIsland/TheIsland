@@ -445,7 +445,6 @@ namespace TheIsland.Core.Classes
                 new MarketSelectRequest
                 {
                     marketIds = new List<ulong> { marketId },
-                    itemTypes = this.ResellItems.ToList(),
                     ownerId = this.MarketBot.AsPlayerId(),
                 }).ConfigureAwait(false);
 
