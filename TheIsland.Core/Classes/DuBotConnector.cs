@@ -8,6 +8,7 @@ namespace TheIsland.Core.Classes
     using System.Collections.Generic;
     using System.Net.Http;
     using System.Threading.Tasks;
+    using Amazon.Runtime;
     using Amazon.Runtime.Internal.Util;
     using Backend;
     using Backend.Business;
@@ -44,6 +45,8 @@ namespace TheIsland.Core.Classes
 
         ConcurrentDictionary<ulong, double> MarketBudgetMultiplier { get; }
 
+        ConcurrentBag<ulong> ResellItems { get; set; }
+
         Task SendMessage(ulong who, string message);
 
         Task<string> ImportBP(ulong playerId, byte[] bp);
@@ -61,6 +64,12 @@ namespace TheIsland.Core.Classes
         Task<List<string>> GiveAllQuanta(double amount, string note);
 
         Task<List<string>> GiveTalentPoints(double amount);
+
+        Task<MarketStorageInfoEx> GetMarketContainerContents(ulong marketId);
+
+        Task<List<string>> SellStuff(ulong marketId, ulong itemType, long unitPrice, long quantity);
+
+        Task CancelBotOrders(ulong marketId);
     }
 
     public class DUClient : IDUClient
@@ -88,6 +97,8 @@ namespace TheIsland.Core.Classes
         public ConcurrentDictionary<ulong, double> MarketBudgetMultiplier { get; private set; } = new ConcurrentDictionary<ulong, double>();
 
         private ConcurrentDictionary<double, string> ItemsForSale { get; set; } = new ConcurrentDictionary<double, string>();
+
+        public ConcurrentBag<ulong> ResellItems { get; set; } = new ConcurrentBag<ulong>();
 
         public DUClient(DualUniverseSettings settings, MarketBotConfig marketBotConfig, DualPlayerRepository dualPlayerRepository)
         {
@@ -417,6 +428,65 @@ namespace TheIsland.Core.Classes
             return log;
         }
 
+        public async Task<MarketStorageInfoEx> GetMarketContainerContents(ulong marketId)
+        {
+            await this.MarketBotConnectionTest().ConfigureAwait(false);
+
+            return await this.MarketBot.Req.MarketContainerGetMyContent(new MarketSelectRequest
+            {
+                marketIds = new List<ulong> { marketId },
+                itemTypes = new List<ulong> { this.MarketBot.GameplayBank.GetDefinition<NQutils.Def.BaseItem>().Id },
+            }).ConfigureAwait(false);
+        }
+
+        public async Task CancelBotOrders(ulong marketId)
+        {
+            var orders = await this.MarketBot.Req.MarketGetMyOrders(
+                new MarketSelectRequest
+                {
+                    marketIds = new List<ulong> { marketId },
+                    itemTypes = this.ResellItems.ToList(),
+                    ownerId = this.MarketBot.AsPlayerId(),
+                }).ConfigureAwait(false);
+
+            foreach (var order in orders.orders)
+            {
+                await this.MarketBot.Req.MarketCancelOrder(order).ConfigureAwait(false);
+            }
+        }
+
+        public async Task<List<string>> SellStuff(ulong marketId, ulong itemType, long unitPrice, long quantity)
+        {
+            List<string> log = new List<string>();
+
+            void logMessage(string input)
+            {
+                log.Add($@"{DateTime.Now} :: {input}");
+            }
+
+            logMessage("Pinging Server (confirming connection)");
+            await this.MarketBotConnectionTest().ConfigureAwait(false);
+
+            logMessage(@$"Selling {itemType} @ {marketId} for this {unitPrice}");
+
+            var order = await this.MarketBot.Req.MarketPlaceOrder(new MarketRequest
+            {
+                marketId = marketId,
+                source = MarketRequestSource.FROM_MARKET_CONTAINER,
+                itemType = itemType,
+                buyQuantity = -quantity,
+                expirationDate = DateTime.Now.AddDays(3000).ToNQTimePoint(),
+                unitPrice = unitPrice * 100,
+            }).ConfigureAwait(false);
+
+            logMessage(@$"Listed {order.itemType} @ {order.marketId} for this {order.unitPrice} ({order.buyQuantity})");
+            return log;
+        }
+
+        /// <summary>
+        /// Gets a list of all sellible items on the market.
+        /// </summary>
+        /// <returns></returns>
         public Dictionary<double, string> GetItemsForSale()
         {
             if (this.ItemsForSale.Count == 0)
@@ -675,6 +745,36 @@ namespace TheIsland.Core.Classes
                     }
 
                     this.BuyPrices.TryAdd(childId, value * 100);
+                }
+            }
+
+            // iterate over recursive prices
+            foreach (var key in this._marketBotConfig.OnlyResellItemsRecursive)
+            {
+                var baseEntry = bank.GetDefinition(key);
+
+                if (baseEntry == null)
+                {
+                    continue;
+                }
+
+                var childrenIds = baseEntry.GetChildrenIdsRecursive();
+                foreach (var childId in childrenIds)
+                {
+                    var entry = bank.GetDefinition(childId);
+
+                    if (entry == null)
+                    {
+                        continue;
+                    }
+
+                    if (entry.GetChildren().Count() != 0)
+                    {
+                        // most likely a category, just continue
+                        continue;
+                    }
+
+                    this.ResellItems.Add(childId);
                 }
             }
         }

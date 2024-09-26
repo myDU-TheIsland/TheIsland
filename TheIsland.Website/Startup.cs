@@ -234,6 +234,7 @@ namespace TheIsland.Website
             if (!this.HostingEnvironment.IsDevelopment())
             {
                 RecurringJob.AddOrUpdate("buyStuff", (IDUClient client) => client.BuyStuff(0), Cron.Minutely);
+                RecurringJob.AddOrUpdate("buyStuff", (MarketService service) => service.SellAllMarketsContainerContents(), Cron.Hourly);
                 RecurringJob.AddOrUpdate("importMarketData", (IImportMarketService service) => service.ImportAsync(), "*/5 * * * *");
             }
         }

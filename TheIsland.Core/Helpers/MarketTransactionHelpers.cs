@@ -40,10 +40,10 @@ namespace TheIsland.Core.Helpers
 
             output.price = input.amount / 100;
             output.type = output.price > 0 ? TransactionType.Sell : TransactionType.Buy;
-            output.quantity = double.Parse(json["market"]?["quantity"]?["quantity"]?.ToString() ?? "0");
+            output.quantity = input.quantity;
             output.creation_date = input.time;
-            output.market_id = double.Parse(json["market"]?["marketId"]?.ToString() ?? "0");
-            output.item_id = double.Parse(json["market"]?["itemType"]?.ToString() ?? "0");
+            output.market_id = input.market_id;
+            output.item_id = input.item_id;
 
             return output;
         }

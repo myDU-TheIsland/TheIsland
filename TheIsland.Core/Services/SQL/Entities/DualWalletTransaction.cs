@@ -20,5 +20,11 @@ namespace TheIsland.Core.Services.SQL.Entities
         public DateTime time { get; set; }
 
         public string payload { get; set; } = string.Empty;
+
+        public double item_id { get; set; } = 0;
+
+        public double market_id { get; set; } = 0;
+
+        public double quantity { get; set; } = 0;
     }
 }

@@ -84,6 +84,20 @@ namespace TheIsland.Website.Controllers.Api
 
         [HttpGet]
         [ApiKey]
+        public async Task<IActionResult> CancelBotOrders()
+        {
+            return this.Json(await this._marketService.CancelAllBotOrders().ConfigureAwait(false));
+        }
+
+        [HttpGet]
+        [ApiKey]
+        public async Task<IActionResult> SellStuff()
+        {
+            return this.Json(await this._marketService.SellAllMarketsContainerContents().ConfigureAwait(false));
+        }
+
+        [HttpGet]
+        [ApiKey]
         public IActionResult MarketBotConfig()
         {
             return this.Json(this._client.MarketBotConfig());

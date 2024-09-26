@@ -31,5 +31,15 @@ namespace TheIsland.Core.Settings
         /// </summary>
         /// <example> 1 means once its goes under 24hrs remaining itll buy if within the buy range.</example>
         public int DaysToWaitBeforeExpiration { get; set; } = 1;
+
+        /// <summary>
+        /// Gets or sets the mark up for item resells.
+        /// </summary>
+        public double MarketMarkUp { get; set; } = 1.1;
+
+        /// <summary>
+        /// Gets or sets list of items to recursively buy and the top price to pay.
+        /// </summary>
+        public List<string> OnlyResellItemsRecursive { get; set; } = new List<string>();
     }
 }

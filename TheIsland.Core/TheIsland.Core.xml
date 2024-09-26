@@ -4,6 +4,12 @@
         <name>TheIsland.Core</name>
     </assembly>
     <members>
+        <member name="M:TheIsland.Core.Classes.DUClient.GetItemsForSale">
+            <summary>
+            Gets a list of all sellible items on the market.
+            </summary>
+            <returns></returns>
+        </member>
         <member name="M:TheIsland.Core.Helpers.ParallelizationHelpers.ForEachAsync``1(System.Collections.Generic.IEnumerable{``0},System.Int32,System.Func{``0,System.Threading.Tasks.Task},System.Threading.CancellationToken)">
             <summary>
             The for each async.
@@ -139,6 +145,16 @@
             Gets or sets the numbers days to buy before expiration.
             </summary>
             <example> 1 means once its goes under 24hrs remaining itll buy if within the buy range.</example>
+        </member>
+        <member name="P:TheIsland.Core.Settings.MarketBotConfig.MarketMarkUp">
+            <summary>
+            Gets or sets the mark up for item resells.
+            </summary>
+        </member>
+        <member name="P:TheIsland.Core.Settings.MarketBotConfig.OnlyResellItemsRecursive">
+            <summary>
+            Gets or sets list of items to recursively buy and the top price to pay.
+            </summary>
         </member>
     </members>
 </doc>
