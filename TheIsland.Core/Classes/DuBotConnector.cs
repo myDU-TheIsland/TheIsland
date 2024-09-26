@@ -474,7 +474,7 @@ namespace TheIsland.Core.Classes
                 source = MarketRequestSource.FROM_MARKET_CONTAINER,
                 itemType = itemType,
                 buyQuantity = -quantity,
-                expirationDate = DateTime.Now.AddDays(3000).ToNQTimePoint(),
+                expirationDate = DateTime.Now.AddDays(30).ToNQTimePoint(),
                 unitPrice = unitPrice * 100,
             }).ConfigureAwait(false);
 

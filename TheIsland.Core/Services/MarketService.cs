@@ -7,7 +7,6 @@ namespace TheIsland.Core.Services
     using System.Collections.Generic;
     using System.Linq;
     using System.Threading.Tasks;
-    using Amazon.Runtime.Internal.Util;
     using NQ;
     using TheIsland.Core.Classes;
     using TheIsland.Core.Helpers;
@@ -69,6 +68,8 @@ namespace TheIsland.Core.Services
             {
                 log.Add($@"{DateTime.Now} :: {input}");
             }
+
+            log.AddRange(await this.CancelAllBotOrders().ConfigureAwait(false));
 
             var markets = await this._dualMarketRepository.GetAsync().ConfigureAwait(false);
 
