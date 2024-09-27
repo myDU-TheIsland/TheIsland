@@ -98,6 +98,34 @@ namespace TheIsland.Website.Controllers.Api
 
         [HttpGet]
         [ApiKey]
+        public async Task<IActionResult> GetMarkets()
+        {
+            return this.Json(await this._dualMarketRepository.GetAsync().ConfigureAwait(false));
+        }
+
+        [HttpGet]
+        [ApiKey]
+        public async Task<IActionResult> HotTime()
+        {
+            return this.Json(await this._marketService.HotTimeEvent().ConfigureAwait(false));
+        }
+
+        [HttpGet]
+        [ApiKey]
+        public async Task<IActionResult> GetMarketName()
+        {
+            return this.Json(await this._client.GetConstructName(170000).ConfigureAwait(false));
+        }
+
+        [HttpGet]
+        [ApiKey]
+        public async Task<IActionResult> SetMarketName()
+        {
+            return this.Json(await this._client.SetConstructName(170000, "Aegis 123").ConfigureAwait(false));
+        }
+
+        [HttpGet]
+        [ApiKey]
         public IActionResult MarketBotConfig()
         {
             return this.Json(this._client.MarketBotConfig());

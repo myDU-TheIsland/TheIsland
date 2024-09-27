@@ -6,13 +6,14 @@ namespace TheIsland.Core.Services
 {
     using System.Collections.Generic;
     using System.Linq;
+    using System.Text.Json;
     using System.Threading.Tasks;
-    using NQ;
     using TheIsland.Core.Classes;
     using TheIsland.Core.Helpers;
     using TheIsland.Core.Services.SQL;
     using TheIsland.Core.Services.SQL.Entities;
     using TheIsland.Core.Settings;
+    using static TheIsland.Core.Helpers.RandomHelpers;
 
     public class MarketService
     {
@@ -181,6 +182,82 @@ namespace TheIsland.Core.Services
             var results = await this._dualMarketTransactionRepository.GetAllActiveAsync(marketId, itemId).ConfigureAwait(false);
 
             return results.Select(item => item.ToMarketTransaction());
+        }
+
+        public async Task<List<string>> HotTimeEvent()
+        {
+            List<string> log = new List<string>();
+
+            void logMessage(string input)
+            {
+                log.Add($@"{DateTime.Now} :: {input}");
+            }
+
+            try
+            {
+                Random random = new Random();
+                var markets = new Dictionary<double, double>();
+
+                foreach (var item in this._marketBotConfig.HotTimeMarkets)
+                {
+                    markets.Add(item, 1);
+                }
+
+                var chosenMarket = Convert.ToUInt64(random.Pick(markets));
+                logMessage($@"Chose Market : {chosenMarket}");
+                var rate = random.Pick(this._marketBotConfig.HotTimeMargins);
+                logMessage($@"With Margin : {rate}");
+
+                // get old market id
+                var configuredMarkets = this._dualClient.MarketBudgetMultiplier.ToArray();
+                var actualMarkets = (await this._dualMarketRepository.GetAsync().ConfigureAwait(false)).ToDictionary(key => Convert.ToUInt64(key.id), value => value);
+
+                logMessage($@"Markets : {JsonSerializer.Serialize(actualMarkets)}");
+
+                ulong constuctId;
+
+                foreach (var market in configuredMarkets)
+                {
+                    constuctId = Convert.ToUInt64(actualMarkets[market.Key].construct_id);
+                    var oldMarketName = await this._dualClient.GetConstructName(constuctId).ConfigureAwait(false) ?? string.Empty;
+
+                    if (oldMarketName.StartsWith("[!]"))
+                    {
+                        logMessage($@"Got to rename old market '{oldMarketName}'");
+                        this._dualClient.MarketBudgetMultiplier.Remove(market.Key, out _);
+
+                        var constructName = oldMarketName;
+                        int index = constructName.IndexOf(']', 3);
+                        constructName = constructName.Substring(index + 1).Trim();
+
+                        logMessage($@"Renaming '{oldMarketName}' to '{constructName}'");
+                        await this._dualClient.SetConstructName(constuctId, constructName).ConfigureAwait(false);
+                    }
+                }
+
+                constuctId = Convert.ToUInt64(actualMarkets[chosenMarket].construct_id);
+                logMessage($@"Construct Id = {constuctId}");
+
+                logMessage($@"Adding new market to MarketBudgetMultiplier");
+                this._dualClient.MarketBudgetMultiplier.TryAdd(chosenMarket, rate);
+
+                logMessage($@"Saving Config");
+                await this._dualClient.SaveMarketBudgetMultiplier().ConfigureAwait(false);
+
+                var name = await this._dualClient.GetConstructName(constuctId).ConfigureAwait(false);
+                logMessage($@"Found '{name}'");
+
+                var newName = $@"[!][{rate}] {name}";
+                logMessage($@"Renaming '{name}' to '{newName}'");
+                await this._dualClient.SetConstructName(constuctId, newName).ConfigureAwait(false);
+                logMessage($@"New Name '{name}'");
+                return log;
+            }
+            catch (Exception exception)
+            {
+                logMessage(@$"Error: {exception}");
+                return log;
+            }
         }
     }
 }

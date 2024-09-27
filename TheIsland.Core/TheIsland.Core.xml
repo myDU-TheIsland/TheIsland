@@ -156,5 +156,10 @@
             Gets or sets list of items to recursively buy and the top price to pay.
             </summary>
         </member>
+        <member name="P:TheIsland.Core.Settings.MarketBotConfig.HotTimeMarkets">
+            <summary>
+            Gets or sets list of markets hot time events can happen at.
+            </summary>
+        </member>
     </members>
 </doc>

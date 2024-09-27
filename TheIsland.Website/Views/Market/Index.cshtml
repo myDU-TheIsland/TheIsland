@@ -16,6 +16,12 @@
     var itemExists = items.ContainsKey(Model.ItemId);
     var selectedMarket = markets[Model.MarketId];
     var selectedItem = itemExists ? items[Model.ItemId] : string.Empty;
+
+    if (!_client.MarketBudgetMultiplier.TryGetValue(Convert.ToUInt64(Model.MarketId), out double marketMultiplier))
+    {
+        marketMultiplier = 1;
+    }
+
     if (!_client.BuyPrices.TryGetValue(Convert.ToUInt64(Model.ItemId), out double botPurchasePrice))
     {
         botPurchasePrice = 0;
@@ -23,7 +29,9 @@
     else
     {
         botPurchasePrice /= 100;
+        botPurchasePrice *= marketMultiplier;
     }
+
 
     string graphHeader = markets.ContainsKey(Model.MarketId) ? " @ " + markets[Model.MarketId] : string.Empty;
 }

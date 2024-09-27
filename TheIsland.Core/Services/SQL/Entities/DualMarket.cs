@@ -4,12 +4,11 @@
 
 namespace TheIsland.Core.Services.SQL.Entities
 {
-    using Dapper.Contrib.Extensions;
-
-    [Table("public.market")]
     public class DualMarket : DatabaseEntity
     {
         public string name { get; set; } = string.Empty;
+
+        public double construct_id { get; set; } = 0;
 
         public decimal value_tax { get; set; } = 0;
     }

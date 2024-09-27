@@ -41,5 +41,23 @@ namespace TheIsland.Core.Settings
         /// Gets or sets list of items to recursively buy and the top price to pay.
         /// </summary>
         public List<string> OnlyResellItemsRecursive { get; set; } = new List<string>();
+
+        /// <summary>
+        /// Gets or sets list of markets hot time events can happen at.
+        /// </summary>
+        public List<double> HotTimeMarkets { get; set; } = new List<double>() { 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137 };
+
+        public Dictionary<double, double> HotTimeMargins { get; set; } = new Dictionary<double, double>
+        {
+            { 1.5, 1 },
+            { 1.45, 2 },
+            { 1.40, 4 },
+            { 1.35, 8 },
+            { 1.30, 16 },
+            { 1.25, 32 },
+            { 1.20, 64 },
+            { 1.15, 128 },
+            { 1.1, 256 },
+        };
     }
 }

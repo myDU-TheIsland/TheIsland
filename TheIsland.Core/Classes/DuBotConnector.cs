@@ -70,6 +70,14 @@ namespace TheIsland.Core.Classes
         Task<List<string>> SellStuff(ulong marketId, ulong itemType, long unitPrice, long quantity);
 
         Task CancelBotOrders(ulong marketId);
+
+        Task<string> GetConstructName(ulong constructId);
+
+        Task<string> SetConstructName(ulong constructId, string name);
+
+        Task SaveMarketBudgetMultiplier();
+
+        Task LoadMarketBudgetMultiplier();
     }
 
     public class DUClient : IDUClient
@@ -140,6 +148,80 @@ namespace TheIsland.Core.Classes
             this.MarketBot = this.CreateBotUser(settings.MarketBot).GetAwaiter().GetResult();
 
             this.InitializeItemPurchasing();
+            this.LoadMarketBudgetMultiplier().GetAwaiter().GetResult();
+        }
+
+        public Task SaveMarketBudgetMultiplier()
+        {
+            try
+            {
+                Dictionary<ulong, double> copy = new Dictionary<ulong, double>(this.MarketBudgetMultiplier.ToArray());
+                return System.IO.File.WriteAllTextAsync("/config/marketBudgetMultiplier.json", System.Text.Json.JsonSerializer.Serialize(copy));
+            }
+            catch
+            {
+                return Task.CompletedTask;
+            }
+        }
+
+        public async Task LoadMarketBudgetMultiplier()
+        {
+            try
+            {
+                var fileText = await System.IO.File.ReadAllTextAsync("/config/marketBudgetMultiplier.json").ConfigureAwait(false);
+                Dictionary<ulong, double>? dictionary = System.Text.Json.JsonSerializer.Deserialize<Dictionary<ulong, double>>(fileText);
+
+                if (dictionary == null)
+                {
+                    return;
+                }
+
+                this.MarketBudgetMultiplier.Clear();
+
+                foreach (var entry in dictionary)
+                {
+                    this.MarketBudgetMultiplier.TryAdd(entry.Key, entry.Value);
+                }
+            }
+            catch
+            {
+                return;
+            }
+        }
+
+        public async Task<string> GetConstructName(ulong constructId)
+        {
+            await this.HelperBotConnectionTest().ConfigureAwait(false);
+            try
+            {
+                var results = await this.HelperBot.Req.ConstructTreeGet(constructId).ConfigureAwait(false);
+
+                return results.constructs[0].name;
+            }
+            catch (Exception exception)
+            {
+                return exception.Message;
+            }
+        }
+
+        public async Task<string> SetConstructName(ulong constructId, string name)
+        {
+            await this.HelperBotConnectionTest().ConfigureAwait(false);
+            try
+            {
+                await this.HelperBot.Req.ConstructRename(new ConstructNameSet()
+                {
+                    constructId = constructId,
+                    newName = name,
+                }).ConfigureAwait(false);
+
+                var results = await this.HelperBot.Req.ConstructTreeGet(constructId).ConfigureAwait(false);
+                return results.constructs[0].name;
+            }
+            catch (Exception exception)
+            {
+                return exception.Message;
+            }
         }
 
         public async Task SendMessage(ulong who, string message)
@@ -441,6 +523,8 @@ namespace TheIsland.Core.Classes
 
         public async Task CancelBotOrders(ulong marketId)
         {
+            await this.MarketBotConnectionTest().ConfigureAwait(false);
+
             var orders = await this.MarketBot.Req.MarketGetMyOrders(
                 new MarketSelectRequest
                 {
