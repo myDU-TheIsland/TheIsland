@@ -5,21 +5,32 @@
 
 @if (!string.IsNullOrEmpty(Model.ErrorMessage))
 {
-       <p>@Html.Raw(Model.ErrorMessage)</p>
+    <p>@Html.Raw(Model.ErrorMessage)</p>
 }
-
-<form asp-action="ImportBPFile" method="post" enctype="multipart/form-data">
-    <div class="card-body pt-0">
-        <div class="row">
-            <div class="col-6">
-                <label class="form-label">Blueprint</label>
-                <div class="input-group">                   
-                    <input type="file" asp-for="BluePrint" class="form-control" multiple="true">
-                </div>
+<div class="row">
+    <div class="col-md-5 pt-0">
+        <img src="/img/blueprint.jpg" class='card-img-top'>
+        <div class="card">
+            <div class="card-header">
+                <h3 class='text-center'>Blueprint Import</h3>
             </div>
-            <div class="button-row d-flex mt-4">
-                <button class="btn bg-gradient-dark ms-auto mb-0 js-btn-next" type="submit" title="Next">Import</button>
+            <div class="card-body">                
+                <form asp-action="ImportBPFile" method="post" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-6">
+                            <label class="form-label">Blueprint</label>
+                            <div class="input-group">
+                                <input type="file" asp-for="BluePrint" class="form-control" multiple="true">
+                            </div>
+                        </div>
+                        <div class="button-row d-flex mt-4">
+                            <button class="btn bg-gradient-dark ms-auto mb-0 js-btn-next" type="submit" title="Next">Import</button>
+                        </div>
+                    </div>
+
+                </form>
             </div>
         </div>
     </div>
-</form>
+    <partial name="_BlueprintInstructions" />
+</div>

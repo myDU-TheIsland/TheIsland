@@ -1,14 +1,12 @@
-﻿@using System.Linq
-@using TheIsland.Core.Classes
-@using TheIsland.Core.Services.SQL.Entities
-@inject TheIsland.Core.Classes.IDUClient _client
-@inject TheIsland.Core.Services.SQL.DualMarketRepository _marketRepo
-@inject TheIsland.Core.Services.MarketService _marketService
+﻿@inject IMarketBot _marketBot
+@inject IGeneralBot _generalBot
+@inject DualMarketRepository _marketRepo
+@inject MarketService _marketService
 @model MarketModel
 @{
     ViewData["Title"] = "Market Data";
 
-    var items = _client.GetItemsForSale().OrderBy(items => items.Value).ToDictionary();
+    var items = _generalBot.GetListOfSellableItems().OrderBy(items => items.Value).ToDictionary();
 
     var markets = (await _marketRepo.GetAsync().ConfigureAwait(false)).ToDictionary(key => key.id, value => value.name);
     markets.Add(0, "All Markets");
@@ -17,12 +15,12 @@
     var selectedMarket = markets[Model.MarketId];
     var selectedItem = itemExists ? items[Model.ItemId] : string.Empty;
 
-    if (!_client.MarketBudgetMultiplier.TryGetValue(Convert.ToUInt64(Model.MarketId), out double marketMultiplier))
+    if (!_marketBot.MarketBudgetMultiplier.TryGetValue(Convert.ToUInt64(Model.MarketId), out double marketMultiplier))
     {
         marketMultiplier = 1;
     }
 
-    if (!_client.BuyPrices.TryGetValue(Convert.ToUInt64(Model.ItemId), out double botPurchasePrice))
+    if (!_marketBot.BuyPrices.TryGetValue(Convert.ToUInt64(Model.ItemId), out double botPurchasePrice))
     {
         botPurchasePrice = 0;
     }

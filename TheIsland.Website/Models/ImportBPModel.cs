@@ -4,9 +4,6 @@
 
 namespace TheIsland.Website.Models
 {
-    using System.ComponentModel;
-    using System.ComponentModel.DataAnnotations;
-
     public class ImportBPModel
     {
         public List<IFormFile> BluePrint { get; set; } = new List<IFormFile>();

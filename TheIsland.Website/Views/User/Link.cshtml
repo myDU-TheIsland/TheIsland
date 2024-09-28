@@ -5,21 +5,30 @@
 
 @if (!string.IsNullOrEmpty(Model.ErrorMessage))
 {
-       <p>@Model.ErrorMessage</p>
+    <p>@Model.ErrorMessage</p>
 }
-
-<form asp-action="LinkUser">
-    <div class="card-body pt-0">
-        <div class="row">
-            <div class="col-6">
-                <label class="form-label">Player Name</label>
-                <div class="input-group">
-                    @Html.TextBoxFor(model => model.PlayerName, new { @class = "form-control" })
-                </div>
+<div class="row">
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-header">
+                <h2 class='text-center'>Link Ingame Player to Discord</h2>
             </div>
-            <div class="button-row d-flex mt-4">
-                <button class="btn bg-gradient-dark ms-auto mb-0 js-btn-next" type="submit" title="Next">Find Player</button>
+            <div class="card-body">
+                <form asp-action="LinkUser">
+                    <div class="row">
+                        <div class="col-6">
+                            <label class="form-label">Player Name</label>
+                            <div class="input-group">
+                                @Html.TextBoxFor(model => model.PlayerName, new { @class = "form-control" })
+                            </div>
+                        </div>
+                        <div class="button-row d-flex mt-4">
+                            <button class="btn bg-gradient-dark ms-auto mb-0 js-btn-next" type="submit" title="Next">Find Player</button>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-</form>
+    <partial name="_BlueprintInstructions" />
+</div>

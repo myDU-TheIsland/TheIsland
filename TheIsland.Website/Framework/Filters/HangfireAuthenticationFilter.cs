@@ -10,7 +10,7 @@ namespace TheIsland.Website.Framework.Filters
     {
         public bool Authorize(DashboardContext context)
         {
-            var httpContext = context.GetHttpContext();
+            HttpContext httpContext = context.GetHttpContext();
             const string nameClaim = "nameidentifier";
             ISiteSettings siteSettings = Startup.SiteSettings;
 

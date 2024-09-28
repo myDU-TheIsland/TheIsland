@@ -2,10 +2,10 @@
 // Copyright (c) Paul Layne. All rights reserved.
 // </copyright>
 
-namespace TheIsland.Core.Classes
+namespace TheIsland.Core.Services
 {
     using System.Threading.Tasks;
-    using TheIsland.Core.Classes;
+    using TheIsland.Core.Bots;
 
     public interface IIngameMessaging
     {
@@ -14,9 +14,9 @@ namespace TheIsland.Core.Classes
 
     public class IngameMessaging : IIngameMessaging
     {
-        private readonly IDUClient _client;
+        private readonly IGeneralBot _client;
 
-        public IngameMessaging(IDUClient client)
+        public IngameMessaging(IGeneralBot client)
         {
             this._client = client;
         }

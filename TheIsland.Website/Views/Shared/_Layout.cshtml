@@ -38,11 +38,8 @@
                                 <a asp-controller="Market" asp-action="Index" asp-area="" class="dropdown-item">Market Data</a>
                                 @if (User?.Identity?.IsAuthenticated ?? false)
                                 {
-                                    @if (!await _playerLinkingService.HasPlayerMapping(double.Parse(Context.User.Claims.FirstOrDefault(item => item.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value ?? "-1")).ConfigureAwait(false))
-                                    {
-                                        <a class="dropdown-item" asp-area="" asp-controller="User" asp-action="Link">Link Account</a>
-                                    }
-                                    else
+                                    <a class="dropdown-item" asp-area="" asp-controller="User" asp-action="Link">Link Game Account(s)</a>
+                                    @if (await _playerLinkingService.HasPlayerMapping(double.Parse(Context.User.Claims.FirstOrDefault(item => item.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value ?? "-1")).ConfigureAwait(false))
                                     {
                                         <a class="dropdown-item" asp-area="" asp-controller="User" asp-action="ImportBP">Blueprints</a>
                                     }

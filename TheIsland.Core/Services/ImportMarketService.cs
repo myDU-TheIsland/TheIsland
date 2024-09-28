@@ -39,23 +39,30 @@ namespace TheIsland.Core.Services
 
             LastRead lastReadWallet = await this._lastReadRepository.GetAsync(nameof(DualWalletTransaction)).ConfigureAwait(false);
 
-            var walletTransactions = await this._dualWalletRepository.GetAllAfterIdAsync(lastReadWallet.table_id).ConfigureAwait(false);
+            IEnumerable<DualWalletTransaction> walletTransactions = await this._dualWalletRepository.GetAllAfterIdAsync(lastReadWallet.table_id).ConfigureAwait(false);
+
+            if (walletTransactions.Count() == 0)
+            {
+                return true;
+            }
 
             // map market to our object
-            var internalMarketTransactionWallet = walletTransactions.Select(transaction => transaction.ToMarketTransaction()).ToArray();
+            MarketTransaction[] internalMarketTransactionWallet = walletTransactions.Select(transaction => transaction.ToMarketTransaction()).ToArray();
+
+            if (internalMarketTransactionWallet.Count() == 0)
+            {
+                return true;
+            }
 
             try
             {
                 await this._transactionRepository.AddAsync(internalMarketTransactionWallet).ConfigureAwait(false);
+                lastReadWallet.table_id = walletTransactions.Max(item => item.id);
+                await this._lastReadRepository.UpdateAsync(lastReadWallet).ConfigureAwait(false);
             }
             catch
             {
                 return false;
-            }
-            finally
-            {
-                lastReadWallet.table_id = walletTransactions.Max(item => item.id);
-                await this._lastReadRepository.UpdateAsync(lastReadWallet).ConfigureAwait(false);
             }
 
             return true;

@@ -11,5 +11,7 @@ namespace TheIsland.Core.Settings
         public string BotPassword { get; set; } = string.Empty;
 
         public string PlayerName { get; set; } = string.Empty;
+
+        public string QueueingUri { get; set; } = "http://queueing:9630";
     }
 }

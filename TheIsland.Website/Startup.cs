@@ -12,11 +12,10 @@ namespace TheIsland.Website
     using Microsoft.AspNetCore.Authentication.Cookies;
     using Microsoft.AspNetCore.Http.Features;
     using Microsoft.AspNetCore.HttpOverrides;
-    using Microsoft.AspNetCore.Mvc.Filters;
     using Microsoft.AspNetCore.Server.Kestrel.Core;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.IdentityModel.Logging;
-    using TheIsland.Core.Classes;
+    using TheIsland.Core.Bots;
     using TheIsland.Core.Services;
     using TheIsland.Core.Services.SQL;
     using TheIsland.Core.Settings;
@@ -55,12 +54,14 @@ namespace TheIsland.Website
                 .AddJsonFile($"marketBotSettings.{env.EnvironmentName}.json", true)
                 .AddEnvironmentVariables();
 
-            var botConfig = builder2.Build();
+            IConfigurationRoot botConfig = builder2.Build();
 
             // Build settings object (pulls from appsettings.*)
             MarketBotConfig marketBotConfig = new MarketBotConfig();
             botConfig.Bind(marketBotConfig);
             MarketBotConfig = marketBotConfig;
+
+            Core.Initializer.InitializeCore();
         }
 
         /// <summary>
@@ -133,7 +134,8 @@ namespace TheIsland.Website
             });
 
             // settings
-            services.AddSingleton<IDUClient, DUClient>();
+            services.AddSingleton<IMarketBot, MarketBot>();
+            services.AddSingleton<IGeneralBot, GeneralBot>();
             services.AddSingleton<ISiteSettings>(SiteSettings);
             services.AddSingleton(SiteSettings.DualUniverse);
             services.AddSingleton(MarketBotConfig);
@@ -197,7 +199,7 @@ namespace TheIsland.Website
             app.UseHttpsRedirection();
 
             // Required to serve files with no extension in the .well-known folder
-            var options = new StaticFileOptions()
+            StaticFileOptions options = new StaticFileOptions()
             {
                 ServeUnknownFileTypes = true,
             };
@@ -233,7 +235,7 @@ namespace TheIsland.Website
 
             if (!this.HostingEnvironment.IsDevelopment())
             {
-                RecurringJob.AddOrUpdate("buyStuff", (IDUClient client) => client.BuyStuff(0), Cron.Minutely);
+                RecurringJob.AddOrUpdate("buyStuff", (IMarketBot client) => client.BuyStuff(0), Cron.Minutely);
                 RecurringJob.AddOrUpdate("sellStuff", (MarketService service) => service.SellAllMarketsContainerContents(), Cron.Hourly);
                 RecurringJob.AddOrUpdate("importMarketData", (IImportMarketService service) => service.ImportAsync(), "*/5 * * * *");
                 RecurringJob.AddOrUpdate("hotTime", (MarketService service) => service.HotTimeEvent(), "0 */3 * * *");

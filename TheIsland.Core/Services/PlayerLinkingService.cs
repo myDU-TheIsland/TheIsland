@@ -6,7 +6,6 @@ namespace TheIsland.Core.Services
 {
     using System;
     using System.Threading.Tasks;
-    using TheIsland.Core.Classes;
     using TheIsland.Core.Services.SQL;
     using TheIsland.Core.Services.SQL.Entities;
 
@@ -40,7 +39,7 @@ namespace TheIsland.Core.Services
             }
 
             // verify player is online
-            var player = await this._playerRepository.GetAsync(playerId).ConfigureAwait(false);
+            DualPlayer player = await this._playerRepository.GetAsync(playerId).ConfigureAwait(false);
 
             if (player.connected)
             {
@@ -54,14 +53,14 @@ namespace TheIsland.Core.Services
         public async Task<bool> VerifyToken(string token)
         {
             // find the token
-            var result = await this._linkTokenRepository.FindByToken(token).ConfigureAwait(false);
+            LinkToken? result = await this._linkTokenRepository.FindByToken(token).ConfigureAwait(false);
 
             if (result == null)
             {
                 return false;
             }
 
-            var newEntry = new UserMapping { discord_id = result.discord_id, dual_id = result.player_id };
+            UserMapping newEntry = new UserMapping { discord_id = result.discord_id, dual_id = result.player_id };
 
             await this._userMappingRepository.AddAsync(newEntry).ConfigureAwait(false);
             await this._linkTokenRepository.RemoveAsync(result.id).ConfigureAwait(false);
@@ -76,11 +75,11 @@ namespace TheIsland.Core.Services
 
         public async Task<bool> HasPlayerMapping(double discordId)
         {
-            var result = await this._userMappingRepository.FindByDiscordId(discordId).ConfigureAwait(false);
+            UserMapping? result = await this._userMappingRepository.FindByDiscordId(discordId).ConfigureAwait(false);
 
             if (result != null)
             {
-                var linkResult = await this._linkTokenRepository.FindByPlayerId(result.dual_id).ConfigureAwait(false);
+                LinkToken? linkResult = await this._linkTokenRepository.FindByPlayerId(result.dual_id).ConfigureAwait(false);
 
                 if (linkResult != null)
                 {

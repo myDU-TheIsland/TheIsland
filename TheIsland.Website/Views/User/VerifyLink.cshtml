@@ -8,18 +8,30 @@
     <p>@Model.ErrorMessage</p>
 }
 
-<form asp-action="ConfirmLink">
-    <div class="card-body pt-0">
-        <div class="row">
-            <div class="col-6">
-                <label class="form-label">Token</label>
-                <div class="input-group">
-                    @Html.TextBoxFor(model => model.Token, new { @class = "form-control" })
-                </div>
+<div class="row">
+    <div class="col-md-5">
+        <div class="card">
+            <div class="card-header">
+                <h2 class='card-title text-center'>Verify Ingame Code</h2>
             </div>
-            <div class="button-row d-flex mt-4">
-                <button class="btn bg-gradient-dark ms-auto mb-0 js-btn-next" type="submit" title="Next">Confirm Token</button>
+            <div class="card-body">
+                <form asp-action="ConfirmLink">
+                    <div class="card-body pt-0">
+                        <div class="row">
+                            <div class="col-6">
+                                <label class="form-label">Token</label>
+                                <div class="input-group">
+                                    @Html.TextBoxFor(model => model.Token, new { @class = "form-control" })
+                                </div>
+                            </div>
+                            <div class="button-row d-flex mt-4">
+                                <button class="btn bg-gradient-dark ms-auto mb-0 js-btn-next" type="submit" title="Next">Confirm Token</button>
+                            </div>
+                        </div>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-</form>
+    <partial name="_BlueprintInstructions" />
+</div>

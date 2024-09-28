@@ -5,7 +5,7 @@
 namespace TheIsland.Website.Controllers.Api
 {
     using Microsoft.AspNetCore.Mvc;
-    using TheIsland.Core.Classes;
+    using TheIsland.Core.Bots;
     using TheIsland.Core.Services.SQL;
     using TheIsland.Website.Framework.Attributes;
 
@@ -14,9 +14,9 @@ namespace TheIsland.Website.Controllers.Api
     {
         private readonly DualPlayerRepository _playerRepository;
         private readonly UserMappingRepository _userMappingRepository;
-        private readonly IDUClient _client;
+        private readonly IGeneralBot _client;
 
-        public UserController(DualPlayerRepository playerRepository, UserMappingRepository userMappingRepository, IDUClient client)
+        public UserController(DualPlayerRepository playerRepository, UserMappingRepository userMappingRepository, IGeneralBot client)
         {
             this._playerRepository = playerRepository;
             this._userMappingRepository = userMappingRepository;

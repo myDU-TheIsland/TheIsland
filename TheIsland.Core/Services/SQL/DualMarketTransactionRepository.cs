@@ -37,5 +37,13 @@ namespace TheIsland.Core.Services.SQL
                 }
             }
         }
+
+        public async Task<IEnumerable<DualMarketTransaction>> GetAllByPlayerAndMarket(double marketId, double ownerId)
+        {
+            using (DbConnection databaseConnection = this.GetConnection())
+            {
+                return await databaseConnection.QueryAsync<DualMarketTransaction>("SELECT * FROM public.market_order where market_id = @MarketId and owner_id = @OwnerId;", new { MarketId = marketId, OwnerId = ownerId }).ConfigureAwait(false);
+            }
+        }
     }
 }

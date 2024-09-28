@@ -5,9 +5,7 @@
 namespace TheIsland.Core.Services.SQL
 {
     using System.Data.Common;
-    using Backend;
     using Dapper;
-    using Newtonsoft.Json.Linq;
     using TheIsland.Core.Services.SQL.Entities;
     using TheIsland.Core.Settings;
 

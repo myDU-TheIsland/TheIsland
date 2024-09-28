@@ -5,7 +5,6 @@
 namespace TheIsland.Core.Services.SQL
 {
     using System.Data.Common;
-    using Dapper;
     using Dapper.Contrib.Extensions;
     using Npgsql;
     using TheIsland.Core.Services.SQL.Entities;

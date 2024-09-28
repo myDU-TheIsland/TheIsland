@@ -15,7 +15,7 @@ namespace TheIsland.Core.Services.SQL.Entities
 
         public DateTime creation_date { get; set; }
 
-        public DateTime completion_date { get; set; }
+        public DateTime? completion_date { get; set; }
 
         public DateTime expiration_date { get; set; }
 
@@ -24,5 +24,7 @@ namespace TheIsland.Core.Services.SQL.Entities
         public double item_type_id { get; set; }
 
         public double market_id { get; set; }
+
+        public double owner_id { get; set; }
     }
 }

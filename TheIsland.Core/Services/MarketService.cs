@@ -8,7 +8,7 @@ namespace TheIsland.Core.Services
     using System.Linq;
     using System.Text.Json;
     using System.Threading.Tasks;
-    using TheIsland.Core.Classes;
+    using TheIsland.Core.Bots;
     using TheIsland.Core.Helpers;
     using TheIsland.Core.Services.SQL;
     using TheIsland.Core.Services.SQL.Entities;
@@ -22,7 +22,7 @@ namespace TheIsland.Core.Services
         private readonly DualMarketRepository _dualMarketRepository;
         private readonly DualWalletRepository _dualWalletRepository;
         private readonly MarketBotConfig _marketBotConfig;
-        private readonly IDUClient _dualClient;
+        private readonly IMarketBot _marketBot;
 
         public MarketService(
             MarketTransactionRepository transactionRepository,
@@ -30,14 +30,14 @@ namespace TheIsland.Core.Services
             DualMarketTransactionRepository dualMarketTransactionRepository,
             DualWalletRepository dualWalletRepository,
             MarketBotConfig marketBotConfig,
-            IDUClient dualClient)
+            IMarketBot dualClient)
         {
             this._transactionRepository = transactionRepository;
             this._dualMarketRepository = dualMarketRepository;
             this._dualMarketTransactionRepository = dualMarketTransactionRepository;
             this._dualWalletRepository = dualWalletRepository;
             this._marketBotConfig = marketBotConfig;
-            this._dualClient = dualClient;
+            this._marketBot = dualClient;
         }
 
         public async Task<List<string>> CancelAllBotOrders()
@@ -49,12 +49,12 @@ namespace TheIsland.Core.Services
                 log.Add($@"{DateTime.Now} :: {input}");
             }
 
-            var markets = await this._dualMarketRepository.GetAsync().ConfigureAwait(false);
+            IEnumerable<DualMarket> markets = await this._dualMarketRepository.GetAsync().ConfigureAwait(false);
 
-            foreach (var market in markets)
+            foreach (DualMarket market in markets)
             {
                 logMessage($@"Processing Market {market.name} ({market.id})");
-                await this._dualClient.CancelBotOrders(Convert.ToUInt64(market.id)).ConfigureAwait(false);
+                await this._marketBot.CancelBotOrders(Convert.ToUInt64(market.id)).ConfigureAwait(false);
                 logMessage($@"Market {market.name} ({market.id}) Complete!");
             }
 
@@ -72,9 +72,9 @@ namespace TheIsland.Core.Services
 
             log.AddRange(await this.CancelAllBotOrders().ConfigureAwait(false));
 
-            var markets = await this._dualMarketRepository.GetAsync().ConfigureAwait(false);
+            IEnumerable<DualMarket> markets = await this._dualMarketRepository.GetAsync().ConfigureAwait(false);
 
-            foreach (var market in markets)
+            foreach (DualMarket market in markets)
             {
                 logMessage($@"Processing Market {market.name} ({market.id})");
                 log.AddRange(await this.SellMarketContainerContents(market.id).ConfigureAwait(false));
@@ -95,44 +95,44 @@ namespace TheIsland.Core.Services
 
             try
             {
-                var walletsTransaction = await this._dualWalletRepository.GetAllBotTransactionOnMarket(marketId).ConfigureAwait(false);
+                IEnumerable<DualWalletTransaction> walletsTransaction = await this._dualWalletRepository.GetAllBotTransactionOnMarket(marketId).ConfigureAwait(false);
                 logMessage($@"Found {walletsTransaction.Count()} wallet transactions for market {marketId}");
 
-                var groupByItemId = walletsTransaction.Where(item => this._dualClient.ResellItems.Contains(Convert.ToUInt64(item.item_id))).GroupBy(item => item.item_id).Select(item => new Tuple<double, double, double>(item.Key, item.Sum(c => c.quantity), item.Sum(c => c.amount)));
+                IEnumerable<Tuple<double, double, double>> groupByItemId = walletsTransaction.Where(item => this._marketBot.ResellItems.Contains(Convert.ToUInt64(item.item_id))).GroupBy(item => item.item_id).Select(item => new Tuple<double, double, double>(item.Key, item.Sum(c => c.quantity), item.Sum(c => c.amount)));
 
                 logMessage($@"Grouped like items together and got {groupByItemId.Count()} results!");
 
-                logMessage($@"Fetching Container Contents for market {marketId} with these items {System.Text.Json.JsonSerializer.Serialize(this._dualClient.ResellItems)}!");
+                logMessage($@"Fetching Container Contents for market {marketId} with these items {System.Text.Json.JsonSerializer.Serialize(this._marketBot.ResellItems)}!");
 
-                var containerContents = await this._dualClient.GetMarketContainerContents(Convert.ToUInt64(marketId)).ConfigureAwait(false);
+                NQ.MarketStorageInfoEx containerContents = await this._marketBot.GetMarketContainerContents(Convert.ToUInt64(marketId)).ConfigureAwait(false);
 
                 logMessage($@"Container has {containerContents.slots.Count()}!");
                 logMessage($@"Container contents {System.Text.Json.JsonSerializer.Serialize(containerContents.slots)}!");
 
                 Dictionary<ulong, long> prices = new Dictionary<ulong, long>();
 
-                foreach (var item in groupByItemId)
+                foreach (Tuple<double, double, double>? item in groupByItemId)
                 {
-                    var itemId = Convert.ToUInt64(item.Item1);
-                    var totalSpent = Math.Abs(item.Item3) / 100;
-                    var totalBought = item.Item2;
-                    var avgPer = (long)(totalSpent / totalBought);
+                    ulong itemId = Convert.ToUInt64(item.Item1);
+                    double totalSpent = Math.Abs(item.Item3) / 100;
+                    double totalBought = item.Item2;
+                    long avgPer = (long)(totalSpent / totalBought);
 
                     logMessage($@"Processing has '{itemId}' ({totalSpent}/{totalBought}) with avg price '{avgPer}'!");
 
                     prices.Add(itemId, avgPer);
                 }
 
-                foreach (var slot in containerContents.slots)
+                foreach (NQ.MarketStorageSlotEx? slot in containerContents.slots)
                 {
-                    var itemId = slot.itemAndQuantity.item.type;
+                    ulong itemId = slot.itemAndQuantity.item.type;
 
                     if (!slot.purchased)
                     {
                         continue;
                     }
 
-                    if (!this._dualClient.ResellItems.Contains(itemId))
+                    if (!this._marketBot.ResellItems.Contains(itemId))
                     {
                         continue;
                     }
@@ -143,16 +143,16 @@ namespace TheIsland.Core.Services
                         continue;
                     }
 
-                    var marketQty = slot.itemAndQuantity.quantity.value;
-                    var avgPer = prices[itemId] * this._marketBotConfig.MarketMarkUp;
+                    long marketQty = slot.itemAndQuantity.quantity.value;
+                    double avgPer = prices[itemId] * this._marketBotConfig.MarketMarkUp;
 
-                    if (avgPer < this._dualClient.BuyPrices[itemId])
+                    if (avgPer < this._marketBot.BuyPrices[itemId])
                     {
-                        avgPer = (this._dualClient.BuyPrices[itemId] / 100) * this._marketBotConfig.MarketMarkUp;
+                        avgPer = (this._marketBot.BuyPrices[itemId] / 100) * this._marketBotConfig.MarketMarkUp;
                     }
 
                     logMessage($@"Selling item  {itemId} @ {avgPer}, quantity {marketQty}!");
-                    log.AddRange(await this._dualClient.SellStuff(Convert.ToUInt64(marketId), itemId, Convert.ToInt64(avgPer), marketQty).ConfigureAwait(false));
+                    log.AddRange(await this._marketBot.SellStuff(Convert.ToUInt64(marketId), itemId, Convert.ToInt64(avgPer), marketQty).ConfigureAwait(false));
                 }
             }
             catch (Exception exception)
@@ -165,11 +165,11 @@ namespace TheIsland.Core.Services
 
         public async Task<IEnumerable<MarketStatistics>> GetHourlyStats(double itemId)
         {
-            var results = await this._transactionRepository.GetHourlyStats(itemId).ConfigureAwait(false);
+            IEnumerable<MarketStatistics> results = await this._transactionRepository.GetHourlyStats(itemId).ConfigureAwait(false);
 
-            var markets = await this._dualMarketRepository.GetAsync().ConfigureAwait(false);
+            IEnumerable<DualMarket> markets = await this._dualMarketRepository.GetAsync().ConfigureAwait(false);
 
-            foreach (var item in results)
+            foreach (MarketStatistics item in results)
             {
                 item.market_name = markets.FirstOrDefault(market => market.id == item.market_id)?.name ?? string.Empty;
             }
@@ -179,7 +179,7 @@ namespace TheIsland.Core.Services
 
         public async Task<IEnumerable<MarketTransaction>> GetAllActiveAsync(double marketId, double itemId)
         {
-            var results = await this._dualMarketTransactionRepository.GetAllActiveAsync(marketId, itemId).ConfigureAwait(false);
+            IEnumerable<DualMarketTransaction> results = await this._dualMarketTransactionRepository.GetAllActiveAsync(marketId, itemId).ConfigureAwait(false);
 
             return results.Select(item => item.ToMarketTransaction());
         }
@@ -196,60 +196,76 @@ namespace TheIsland.Core.Services
             try
             {
                 Random random = new Random();
-                var markets = new Dictionary<double, double>();
+                Dictionary<double, double> markets = new Dictionary<double, double>();
 
-                foreach (var item in this._marketBotConfig.HotTimeMarkets)
+                foreach (double item in this._marketBotConfig.HotTimeMarkets)
                 {
                     markets.Add(item, 1);
                 }
 
-                var chosenMarket = Convert.ToUInt64(random.Pick(markets));
+                ulong chosenMarket = Convert.ToUInt64(random.Pick(markets));
                 logMessage($@"Chose Market : {chosenMarket}");
-                var rate = random.Pick(this._marketBotConfig.HotTimeMargins);
+                double rate = random.Pick(this._marketBotConfig.HotTimeMargins);
                 logMessage($@"With Margin : {rate}");
 
                 // get old market id
-                var configuredMarkets = this._dualClient.MarketBudgetMultiplier.ToArray();
-                var actualMarkets = (await this._dualMarketRepository.GetAsync().ConfigureAwait(false)).ToDictionary(key => Convert.ToUInt64(key.id), value => value);
+                KeyValuePair<ulong, double>[] configuredMarkets = this._marketBot.MarketBudgetMultiplier.ToArray();
+                Dictionary<ulong, DualMarket> actualMarkets = (await this._dualMarketRepository.GetAsync().ConfigureAwait(false)).ToDictionary(key => Convert.ToUInt64(key.id), value => value);
 
                 logMessage($@"Markets : {JsonSerializer.Serialize(actualMarkets)}");
 
                 ulong constuctId;
+                IEnumerable<DualMarketTransaction> orders;
 
-                foreach (var market in configuredMarkets)
+                foreach (KeyValuePair<ulong, double> market in configuredMarkets)
                 {
                     constuctId = Convert.ToUInt64(actualMarkets[market.Key].construct_id);
-                    var oldMarketName = await this._dualClient.GetConstructName(constuctId).ConfigureAwait(false) ?? string.Empty;
+                    string oldMarketName = await this._marketBot.GetConstructName(constuctId).ConfigureAwait(false) ?? string.Empty;
 
                     if (oldMarketName.StartsWith("[!]"))
                     {
                         logMessage($@"Got to rename old market '{oldMarketName}'");
-                        this._dualClient.MarketBudgetMultiplier.Remove(market.Key, out _);
+                        this._marketBot.MarketBudgetMultiplier.Remove(market.Key, out _);
 
-                        var constructName = oldMarketName;
+                        string constructName = oldMarketName;
                         int index = constructName.IndexOf(']', 3);
                         constructName = constructName.Substring(index + 1).Trim();
 
                         logMessage($@"Renaming '{oldMarketName}' to '{constructName}'");
-                        await this._dualClient.SetConstructName(constuctId, constructName).ConfigureAwait(false);
+                        await this._marketBot.SetConstructName(constuctId, constructName).ConfigureAwait(false);
+
+                        //re-seed market
+                        orders = await this._dualMarketTransactionRepository.GetAllByPlayerAndMarket(market.Key, 3).ConfigureAwait(false);
+
+                        foreach (DualMarketTransaction order in orders)
+                        {
+                            order.completion_date = null;
+                        }
                     }
+                }
+
+                orders = await this._dualMarketTransactionRepository.GetAllByPlayerAndMarket(chosenMarket, 3).ConfigureAwait(false);
+
+                foreach (DualMarketTransaction order in orders)
+                {
+                    order.completion_date = DateTime.UtcNow.AddDays(-3);
                 }
 
                 constuctId = Convert.ToUInt64(actualMarkets[chosenMarket].construct_id);
                 logMessage($@"Construct Id = {constuctId}");
 
                 logMessage($@"Adding new market to MarketBudgetMultiplier");
-                this._dualClient.MarketBudgetMultiplier.TryAdd(chosenMarket, rate);
+                this._marketBot.MarketBudgetMultiplier.TryAdd(chosenMarket, rate);
 
                 logMessage($@"Saving Config");
-                await this._dualClient.SaveMarketBudgetMultiplier().ConfigureAwait(false);
+                await this._marketBot.SaveMarketBudgetMultiplier().ConfigureAwait(false);
 
-                var name = await this._dualClient.GetConstructName(constuctId).ConfigureAwait(false);
+                string name = await this._marketBot.GetConstructName(constuctId).ConfigureAwait(false);
                 logMessage($@"Found '{name}'");
 
-                var newName = $@"[!][{rate}] {name}";
+                string newName = $@"[!][{rate}] {name}";
                 logMessage($@"Renaming '{name}' to '{newName}'");
-                await this._dualClient.SetConstructName(constuctId, newName).ConfigureAwait(false);
+                await this._marketBot.SetConstructName(constuctId, newName).ConfigureAwait(false);
                 logMessage($@"New Name '{name}'");
                 return log;
             }

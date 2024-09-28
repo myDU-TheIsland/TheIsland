@@ -6,14 +6,13 @@ namespace TheIsland.Website.Controllers.Api
 {
     using System.Linq;
     using Microsoft.AspNetCore.Mvc;
-    using TheIsland.Core.Classes;
+    using TheIsland.Core.Bots;
     using TheIsland.Core.Services;
     using TheIsland.Core.Services.SQL;
     using TheIsland.Core.Services.SQL.Entities;
     using TheIsland.Website.Classes;
     using TheIsland.Website.Framework.Attributes;
     using TheIsland.Website.Framework.Helpers;
-    using TheIsland.Website.Models;
 
     [Area("Api")]
     public class MarketController : IslandController
@@ -21,20 +20,23 @@ namespace TheIsland.Website.Controllers.Api
         private readonly MarketService _marketService;
         private readonly IImportMarketService _importMarketService;
         private readonly DualMarketRepository _dualMarketRepository;
-        private readonly IDUClient _client;
+        private readonly IGeneralBot _generalBot;
+        private readonly IMarketBot _marketBot;
         private readonly DualMarketRepository _marketRepo;
 
         public MarketController(
             IImportMarketService importMarketService,
             MarketService marketService,
             DualMarketRepository dualMarketRepository,
-            IDUClient client,
+            IGeneralBot generalBot,
+            IMarketBot marketBot,
             DualMarketRepository marketRepo)
         {
             this._importMarketService = importMarketService;
             this._marketService = marketService;
             this._dualMarketRepository = dualMarketRepository;
-            this._client = client;
+            this._generalBot = generalBot;
+            this._marketBot = marketBot;
             this._marketRepo = marketRepo;
         }
 
@@ -50,13 +52,13 @@ namespace TheIsland.Website.Controllers.Api
         [HttpGet]
         public IActionResult Hierarchy()
         {
-            return this.Json(this._client.GetMarketHierarchy(false));
+            return this.Json(this._generalBot.GetMarketHierarchy(false));
         }
 
         [HttpGet]
         public IActionResult ItemList()
         {
-            var output = this._client.GetItemsForSale().ToArray().DistinctBy(item => item.Value).ToDictionary(key => key.Value, value => value.Key);
+            Dictionary<string, double> output = this._generalBot.GetListOfSellableItems().ToArray().DistinctBy(item => item.Value).ToDictionary(key => key.Value, value => value.Key);
             return this.Json(output);
         }
 
@@ -64,7 +66,7 @@ namespace TheIsland.Website.Controllers.Api
         [Route("Api/Market/Stats/Hourly/{id}")]
         public async Task<IActionResult> GetHourlySales(double id)
         {
-            var results = await this._marketService.GetHourlyStats(id).ConfigureAwait(false);
+            IEnumerable<MarketStatistics> results = await this._marketService.GetHourlyStats(id).ConfigureAwait(false);
             return this.Json(results.ToGraph());
         }
 
@@ -79,7 +81,7 @@ namespace TheIsland.Website.Controllers.Api
         [ApiKey]
         public async Task<IActionResult> BuyStuff()
         {
-            return this.Json(await this._client.BuyStuff(0).ConfigureAwait(false));
+            return this.Json(await this._marketBot.BuyStuff(0).ConfigureAwait(false));
         }
 
         [HttpGet]
@@ -114,21 +116,14 @@ namespace TheIsland.Website.Controllers.Api
         [ApiKey]
         public async Task<IActionResult> GetMarketName()
         {
-            return this.Json(await this._client.GetConstructName(170000).ConfigureAwait(false));
+            return this.Json(await this._marketBot.GetConstructName(170000).ConfigureAwait(false));
         }
 
         [HttpGet]
         [ApiKey]
         public async Task<IActionResult> SetMarketName()
         {
-            return this.Json(await this._client.SetConstructName(170000, "Aegis 123").ConfigureAwait(false));
-        }
-
-        [HttpGet]
-        [ApiKey]
-        public IActionResult MarketBotConfig()
-        {
-            return this.Json(this._client.MarketBotConfig());
+            return this.Json(await this._marketBot.SetConstructName(170000, "Aegis 123").ConfigureAwait(false));
         }
     }
 }

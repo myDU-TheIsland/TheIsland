@@ -6,7 +6,6 @@ namespace TheIsland.Core.Services.SQL
 {
     using System.Data.Common;
     using Dapper;
-    using TheIsland.Core.Classes;
     using TheIsland.Core.Services.SQL.Entities;
     using TheIsland.Core.Settings;
 

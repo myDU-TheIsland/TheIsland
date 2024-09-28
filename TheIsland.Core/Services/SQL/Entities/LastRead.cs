@@ -4,7 +4,6 @@
 
 namespace TheIsland.Core.Services.SQL.Entities
 {
-    using System;
     using Dapper.Contrib.Extensions;
 
     [Table("public.last_read")]

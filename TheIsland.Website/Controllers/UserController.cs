@@ -6,7 +6,7 @@ namespace TheIsland.Website.Controllers
 {
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
-    using TheIsland.Core.Classes;
+    using TheIsland.Core.Bots;
     using TheIsland.Core.Services;
     using TheIsland.Core.Services.SQL.Entities;
     using TheIsland.Website.Classes;
@@ -15,12 +15,12 @@ namespace TheIsland.Website.Controllers
     public class UserController : IslandController
     {
         private readonly PlayerLinkingService _playerLinkingService;
-        private readonly IDUClient _duClient;
+        private readonly IGeneralBot _generalBot;
 
-        public UserController(PlayerLinkingService playerLinkingService, IDUClient client)
+        public UserController(PlayerLinkingService playerLinkingService, IGeneralBot generalBot)
         {
             this._playerLinkingService = playerLinkingService;
-            this._duClient = client;
+            this._generalBot = generalBot;
         }
 
         [HttpGet("~/link")]
@@ -45,7 +45,7 @@ namespace TheIsland.Website.Controllers
             }
 
             // find the players id;
-            var player = await this._playerLinkingService.FindPlayer(model.PlayerName).ConfigureAwait(false);
+            DualPlayer? player = await this._playerLinkingService.FindPlayer(model.PlayerName).ConfigureAwait(false);
 
             if (player == null)
             {
@@ -53,7 +53,7 @@ namespace TheIsland.Website.Controllers
                 return this.RedirectToAction("Link", model);
             }
 
-            var result = await this._playerLinkingService.SendToken(player.id, this.DiscordId).ConfigureAwait(false);
+            bool result = await this._playerLinkingService.SendToken(player.id, this.DiscordId).ConfigureAwait(false);
 
             if (!result)
             {
@@ -87,7 +87,7 @@ namespace TheIsland.Website.Controllers
                 return this.RedirectToAction("VerifyLink", model);
             }
 
-            var result = await this._playerLinkingService.VerifyToken(model.Token).ConfigureAwait(false);
+            bool result = await this._playerLinkingService.VerifyToken(model.Token).ConfigureAwait(false);
 
             if (!result)
             {
@@ -124,15 +124,15 @@ namespace TheIsland.Website.Controllers
                     return this.RedirectToAction("ImportBP", model);
                 }
 
-                foreach (var blueprint in model.BluePrint)
+                foreach (IFormFile blueprint in model.BluePrint)
                 {
                     try
                     {
-                        using (var ms = new MemoryStream())
+                        using (MemoryStream ms = new MemoryStream())
                         {
                             blueprint.CopyTo(ms);
-                            var fileBytes = ms.ToArray();
-                            model.ErrorMessage += await this._duClient.ImportBP(Convert.ToUInt64(result.dual_id), fileBytes).ConfigureAwait(false) + "<br />";
+                            byte[] fileBytes = ms.ToArray();
+                            model.ErrorMessage += await this._generalBot.ImportBP(Convert.ToUInt64(result.dual_id), fileBytes).ConfigureAwait(false) + "<br />";
                         }
                     }
                     catch (Exception exception)
