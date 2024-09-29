@@ -9,9 +9,9 @@ namespace TheIsland.Core.Services
     using System.Text.Json;
     using System.Threading.Tasks;
     using TheIsland.Core.Bots;
+    using TheIsland.Core.Entities;
     using TheIsland.Core.Helpers;
     using TheIsland.Core.Services.SQL;
-    using TheIsland.Core.Services.SQL.Entities;
     using TheIsland.Core.Settings;
     using static TheIsland.Core.Helpers.RandomHelpers;
 
@@ -216,14 +216,9 @@ namespace TheIsland.Core.Services
 
                 log.AddRange(await this.FixHotTimeMarkets().ConfigureAwait(false));
 
-                IEnumerable<DualMarketTransaction> orders = await this._dualMarketTransactionRepository.GetAllByPlayerAndMarket(chosenMarket, 3).ConfigureAwait(false);
+                // disable seeded orders
+                await this._dualMarketTransactionRepository.EnableBotSeedOrders(chosenMarket).ConfigureAwait(false);
 
-                foreach (DualMarketTransaction order in orders)
-                {
-                    order.completion_date = DateTime.UtcNow.AddDays(-3);
-                }
-
-                // await this._dualMarketTransactionRepository.UpdateAsync(orders).ConfigureAwait(false);
                 ulong constuctId = Convert.ToUInt64(actualMarkets[chosenMarket].construct_id);
                 logMessage($@"Construct Id = {constuctId}");
 
@@ -279,14 +274,7 @@ namespace TheIsland.Core.Services
                     await this._marketBot.SetConstructName(constuctId, constructName).ConfigureAwait(false);
 
                     //re-seed market
-                    IEnumerable<DualMarketTransaction> orders = await this._dualMarketTransactionRepository.GetAllByPlayerAndMarket(market, 3).ConfigureAwait(false);
-
-                    foreach (DualMarketTransaction order in orders)
-                    {
-                        order.completion_date = null;
-                    }
-
-                    //await this._dualMarketTransactionRepository.UpdateAsync(orders).ConfigureAwait(false);
+                    await this._dualMarketTransactionRepository.EnableBotSeedOrders(market).ConfigureAwait(false);
                 }
             }
 

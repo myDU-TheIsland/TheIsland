@@ -6,7 +6,7 @@ namespace TheIsland.Core.Helpers
 {
     using Newtonsoft.Json.Linq;
     using NQ;
-    using TheIsland.Core.Services.SQL.Entities;
+    using TheIsland.Core.Entities;
 
     public static class MarketTransactionHelpers
     {

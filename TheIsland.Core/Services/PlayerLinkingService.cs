@@ -6,8 +6,8 @@ namespace TheIsland.Core.Services
 {
     using System;
     using System.Threading.Tasks;
+    using TheIsland.Core.Entities;
     using TheIsland.Core.Services.SQL;
-    using TheIsland.Core.Services.SQL.Entities;
 
     public class PlayerLinkingService
     {

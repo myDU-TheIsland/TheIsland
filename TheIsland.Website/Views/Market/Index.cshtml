@@ -30,7 +30,6 @@
         botPurchasePrice *= marketMultiplier;
     }
 
-
     string graphHeader = markets.ContainsKey(Model.MarketId) ? " @ " + markets[Model.MarketId] : string.Empty;
 }
 <div class="row">
@@ -60,8 +59,8 @@
         string varyByString = $@"{Model.ItemId}/{Model.MarketId}";
 
         var orders = itemExists ? await this._marketService.GetAllActiveAsync(Model.MarketId, Model.ItemId).ConfigureAwait(false) : Enumerable.Empty<MarketTransaction>();
-        var buyOrders = orders.Where(item => item.type == TheIsland.Core.Services.SQL.Entities.TransactionType.BuyOrder);
-        var sellOrders = orders.Where(item => item.type == TheIsland.Core.Services.SQL.Entities.TransactionType.SellOrder);
+        var buyOrders = orders.Where(item => item.type == TheIsland.Core.Entities.TransactionType.BuyOrder);
+        var sellOrders = orders.Where(item => item.type == TheIsland.Core.Entities.TransactionType.SellOrder);
 
         <div class="col-md-5">
             <div class="card">

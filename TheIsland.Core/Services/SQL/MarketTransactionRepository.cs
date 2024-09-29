@@ -6,7 +6,7 @@ namespace TheIsland.Core.Services.SQL
 {
     using System.Data.Common;
     using Dapper;
-    using TheIsland.Core.Services.SQL.Entities;
+    using TheIsland.Core.Entities;
     using TheIsland.Core.Settings;
 
     public class MarketTransactionRepository : EntityRepository<MarketTransaction>

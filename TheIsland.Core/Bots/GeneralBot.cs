@@ -181,11 +181,11 @@ namespace TheIsland.Core.Bots
 
             try
             {
-                IEnumerable<Services.SQL.Entities.DualPlayer> players = await this._dualPlayerRepository.GetAsync().ConfigureAwait(false);
+                IEnumerable<Entities.DualPlayer> players = await this._dualPlayerRepository.GetAsync().ConfigureAwait(false);
 
                 await this.BotConnectionTest().ConfigureAwait(false);
 
-                foreach (Services.SQL.Entities.DualPlayer player in players)
+                foreach (Entities.DualPlayer player in players)
                 {
                     if (player.admin || player.is_bot)
                     {
@@ -226,7 +226,7 @@ namespace TheIsland.Core.Bots
             {
                 double giveToPlayer = amount * 100;
 
-                IEnumerable<Services.SQL.Entities.DualPlayer> players = await this._dualPlayerRepository.GetAsync().ConfigureAwait(false);
+                IEnumerable<Entities.DualPlayer> players = await this._dualPlayerRepository.GetAsync().ConfigureAwait(false);
 
                 await this.BotConnectionTest().ConfigureAwait(false);
 
@@ -250,7 +250,7 @@ namespace TheIsland.Core.Bots
                     return log;
                 }
 
-                foreach (Services.SQL.Entities.DualPlayer player in players)
+                foreach (Entities.DualPlayer player in players)
                 {
                     if (player.admin || player.is_bot)
                     {

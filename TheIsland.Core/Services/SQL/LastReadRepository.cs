@@ -7,7 +7,7 @@ namespace TheIsland.Core.Services.SQL
     using System.Data.Common;
     using Dapper.Contrib.Extensions;
     using Npgsql;
-    using TheIsland.Core.Services.SQL.Entities;
+    using TheIsland.Core.Entities;
     using TheIsland.Core.Settings;
 
     public class LastReadRepository

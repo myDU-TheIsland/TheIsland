@@ -2,7 +2,7 @@
 // Copyright (c) Paul Layne. All rights reserved.
 // </copyright>
 
-namespace TheIsland.Core.Services.SQL.Entities
+namespace TheIsland.Core.Entities
 {
     using System.Text.Json.Serialization;
 

@@ -6,7 +6,7 @@ namespace TheIsland.Core.Services.SQL
 {
     using System.Data.Common;
     using Dapper;
-    using TheIsland.Core.Services.SQL.Entities;
+    using TheIsland.Core.Entities;
     using TheIsland.Core.Settings;
 
     public class DualMarketTransactionRepository : EntityRepository<DualMarketTransaction>
@@ -38,11 +38,19 @@ namespace TheIsland.Core.Services.SQL
             }
         }
 
-        public async Task<IEnumerable<DualMarketTransaction>> GetAllByPlayerAndMarket(double marketId, double ownerId)
+        public async Task<int> DisableBotSeedOrders(double marketId)
         {
             using (DbConnection databaseConnection = this.GetConnection())
             {
-                return await databaseConnection.QueryAsync<DualMarketTransaction>("SELECT * FROM public.market_order where market_id = @MarketId and owner_id = @OwnerId;", new { MarketId = marketId, OwnerId = ownerId }).ConfigureAwait(false);
+                return await databaseConnection.ExecuteAsync("UPDATE public.market_order SET completion_date = @DateTime where market_id = @MarketId and owner_id = @OwnerId;", new { MarketId = marketId, OwnerId = 3, @DateTime = DateTime.UtcNow.AddDays(-3) }).ConfigureAwait(false);
+            }
+        }
+
+        public async Task<int> EnableBotSeedOrders(double marketId)
+        {
+            using (DbConnection databaseConnection = this.GetConnection())
+            {
+                return await databaseConnection.ExecuteAsync("UPDATE public.market_order SET completion_date = null where market_id = @MarketId and owner_id = @OwnerId;", new { MarketId = marketId, OwnerId = 3 }).ConfigureAwait(false);
             }
         }
     }

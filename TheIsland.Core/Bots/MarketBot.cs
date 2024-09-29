@@ -165,6 +165,7 @@ namespace TheIsland.Core.Bots
                     if (this.BuyPrices.TryGetValue(order.itemType, out double budget))
                     {
                         budget *= marketMultiplier;
+                        budget = Math.Ceiling(budget);
                     }
 
                     logMessage(@$"Using Budget {budget} on {order.itemType} ({order.orderId}@{order.unitPrice})");

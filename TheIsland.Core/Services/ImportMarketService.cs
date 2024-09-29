@@ -4,8 +4,8 @@
 
 namespace TheIsland.Core.Services
 {
+    using TheIsland.Core.Entities;
     using TheIsland.Core.Services.SQL;
-    using TheIsland.Core.Services.SQL.Entities;
     using static TheIsland.Core.Helpers.MarketTransactionHelpers;
 
     public interface IImportMarketService

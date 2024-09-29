@@ -9,7 +9,7 @@ namespace TheIsland.Core.Services.SQL
     using System.Threading;
     using System.Threading.Tasks;
     using Dapper;
-    using TheIsland.Core.Services.SQL.Entities;
+    using TheIsland.Core.Entities;
     using TheIsland.Core.Settings;
 
     public class DualMarketRepository : EntityRepository<DualMarket>

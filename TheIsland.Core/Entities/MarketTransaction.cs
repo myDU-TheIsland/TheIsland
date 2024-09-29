@@ -2,10 +2,11 @@
 // Copyright (c) Paul Layne. All rights reserved.
 // </copyright>
 
-namespace TheIsland.Core.Services.SQL.Entities
+namespace TheIsland.Core.Entities
 {
     using System;
     using Dapper.Contrib.Extensions;
+    using TheIsland.Core.Entities;
 
     public enum TransactionType
     {
