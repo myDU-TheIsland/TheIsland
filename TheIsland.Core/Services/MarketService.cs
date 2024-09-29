@@ -214,44 +214,18 @@ namespace TheIsland.Core.Services
 
                 logMessage($@"Markets : {JsonSerializer.Serialize(actualMarkets)}");
 
-                ulong constuctId;
-                IEnumerable<DualMarketTransaction> orders;
+                log.AddRange(await this.FixHotTimeMarkets().ConfigureAwait(false));
 
-                foreach (KeyValuePair<ulong, double> market in configuredMarkets)
-                {
-                    constuctId = Convert.ToUInt64(actualMarkets[market.Key].construct_id);
-                    string oldMarketName = await this._marketBot.GetConstructName(constuctId).ConfigureAwait(false) ?? string.Empty;
-
-                    if (oldMarketName.StartsWith("[!]"))
-                    {
-                        logMessage($@"Got to rename old market '{oldMarketName}'");
-                        this._marketBot.MarketBudgetMultiplier.Remove(market.Key, out _);
-
-                        string constructName = oldMarketName;
-                        int index = constructName.IndexOf(']', 3);
-                        constructName = constructName.Substring(index + 1).Trim();
-
-                        logMessage($@"Renaming '{oldMarketName}' to '{constructName}'");
-                        await this._marketBot.SetConstructName(constuctId, constructName).ConfigureAwait(false);
-
-                        //re-seed market
-                        orders = await this._dualMarketTransactionRepository.GetAllByPlayerAndMarket(market.Key, 3).ConfigureAwait(false);
-
-                        foreach (DualMarketTransaction order in orders)
-                        {
-                            order.completion_date = null;
-                        }
-                    }
-                }
-
-                orders = await this._dualMarketTransactionRepository.GetAllByPlayerAndMarket(chosenMarket, 3).ConfigureAwait(false);
+                IEnumerable<DualMarketTransaction> orders = await this._dualMarketTransactionRepository.GetAllByPlayerAndMarket(chosenMarket, 3).ConfigureAwait(false);
 
                 foreach (DualMarketTransaction order in orders)
                 {
                     order.completion_date = DateTime.UtcNow.AddDays(-3);
                 }
 
-                constuctId = Convert.ToUInt64(actualMarkets[chosenMarket].construct_id);
+                await this._dualMarketTransactionRepository.UpdateAsync(orders).ConfigureAwait(false);
+
+                ulong constuctId = Convert.ToUInt64(actualMarkets[chosenMarket].construct_id);
                 logMessage($@"Construct Id = {constuctId}");
 
                 logMessage($@"Adding new market to MarketBudgetMultiplier");
@@ -274,6 +248,50 @@ namespace TheIsland.Core.Services
                 logMessage(@$"Error: {exception}");
                 return log;
             }
+        }
+
+        private async Task<List<string>> FixHotTimeMarkets()
+        {
+            List<string> log = new List<string>();
+
+            void logMessage(string input)
+            {
+                log.Add($@"{DateTime.Now} :: {input}");
+            }
+
+            List<ulong> configuredMarkets = this._marketBotConfig.HotTimeMarkets.Select(Convert.ToUInt64).ToList();
+            Dictionary<ulong, DualMarket> actualMarkets = (await this._dualMarketRepository.GetAsync().ConfigureAwait(false)).ToDictionary(key => Convert.ToUInt64(key.id), value => value);
+
+            foreach (ulong market in configuredMarkets)
+            {
+                ulong constuctId = Convert.ToUInt64(actualMarkets[market].construct_id);
+                string oldMarketName = await this._marketBot.GetConstructName(constuctId).ConfigureAwait(false) ?? string.Empty;
+
+                if (oldMarketName.StartsWith("[!]"))
+                {
+                    logMessage($@"Got to rename old market '{oldMarketName}'");
+                    this._marketBot.MarketBudgetMultiplier.TryRemove(market, out _);
+
+                    string constructName = oldMarketName;
+                    int index = constructName.IndexOf(']', 3);
+                    constructName = constructName.Substring(index + 1).Trim();
+
+                    logMessage($@"Renaming '{oldMarketName}' to '{constructName}'");
+                    await this._marketBot.SetConstructName(constuctId, constructName).ConfigureAwait(false);
+
+                    //re-seed market
+                    IEnumerable<DualMarketTransaction> orders = await this._dualMarketTransactionRepository.GetAllByPlayerAndMarket(market, 3).ConfigureAwait(false);
+
+                    foreach (DualMarketTransaction order in orders)
+                    {
+                        order.completion_date = null;
+                    }
+
+                    await this._dualMarketTransactionRepository.UpdateAsync(orders).ConfigureAwait(false);
+                }
+            }
+
+            return log;
         }
     }
 }

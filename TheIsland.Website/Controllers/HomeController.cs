@@ -22,7 +22,8 @@ namespace TheIsland.Website.Controllers
             return this.View();
         }
 
-        public IActionResult Privacy()
+        [Route("~/Community")]
+        public IActionResult Community()
         {
             return this.View();
         }
