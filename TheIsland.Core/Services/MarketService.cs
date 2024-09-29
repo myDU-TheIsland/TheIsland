@@ -223,8 +223,7 @@ namespace TheIsland.Core.Services
                     order.completion_date = DateTime.UtcNow.AddDays(-3);
                 }
 
-                await this._dualMarketTransactionRepository.UpdateAsync(orders).ConfigureAwait(false);
-
+                // await this._dualMarketTransactionRepository.UpdateAsync(orders).ConfigureAwait(false);
                 ulong constuctId = Convert.ToUInt64(actualMarkets[chosenMarket].construct_id);
                 logMessage($@"Construct Id = {constuctId}");
 
@@ -287,7 +286,7 @@ namespace TheIsland.Core.Services
                         order.completion_date = null;
                     }
 
-                    await this._dualMarketTransactionRepository.UpdateAsync(orders).ConfigureAwait(false);
+                    //await this._dualMarketTransactionRepository.UpdateAsync(orders).ConfigureAwait(false);
                 }
             }
 
