@@ -163,9 +163,9 @@ namespace TheIsland.Core.Services
             return log;
         }
 
-        public async Task<IEnumerable<MarketStatistics>> GetHourlyStats(double itemId)
+        public async Task<IEnumerable<MarketStatistics>> GetHourlyStats(double itemId, double marketId = -1)
         {
-            IEnumerable<MarketStatistics> results = await this._transactionRepository.GetHourlyStats(itemId).ConfigureAwait(false);
+            IEnumerable<MarketStatistics> results = await this._transactionRepository.GetHourlyStats(itemId, marketId).ConfigureAwait(false);
 
             IEnumerable<DualMarket> markets = await this._dualMarketRepository.GetAsync().ConfigureAwait(false);
 

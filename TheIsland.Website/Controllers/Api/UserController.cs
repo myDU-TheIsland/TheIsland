@@ -7,10 +7,11 @@ namespace TheIsland.Website.Controllers.Api
     using Microsoft.AspNetCore.Mvc;
     using TheIsland.Core.Bots;
     using TheIsland.Core.Services.SQL;
+    using TheIsland.Website.Classes;
     using TheIsland.Website.Framework.Attributes;
 
     [Area("Api")]
-    public class UserController : Controller
+    public class UserController : IslandController
     {
         private readonly DualPlayerRepository _playerRepository;
         private readonly UserMappingRepository _userMappingRepository;

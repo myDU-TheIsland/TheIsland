@@ -8,9 +8,9 @@
 
     var items = _generalBot.GetListOfSellableItems().OrderBy(items => items.Value).ToDictionary();
 
-    var markets = (await _marketRepo.GetAsync().ConfigureAwait(false)).ToDictionary(key => key.id, value => value.name);
+    var markets = (await _marketRepo.GetAsync().ConfigureAwait(false)).ToDictionary(key => key.id, value => value.name.Replace("Market", string.Empty).Replace("District", string.Empty).Trim());
     markets.Add(0, "All Markets");
-
+    
     var itemExists = items.ContainsKey(Model.ItemId);
     var selectedMarket = markets[Model.MarketId];
     var selectedItem = itemExists ? items[Model.ItemId] : string.Empty;
@@ -42,8 +42,8 @@
                         <option value="@item.Key">@item.Value</option>
                     }
                 </select>
-                <select asp-for="MarketId" class="selectpicker" data-size="7" data-style="btn btn-primary btn-round" id="input-marketId">
-                    @foreach (var market in markets.OrderBy(item => item.Key).ToArray())
+                <select asp-for="MarketId" class="selectpicker" data-size="7" data-live-search="true" data-style="btn btn-primary btn-round" id="input-marketId">
+                    @foreach (var market in markets.OrderBy(item => item.Value).ToArray())
                     {
                         <option value="@market.Key">@market.Value</option>
                     }
@@ -160,6 +160,12 @@
     </script>
     @if (itemExists)
     {
+        string uri = $@"/Api/Market/Stats/Hourly/{Model.ItemId}";
+        if(Model.MarketId > 0)
+        {
+            uri += $@"/{Model.MarketId}";
+        }
+
         <script type="text/javascript">
             var table = $('#buyTable').DataTable({
                 searching: false,
@@ -177,7 +183,7 @@
 
             function drawChart() {
                 var jsonData = $.ajax({
-                    url: "/Api/Market/Stats/Hourly/@Model.ItemId",
+                    url: "@uri",
                     dataType: "json",
                     async: false
                 }).responseText;

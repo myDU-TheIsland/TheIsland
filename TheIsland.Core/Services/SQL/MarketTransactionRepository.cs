@@ -15,9 +15,9 @@ namespace TheIsland.Core.Services.SQL
         {
         }
 
-        public async Task<IEnumerable<MarketStatistics>> GetHourlyStats(double item)
+        public async Task<IEnumerable<MarketStatistics>> GetHourlyStats(double item, double marketId = -1)
         {
-            string query = $@"
+            string query = @"
 WITH 
 --Generate time series based on min and max creation_date
 TIME_SERIES AS (
@@ -37,6 +37,7 @@ FROM TIME_SERIES
 LEFT JOIN public.market_transactions
 	ON TIME_SERIES.hour = date_trunc('hour', creation_date) 
 	AND item_id = @ItemId
+	{market}
 GROUP BY 
 	item_id,
 	TIME_SERIES.hour
@@ -44,9 +45,18 @@ ORDER BY TIME_SERIES.hour DESC
 LIMIT 72
 			";
 
+            if (marketId > 0)
+            {
+                query = query.Replace("{market}", "AND market_id = @MarketId");
+            }
+            else
+            {
+                query = query.Replace("{market}", string.Empty);
+            }
+
             using (DbConnection databaseConnection = this.GetConnection())
             {
-                return await databaseConnection.QueryAsync<MarketStatistics>(query, new { ItemId = item }).ConfigureAwait(false);
+                return await databaseConnection.QueryAsync<MarketStatistics>(query, new { ItemId = item, MarketId = marketId }).ConfigureAwait(false);
             }
         }
 

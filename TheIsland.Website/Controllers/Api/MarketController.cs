@@ -41,89 +41,12 @@ namespace TheIsland.Website.Controllers.Api
         }
 
         [HttpGet]
-        public async Task<IActionResult> Markets()
-        {
-            List<DualMarket> output = (await this._marketRepo.GetAsync().ConfigureAwait(false)).ToList();
-            output.Add(new DualMarket { id = 0, name = "All Markets" });
-            output = output.OrderBy(x => x.id).ToList();
-            return this.Json(output.ToDictionary(key => key.name, value => value.id));
-        }
-
-        [HttpGet]
-        public IActionResult Hierarchy()
-        {
-            return this.Json(this._generalBot.GetMarketHierarchy(false));
-        }
-
-        [HttpGet]
-        public IActionResult ItemList()
-        {
-            Dictionary<string, double> output = this._generalBot.GetListOfSellableItems().ToArray().DistinctBy(item => item.Value).ToDictionary(key => key.Value, value => value.Key);
-            return this.Json(output);
-        }
-
-        [HttpGet]
         [Route("Api/Market/Stats/Hourly/{id}")]
-        public async Task<IActionResult> GetHourlySales(double id)
+        [Route("Api/Market/Stats/Hourly/{id}/{marketId}")]
+        public async Task<IActionResult> GetHourlySales(double id, double marketId = -1)
         {
-            IEnumerable<MarketStatistics> results = await this._marketService.GetHourlyStats(id).ConfigureAwait(false);
+            IEnumerable<MarketStatistics> results = await this._marketService.GetHourlyStats(id, marketId).ConfigureAwait(false);
             return this.Json(results.ToGraph());
-        }
-
-        [HttpGet]
-        [ApiKey]
-        public async Task<IActionResult> Import()
-        {
-            return this.Json(await this._importMarketService.ImportAsync().ConfigureAwait(false));
-        }
-
-        [HttpGet]
-        [ApiKey]
-        public async Task<IActionResult> BuyStuff()
-        {
-            return this.Json(await this._marketBot.BuyStuff(0).ConfigureAwait(false));
-        }
-
-        [HttpGet]
-        [ApiKey]
-        public async Task<IActionResult> CancelBotOrders()
-        {
-            return this.Json(await this._marketService.CancelAllBotOrders().ConfigureAwait(false));
-        }
-
-        [HttpGet]
-        [ApiKey]
-        public async Task<IActionResult> SellStuff()
-        {
-            return this.Json(await this._marketService.SellAllMarketsContainerContents().ConfigureAwait(false));
-        }
-
-        [HttpGet]
-        [ApiKey]
-        public async Task<IActionResult> GetMarkets()
-        {
-            return this.Json(await this._dualMarketRepository.GetAsync().ConfigureAwait(false));
-        }
-
-        [HttpGet]
-        [ApiKey]
-        public async Task<IActionResult> HotTime()
-        {
-            return this.Json(await this._marketService.HotTimeEvent().ConfigureAwait(false));
-        }
-
-        [HttpGet]
-        [ApiKey]
-        public async Task<IActionResult> GetMarketName()
-        {
-            return this.Json(await this._marketBot.GetConstructName(170000).ConfigureAwait(false));
-        }
-
-        [HttpGet]
-        [ApiKey]
-        public async Task<IActionResult> SetMarketName()
-        {
-            return this.Json(await this._marketBot.SetConstructName(170000, "Aegis 123").ConfigureAwait(false));
         }
     }
 }
