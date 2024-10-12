@@ -3,10 +3,6 @@
     ViewData["Title"] = "Import Blueprint";
 }
 
-@if (!string.IsNullOrEmpty(Model.ErrorMessage))
-{
-    <p>@Html.Raw(Model.ErrorMessage)</p>
-}
 <div class="row">
     <div class="col-md-5 pt-0">
         <img src="/img/blueprint.jpg" class='card-img-top'>
@@ -14,7 +10,11 @@
             <div class="card-header">
                 <h3 class='text-center'>Blueprint Import</h3>
             </div>
-            <div class="card-body">                
+            <div class="card-body">
+                @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                {
+                    <p>@Html.Raw(Model.ErrorMessage)</p>
+                }
                 <form asp-action="ImportBPFile" method="post" enctype="multipart/form-data">
                     <div class="row">
                         <div class="col-6">
