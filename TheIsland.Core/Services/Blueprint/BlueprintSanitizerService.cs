@@ -23,6 +23,43 @@ namespace TheIsland.Core.Services.Blueprint
             // ReSharper disable once AccessToStaticMemberViaDerivedType
             var bp = await JObject.ReadFromAsync(textReader, cancellationToken).ConfigureAwait(false);
 
+            var model = bp["Model"];
+            if (model == null)
+            {
+                return BlueprintSanitationResult.Failed("Not a valid BP");
+            }
+
+            model["FreeDeploy"] = false;
+
+            if (bp["Model"]?["JsonProperties"] == null)
+            {
+                return BlueprintSanitationResult.Failed("BP is Missing JsonProperties");
+            }
+
+            var jsonPropObj = bp["Model"]?["JsonProperties"] !;
+            jsonPropObj["isNPC"] = false;
+            jsonPropObj["isUntargetable"] = false;
+            jsonPropObj["planetProperties"] = null;
+
+            var serverProps = bp["Model"]?["JsonProperties"]?["serverProperties"];
+            if (serverProps != null)
+            {
+                serverProps["isFixture"] = null;
+                serverProps["isBase"] = null;
+                serverProps["isFlaggedForModeration"] = null;
+                serverProps["isDynamicWreck"] = false;
+                serverProps["fuelType"] = null;
+                serverProps["fuelAmount"] = null;
+                serverProps["compacted"] = false;
+                serverProps["dynamicFixture"] = null;
+                serverProps["constructCloneSource"] = null;
+                serverProps["rdmsTags"] = JObject.FromObject(new
+                {
+                    constructTags = Array.Empty<object>(),
+                    elementsTags = Array.Empty<object>(),
+                });
+            }
+
             if (bp["Elements"] == null)
             {
                 return BlueprintSanitationResult.Succeeded(blueprintBytes);
