@@ -117,10 +117,16 @@ namespace TheIsland.Website.Controllers
         {
             if (this.ModelState.IsValid && model.BluePrint != null)
             {
-                UserMapping? result = await this._playerLinkingService.GetPlayerMapping(this.DiscordId).ConfigureAwait(false);
-                if (result == null)
+                var player = this.SelectedPlayer;
+
+                if (player == -1)
                 {
-                    model.ErrorMessage = "Couldn't find your player account. Is it linked?";
+                    player = (await this._playerLinkingService.GetPlayerMapping(this.DiscordId).ConfigureAwait(false)).FirstOrDefault()?.dual_id ?? -1;
+                }
+
+                if (player == -1)
+                {
+                    model.ErrorMessage = "Failed to find player id, did you link your player yet?";
                     return this.RedirectToAction("ImportBP", model);
                 }
 
@@ -132,7 +138,7 @@ namespace TheIsland.Website.Controllers
                         {
                             blueprint.CopyTo(ms);
                             byte[] fileBytes = ms.ToArray();
-                            model.ErrorMessage += await this._generalBot.ImportBP(Convert.ToUInt64(result.dual_id), fileBytes).ConfigureAwait(false) + "<br />";
+                            model.ErrorMessage += await this._generalBot.ImportBP(Convert.ToUInt64(player), fileBytes).ConfigureAwait(false) + "<br />";
                         }
                     }
                     catch (Exception exception)
@@ -146,6 +152,32 @@ namespace TheIsland.Website.Controllers
 
             model.ErrorMessage = "Not sure what happened. Contact an admin";
             return this.RedirectToAction("ImportBP", model);
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> SetPlayerId(double playerId)
+        {
+            string? urlReferrer = null;
+            if (this.HttpContext.Request.Headers.ContainsKey("Referer"))
+            {
+                urlReferrer = this.HttpContext.Request.Headers.Referer!.ToString();
+            }
+
+            if (urlReferrer == null)
+            {
+                urlReferrer = "~/";
+            }
+
+            var players = await this._playerLinkingService.GetPlayerMapping(this.DiscordId).ConfigureAwait(false);
+
+            if (players.Any(item => item.dual_id == playerId))
+            {
+                //set session variable
+                this.HttpContext.Session.SetString("Player", playerId.ToString());
+            }
+
+            return this.Redirect(urlReferrer);
         }
     }
 }

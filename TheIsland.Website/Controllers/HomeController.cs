@@ -6,9 +6,10 @@ namespace TheIsland.Website.Controllers
 {
     using System.Diagnostics;
     using Microsoft.AspNetCore.Mvc;
+    using TheIsland.Website.Classes;
     using TheIsland.Website.Models;
 
-    public class HomeController : Controller
+    public class HomeController : IslandController
     {
         private readonly ILogger<HomeController> _logger;
 

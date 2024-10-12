@@ -10,6 +10,7 @@ namespace TheIsland.Website
     using Hangfire.Dashboard;
     using Microsoft.AspNetCore.Authentication;
     using Microsoft.AspNetCore.Authentication.Cookies;
+    using Microsoft.AspNetCore.DataProtection;
     using Microsoft.AspNetCore.Http.Features;
     using Microsoft.AspNetCore.HttpOverrides;
     using Microsoft.AspNetCore.Server.Kestrel.Core;
@@ -122,7 +123,7 @@ namespace TheIsland.Website
                         user.GetString("avatar"),
                         (user.GetString("avatar") ?? string.Empty).StartsWith("a_") ? "gif" : "png"));
             });
-
+            services.AddSession();
             services.AddAuthorization(options =>
             {
                 options.AddPolicy("Admin", policy => policy.RequireClaim("nameidentifier", SiteSettings.Admins));
@@ -133,23 +134,35 @@ namespace TheIsland.Website
                 options.EnableForHttps = true;
             });
 
+            if (this.HostingEnvironment.IsDevelopment())
+            {
+                services.AddDataProtection()
+                    .PersistKeysToFileSystem(new DirectoryInfo(@"./dpk"));
+            }
+            else
+            {
+                services.AddDataProtection()
+                    .PersistKeysToFileSystem(new DirectoryInfo(@"/config/dpk"));
+            }
+
             // settings
             services.AddSingleton<IMarketBot, MarketBot>();
             services.AddSingleton<IGeneralBot, GeneralBot>();
-            services.AddSingleton<ISiteSettings>(SiteSettings);
+            services.AddSingleton(SiteSettings);
             services.AddSingleton(SiteSettings.DualUniverse);
+            services.AddSingleton(SiteSettings.Postgres);
             services.AddSingleton(MarketBotConfig);
             services.AddSingleton<ApiKeyAuthorizationFilter>();
 
             // repositories
-            services.AddSingleton(new DualMarketRepository(SiteSettings.Postgres));
-            services.AddSingleton(new DualMarketTransactionRepository(SiteSettings.Postgres));
-            services.AddSingleton(new DualWalletRepository(SiteSettings.Postgres));
-            services.AddSingleton(new LastReadRepository(SiteSettings.Postgres));
-            services.AddSingleton(new LinkTokenRepository(SiteSettings.Postgres));
-            services.AddSingleton(new MarketTransactionRepository(SiteSettings.Postgres));
-            services.AddSingleton(new DualPlayerRepository(SiteSettings.Postgres));
-            services.AddSingleton(new UserMappingRepository(SiteSettings.Postgres));
+            services.AddSingleton<DualMarketRepository>();
+            services.AddSingleton<DualMarketTransactionRepository>();
+            services.AddSingleton<DualWalletRepository>();
+            services.AddSingleton<LastReadRepository>();
+            services.AddSingleton<LinkTokenRepository>();
+            services.AddSingleton<MarketTransactionRepository>();
+            services.AddSingleton<DualPlayerRepository>();
+            services.AddSingleton<UserMappingRepository>();
 
             // services
             services.AddSingleton<MarketService>();
@@ -197,6 +210,7 @@ namespace TheIsland.Website
             }
 
             app.UseHttpsRedirection();
+            app.UseSession();
 
             // Required to serve files with no extension in the .well-known folder
             StaticFileOptions options = new StaticFileOptions()
@@ -227,7 +241,7 @@ namespace TheIsland.Website
                     pattern: "{controller=Home}/{action=Index}/{id?}");
             });
 
-            app.UseHangfireDashboard("/hangfire", new DashboardOptions
+            app.UseHangfireDashboard("/admin/hangfire", new DashboardOptions
             {
                 Authorization = new[] { new HangfireAuthenticationFilter() },
                 IsReadOnlyFunc = (DashboardContext context) => true,

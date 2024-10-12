@@ -26,6 +26,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <Compile Remove="dpk\**" />
+	  <Content Remove="dpk\**" />
+	  <EmbeddedResource Remove="dpk\**" />
+	  <None Remove="dpk\**" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<AdditionalFiles Include="../stylecop.json" Link="stylecop.json">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</AdditionalFiles>

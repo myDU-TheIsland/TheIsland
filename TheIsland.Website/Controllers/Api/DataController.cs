@@ -37,7 +37,7 @@ namespace TheIsland.Website.Controllers.Api
 
             foreach (var price in this._marketBot.BuyPrices)
             {
-                prices.TryAdd(price.Key, Math.Ceiling(price.Value * multi));
+                prices.TryAdd(price.Key, Math.Ceiling((price.Value / 100) * multi));
             }
 
             switch (type)

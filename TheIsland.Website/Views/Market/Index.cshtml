@@ -36,13 +36,13 @@
     <div class="col-md-12">
         <div class="card">
             <div class="card-body">
-                <select asp-for="ItemId" class="selectpicker" data-size="7" data-live-search="true" data-style="btn btn-primary btn-round" id="input-itemId">
+                <select asp-for="ItemId" class="selectpicker" data-size="7" data-live-search="true" data-style="btn btn-primary" id="input-itemId">
                     @foreach (var item in items)
                     {
                         <option value="@item.Key">@item.Value</option>
                     }
                 </select>
-                <select asp-for="MarketId" class="selectpicker" data-size="7" data-live-search="true" data-style="btn btn-primary btn-round" id="input-marketId">
+                <select asp-for="MarketId" class="selectpicker" data-size="7" data-live-search="true" data-style="btn btn-primary" id="input-marketId">
                     @foreach (var market in markets.OrderBy(item => item.Value).ToArray())
                     {
                         <option value="@market.Key">@market.Value</option>

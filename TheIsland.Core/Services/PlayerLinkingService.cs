@@ -5,6 +5,7 @@
 namespace TheIsland.Core.Services
 {
     using System;
+    using System.Collections.Generic;
     using System.Threading.Tasks;
     using TheIsland.Core.Entities;
     using TheIsland.Core.Services.SQL;
@@ -75,25 +76,35 @@ namespace TheIsland.Core.Services
 
         public async Task<bool> HasPlayerMapping(double discordId)
         {
-            UserMapping? result = await this._userMappingRepository.FindByDiscordId(discordId).ConfigureAwait(false);
+            IEnumerable<UserMapping> result = await this._userMappingRepository.FindByDiscordId(discordId).ConfigureAwait(false);
 
-            if (result != null)
+            if (result != null && result.Any())
             {
-                LinkToken? linkResult = await this._linkTokenRepository.FindByPlayerId(result.dual_id).ConfigureAwait(false);
-
-                if (linkResult != null)
+                foreach (UserMapping userMapping in result)
                 {
-                    // clean up result.
-                    await this._linkTokenRepository.RemoveAsync(linkResult.id).ConfigureAwait(false);
+                    LinkToken? linkResult = await this._linkTokenRepository.FindByPlayerId(userMapping.dual_id).ConfigureAwait(false);
+
+                    if (linkResult != null)
+                    {
+                        // clean up result.
+                        await this._linkTokenRepository.RemoveAsync(linkResult.id).ConfigureAwait(false);
+                    }
                 }
             }
 
-            return result != null;
+            return result != null && result.Any();
         }
 
-        public Task<UserMapping?> GetPlayerMapping(double discordId)
+        public async Task<IEnumerable<UserMapping>> GetPlayerMapping(double discordId)
         {
-            return this._userMappingRepository.FindByDiscordId(discordId);
+            var results = await this._userMappingRepository.FindByDiscordId(discordId).ConfigureAwait(false);
+
+            foreach (var result in results)
+            {
+                result.player_name = (await this._playerRepository.GetAsync(result.dual_id).ConfigureAwait(false)).display_name;
+            }
+
+            return results;
         }
     }
 }

@@ -1,5 +1,16 @@
 ﻿@using System.Security.Claims
+@using Microsoft.AspNetCore.Http;
 @inject TheIsland.Core.Services.PlayerLinkingService _playerLinkingService
+@{
+    bool hasPlayerInfo = false;
+    double discordId = -1;
+
+    if (User?.Identity?.IsAuthenticated ?? false)
+    {
+        discordId = double.Parse(Context.User.Claims.FirstOrDefault(item => item.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value ?? "-1");
+        hasPlayerInfo = await _playerLinkingService.HasPlayerMapping(discordId).ConfigureAwait(false);
+    }
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -39,17 +50,40 @@
                                 @if (User?.Identity?.IsAuthenticated ?? false)
                                 {
                                     <a class="dropdown-item" asp-area="" asp-controller="User" asp-action="Link">Link Game Account(s)</a>
-                                    @if (await _playerLinkingService.HasPlayerMapping(double.Parse(Context.User.Claims.FirstOrDefault(item => item.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value ?? "-1")).ConfigureAwait(false))
+                                    @if (hasPlayerInfo)
                                     {
                                         <a class="dropdown-item" asp-area="" asp-controller="User" asp-action="ImportBP">Blueprints</a>
                                     }
                                     <a asp-controller="Authentication" asp-action="SignOutCurrentUser" class="dropdown-item">Logout</a>
-                                } else {
+                                }
+                                else
+                                {
                                     <a asp-controller="Authentication" asp-action="Signin" class="dropdown-item">Sign In</a>
                                 }
                             </div>
                         </li>
                     </ul>
+                    @if (hasPlayerInfo)
+                    {
+                        <ul class="navbar-nav pull-right">
+                            <li class="nav-item">
+                                <form id="playerChange" asp-action="SetPlayerId" asp-controller="User" method="post">
+                                    @{
+                                        var players = await _playerLinkingService.GetPlayerMapping(discordId).ConfigureAwait(false);
+                                        var selectedPlayer = double.Parse(this.Context.Session.GetString("Player")??"-1");
+                                    }
+
+                                    <select name="playerId" id="playerSelection" value="@selectedPlayer" class="btn btn-primary">
+                                    @foreach (var player in players)
+                                    {
+                                        <option value="@player.dual_id">@player.player_name</option>
+                                    }
+
+                                    </select>
+                                </form>
+                            </li>
+                        </ul>
+                    }
                 </div>
             </nav>
         </div>
@@ -63,6 +97,11 @@
     <script src="~/js/plugins/perfect-scrollbar.jquery.min.js" asp-append-version="true"></script>
     <script src="~/js/plugins/jquery.dataTables.min.js" asp-append-version="true"></script>
     <script src="~/js/material-dashboard.min.js" asp-append-version="true"></script>
+    <script type="text/javascript">
+        $("#playerSelection").on( "change",  function(){
+          $("#playerChange").trigger( "submit" );
+        });
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

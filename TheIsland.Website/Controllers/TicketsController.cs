@@ -5,8 +5,9 @@
 namespace TheIsland.Website.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
+    using TheIsland.Website.Classes;
 
-    public class TicketsController : Controller
+    public class TicketsController : IslandController
     {
         public IActionResult Index()
         {

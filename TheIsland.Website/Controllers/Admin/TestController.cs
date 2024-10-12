@@ -14,7 +14,8 @@ namespace TheIsland.Website.Controllers.Admin
     using TheIsland.Website.Framework.Attributes;
     using TheIsland.Website.Framework.Helpers;
 
-    public class AdminController : IslandController
+    [Area("Admin")]
+    public class TestController : IslandController
     {
         private readonly MarketService _marketService;
         private readonly IImportMarketService _importMarketService;
@@ -23,7 +24,7 @@ namespace TheIsland.Website.Controllers.Admin
         private readonly IMarketBot _marketBot;
         private readonly DualMarketRepository _marketRepo;
 
-        public AdminController(
+        public TestController(
             IImportMarketService importMarketService,
             MarketService marketService,
             DualMarketRepository dualMarketRepository,
