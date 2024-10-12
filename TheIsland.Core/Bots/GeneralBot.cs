@@ -14,6 +14,7 @@ namespace TheIsland.Core.Bots
     using NQ.Interfaces;
     using NQutils.Sql;
     using TheIsland.Core.Classes;
+    using TheIsland.Core.Services.Blueprint;
     using TheIsland.Core.Services.SQL;
     using TheIsland.Core.Settings;
 
@@ -118,8 +119,33 @@ namespace TheIsland.Core.Bots
 
         #region User Functions
 
+        private bool IsBlueprintSanitationEnabled()
+            => Environment.GetEnvironmentVariable("BP_SANITATION_ENABLED") == "true";
+
         public async Task<string> ImportBP(ulong playerId, byte[] bp)
         {
+            if (this.IsBlueprintSanitationEnabled())
+            {
+                var sanitizer = new BlueprintSanitizerService();
+
+                try
+                {
+                    var result = await sanitizer.SanitizeAsync(this.Bot.GameplayBank, bp, CancellationToken.None)
+                        .ConfigureAwait(false);
+
+                    if (!result.Success)
+                    {
+                        return result.Message;
+                    }
+
+                    bp = result.BlueprintBytes;
+                }
+                catch (Exception e)
+                {
+                    return e.Message;
+                }
+            }
+
             await this.BotConnectionTest().ConfigureAwait(false);
             BlueprintId blueprintId = 0;
             try
