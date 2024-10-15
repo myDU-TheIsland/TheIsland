@@ -21,6 +21,7 @@ namespace TheIsland.Core.Bots
     using NQutils;
     using NQutils.Sql;
     using Orleans;
+    using TheIsland.Core.Helpers;
     using TheIsland.Core.Settings;
 
     public interface IBotClient
@@ -77,7 +78,7 @@ namespace TheIsland.Core.Bots
 
             ServiceProvider servProvider = services.BuildServiceProvider();
             this.ServiceProvider = servProvider;
-            this.ServiceProvider.StartServices().Wait();
+            this.ServiceProvider.StartServicesV2().Wait();
             ClientExtensions.SetSingletons(servProvider);
             ClientExtensions.UseFactory(servProvider.GetRequiredService<IDuClientFactory>());
             this.Orleans = this.ServiceProvider.GetRequiredService<IClusterClient>();
