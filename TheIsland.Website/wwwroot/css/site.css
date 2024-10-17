@@ -1,0 +1,3 @@
+div.bs-searchbox > span > input.form-control, div.bs-searchbox > input.form-control {
+    color: black !important;
+}
