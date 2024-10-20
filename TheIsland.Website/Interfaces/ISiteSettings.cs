@@ -13,6 +13,8 @@ namespace TheIsland.Website.Interfaces
 
         string[] ApiKey { get; set; }
 
+        string DPKPath { get; set; }
+
         DiscordSettings Discord { get; set; }
 
         DualUniverseSettings DualUniverse { get; set; }

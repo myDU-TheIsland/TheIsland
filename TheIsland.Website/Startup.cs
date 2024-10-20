@@ -137,7 +137,7 @@ namespace TheIsland.Website
             else
             {
                 services.AddDataProtection()
-                    .PersistKeysToFileSystem(new DirectoryInfo(@"/cwwonfig/dpk"));
+                    .PersistKeysToFileSystem(new DirectoryInfo(SiteSettings.DPKPath));
 
                 services.AddResponseCompression(options =>
                 {
