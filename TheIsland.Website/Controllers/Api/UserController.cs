@@ -15,12 +15,10 @@ namespace TheIsland.Website.Controllers.Api
     public class UserController : IslandController
     {
         private readonly DualPlayerRepository _playerRepository;
-        private readonly PlayerLinkingService _playerLinkingService;
 
-        public UserController(DualPlayerRepository playerRepository, PlayerLinkingService playerLinkingService)
+        public UserController(DualPlayerRepository playerRepository, PlayerLinkingService playerLinkingService) : base(playerLinkingService)
         {
             this._playerRepository = playerRepository;
-            this._playerLinkingService = playerLinkingService;
         }
 
         public async Task<IActionResult> Index()

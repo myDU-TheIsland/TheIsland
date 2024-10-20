@@ -30,7 +30,8 @@ namespace TheIsland.Website.Controllers.Admin
             DualMarketRepository dualMarketRepository,
             IGeneralBot generalBot,
             IMarketBot marketBot,
-            DualMarketRepository marketRepo)
+            DualMarketRepository marketRepo,
+            PlayerLinkingService playerLinkingService) : base(playerLinkingService)
         {
             this._importMarketService = importMarketService;
             this._marketService = marketService;

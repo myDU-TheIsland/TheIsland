@@ -6,6 +6,7 @@ namespace TheIsland.Website.Controllers
 {
     using System.Diagnostics;
     using Microsoft.AspNetCore.Mvc;
+    using TheIsland.Core.Services;
     using TheIsland.Website.Classes;
     using TheIsland.Website.Models;
 
@@ -13,7 +14,7 @@ namespace TheIsland.Website.Controllers
     {
         private readonly ILogger<HomeController> _logger;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, PlayerLinkingService playerLinkingService) : base(playerLinkingService)
         {
             this._logger = logger;
         }

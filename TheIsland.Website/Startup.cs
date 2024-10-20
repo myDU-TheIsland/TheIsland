@@ -123,16 +123,11 @@ namespace TheIsland.Website
                         user.GetString("avatar"),
                         (user.GetString("avatar") ?? string.Empty).StartsWith("a_") ? "gif" : "png"));
             });
-            services.AddSession();
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("Admin", policy => policy.RequireClaim("nameidentifier", SiteSettings.Admins));
-            });
 
-            services.AddResponseCompression(options =>
-            {
-                options.EnableForHttps = true;
-            });
+            services.AddSession();
+
+            services.AddAuthorizationBuilder()
+                .AddPolicy("Admin", policy => policy.RequireClaim("nameidentifier", SiteSettings.Admins));
 
             if (this.HostingEnvironment.IsDevelopment())
             {
@@ -142,7 +137,12 @@ namespace TheIsland.Website
             else
             {
                 services.AddDataProtection()
-                    .PersistKeysToFileSystem(new DirectoryInfo(@"/config/dpk"));
+                    .PersistKeysToFileSystem(new DirectoryInfo(@"/cwwonfig/dpk"));
+
+                services.AddResponseCompression(options =>
+                {
+                    options.EnableForHttps = true;
+                });
             }
 
             // settings
@@ -163,13 +163,14 @@ namespace TheIsland.Website
             services.AddSingleton<MarketTransactionRepository>();
             services.AddSingleton<DualPlayerRepository>();
             services.AddSingleton<UserMappingRepository>();
+            services.AddSingleton<BlueprintExportRepository>();
 
             // services
             services.AddSingleton<MarketService>();
             services.AddSingleton<IImportMarketService, ImportMarketService>();
             services.AddSingleton<PlayerLinkingService>();
             services.AddSingleton<IIngameMessaging, IngameMessaging>();
-            services.AddSingleton<PlayerLinkingService>();
+            services.AddSingleton<IBlueprintService, BlueprintService>();
 
             if (this.HostingEnvironment.IsDevelopment())
             {
@@ -208,6 +209,10 @@ namespace TheIsland.Website
             {
                 IdentityModelEventSource.ShowPII = true;
             }
+            else
+            {
+                app.UseResponseCompression();
+            }
 
             app.UseHttpsRedirection();
             app.UseSession();
@@ -229,7 +234,6 @@ namespace TheIsland.Website
             {
                 ForwardedHeaders = ForwardedHeaders.All,
             });
-            app.UseResponseCompression();
 
             app.UseEndpoints(endpoints =>
             {

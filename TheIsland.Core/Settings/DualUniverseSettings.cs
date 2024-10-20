@@ -8,6 +8,8 @@ namespace TheIsland.Core.Settings
     {
         public string QueueingURL { get; set; } = "http://localhost:9630";
 
+        public string ExportPath { get; set; } = string.Empty;
+
         public ulong[] MarketHeaderIds { get; set; } = { };
 
         public BotSettings WebsiteBot { get; set; } = new BotSettings();

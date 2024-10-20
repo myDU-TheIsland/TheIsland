@@ -19,7 +19,7 @@ namespace TheIsland.Website.Controllers.Admin
     {
         private readonly IGeneralBot _generalBot;
 
-        public AdminController(IGeneralBot generalBot)
+        public AdminController(IGeneralBot generalBot, PlayerLinkingService playerLinkingService) : base(playerLinkingService)
         {
             this._generalBot = generalBot;
         }

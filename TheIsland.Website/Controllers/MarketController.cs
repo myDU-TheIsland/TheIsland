@@ -5,11 +5,16 @@
 namespace TheIsland.Website.Controllers
 {
     using Microsoft.AspNetCore.Mvc;
+    using TheIsland.Core.Services;
     using TheIsland.Website.Classes;
     using TheIsland.Website.Models;
 
     public class MarketController : IslandController
     {
+        public MarketController(PlayerLinkingService playerLinkingService) : base(playerLinkingService)
+        {
+        }
+
         [HttpGet]
         [Route("~/Market/{itemId}/{marketId}/{search}/")]
         [Route("~/Market/{itemId}/{marketId}")]

@@ -6,12 +6,14 @@ namespace TheIsland.Core.Bots
 {
     using System.Collections.Concurrent;
     using Backend;
+    using Backend.AWS;
     using Backend.Database;
     using BotLib.Generated;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
     using NQ;
     using NQ.Interfaces;
+    using NQ.Visibility;
     using NQutils.Sql;
     using TheIsland.Core.Classes;
     using TheIsland.Core.Services.Blueprint;
@@ -20,10 +22,6 @@ namespace TheIsland.Core.Bots
 
     public interface IGeneralBot : IBotClient
     {
-        #region User Functions
-        Task<string> ImportBP(ulong playerId, byte[] bp);
-        #endregion
-
         #region General Functions
         List<MarketEntry> GetMarketHierarchy(bool forceRefresh = false);
 
@@ -114,84 +112,6 @@ namespace TheIsland.Core.Bots
             }
 
             return this.ItemsForSale.ToDictionary();
-        }
-        #endregion
-
-        #region User Functions
-
-        private bool IsBlueprintSanitationEnabled()
-            => Environment.GetEnvironmentVariable("BP_SANITATION_ENABLED") == "true";
-
-        public async Task<string> ImportBP(ulong playerId, byte[] bp)
-        {
-            if (this.IsBlueprintSanitationEnabled())
-            {
-                var sanitizer = new BlueprintSanitizerService();
-
-                try
-                {
-                    var result = await sanitizer.SanitizeAsync(this.Bot.GameplayBank, bp, CancellationToken.None)
-                        .ConfigureAwait(false);
-
-                    if (!result.Success)
-                    {
-                        return result.Message;
-                    }
-
-                    bp = result.BlueprintBytes;
-                }
-                catch (Exception e)
-                {
-                    return e.Message;
-                }
-            }
-
-            await this.BotConnectionTest().ConfigureAwait(false);
-            BlueprintId blueprintId = 0;
-            try
-            {
-                blueprintId = await this.DataAccessor.BlueprintImport(bp, new EntityId { playerId = playerId }).ConfigureAwait(false);
-            }
-            catch (Exception exception)
-            {
-                return @$"Failed to import BP. ({exception.ToString()})";
-            }
-
-            BlueprintProperties blueprintInfo = await this.Orleans.GetBlueprintGrain().GetBlueprintInfo(blueprintId).ConfigureAwait(false);
-            BlueprintModel bluepprintModel = await this.ServiceProvider.GetRequiredService<ISql>().Read(blueprintId).ConfigureAwait(false);
-
-            if (bluepprintModel.FreeDeploy && !await this.Orleans.GetPlayerGrain(playerId).IsAdmin().ConfigureAwait(false))
-            {
-                return "You are not allowed to import free deploy blueprints";
-            }
-
-            IInventoryGrain pig = this.Orleans.GetInventoryGrain(playerId);
-            IGameplayDefinition? blueprintTypeInfo = this.ServiceProvider.GetRequiredService<IGameplayBank>().GetDefinition("Blueprint");
-
-            if (blueprintTypeInfo == null)
-            {
-                return "System problem. Can't identify blueprint type id";
-            }
-
-            ItemInfo item = new ItemInfo
-            {
-                type = blueprintTypeInfo.Id,
-                id = blueprintId,
-            };
-            item.properties.Add("name", new PropertyValue { stringValue = blueprintInfo.name });
-            item.properties.Add("size", new PropertyValue { intValue = (long)blueprintInfo.size.x });
-            item.properties.Add("static", new PropertyValue { boolValue = blueprintInfo.kind != ConstructKind.DYNAMIC });
-            item.properties.Add("kind", new PropertyValue { intValue = (int)blueprintInfo.kind });
-
-            await this.DataAccessor.PlayerInventoryGiveAsync(
-                    playerId,
-                    new ItemAndQuantity
-                    {
-                        item = item,
-                        quantity = 1,
-                    }).ConfigureAwait(false);
-
-            return "Blueprint '" + blueprintInfo.name + "' imported and should be in your nano pack.";
         }
         #endregion
 
@@ -291,8 +211,8 @@ namespace TheIsland.Core.Bots
                     await this.Bot.Req.WalletTransferRequest(new WalletTransfer()
                     {
                         amount = Convert.ToUInt64(giveToPlayer),
-                        toWallet = new EntityId() { playerId = Convert.ToUInt64(player.id) },
-                        fromWallet = new EntityId() { playerId = this.Bot.PlayerId },
+                        toWallet = new NQ.EntityId() { playerId = Convert.ToUInt64(player.id) },
+                        fromWallet = new NQ.EntityId() { playerId = this.Bot.PlayerId },
                         reason = reason,
                     }).ConfigureAwait(false);
                 }

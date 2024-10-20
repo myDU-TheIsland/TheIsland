@@ -14,13 +14,11 @@ namespace TheIsland.Website.Controllers
 
     public class UserController : IslandController
     {
-        private readonly PlayerLinkingService _playerLinkingService;
-        private readonly IGeneralBot _generalBot;
+        private readonly IBlueprintService _bluePrintService;
 
-        public UserController(PlayerLinkingService playerLinkingService, IGeneralBot generalBot)
+        public UserController(IBlueprintService bluePrintService, PlayerLinkingService playerLinkingService) : base(playerLinkingService)
         {
-            this._playerLinkingService = playerLinkingService;
-            this._generalBot = generalBot;
+            this._bluePrintService = bluePrintService;
         }
 
         [HttpGet("~/link")]
@@ -45,7 +43,7 @@ namespace TheIsland.Website.Controllers
             }
 
             // find the players id;
-            DualPlayer? player = await this._playerLinkingService.FindPlayer(model.PlayerName).ConfigureAwait(false);
+            DualPlayer? player = await this.PlayerLinkingService.FindPlayer(model.PlayerName).ConfigureAwait(false);
 
             if (player == null)
             {
@@ -53,7 +51,7 @@ namespace TheIsland.Website.Controllers
                 return this.RedirectToAction("Link", model);
             }
 
-            bool result = await this._playerLinkingService.SendToken(player.id, this.DiscordId).ConfigureAwait(false);
+            bool result = await this.PlayerLinkingService.SendToken(player.id, this.DiscordId).ConfigureAwait(false);
 
             if (!result)
             {
@@ -87,7 +85,7 @@ namespace TheIsland.Website.Controllers
                 return this.RedirectToAction("VerifyLink", model);
             }
 
-            bool result = await this._playerLinkingService.VerifyToken(model.Token).ConfigureAwait(false);
+            bool result = await this.PlayerLinkingService.VerifyToken(model.Token).ConfigureAwait(false);
 
             if (!result)
             {
@@ -97,6 +95,56 @@ namespace TheIsland.Website.Controllers
             }
 
             return this.RedirectToAction("Index", "Home");
+        }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> ExportBP(ExportBPModel? model)
+        {
+            if (model == null)
+            {
+                model = new ExportBPModel();
+            }
+
+            if (this.SelectedPlayer > 0)
+            {
+                model.ExportedBPs = await this._bluePrintService.GetMyExportedBps(Convert.ToUInt64(this.SelectedPlayer)).ConfigureAwait(false);
+                model.ExportableBPs = await this._bluePrintService.GetExportableBPs(Convert.ToUInt64(this.SelectedPlayer)).ConfigureAwait(false);
+            }
+
+            return this.View(model);
+        }
+
+        [HttpPost]
+        [Authorize]
+        public async Task<IActionResult> GenerateBP(ExportBPModel model)
+        {
+            if (!this.ModelState.IsValid)
+            {
+                model.ErrorMessage = "Something went wrong!";
+                this.RedirectToAction("ExportBP", model);
+            }
+
+            await this._bluePrintService.SaveBP(Convert.ToUInt64(this.SelectedPlayer), Convert.ToUInt64(model.SelectedBP), model.SelectedBPName).ConfigureAwait(false);
+
+            return this.RedirectToAction("ExportBP");
+        }
+
+        [HttpGet]
+        [Authorize]
+        [Route("~/BP/{guid}")]
+        public async Task<IActionResult> GetBP(Guid guid)
+        {
+            var blueprintResult = await this._bluePrintService.GetBP(guid, Convert.ToUInt64(this.SelectedPlayer)).ConfigureAwait(false);
+
+            if (blueprintResult == null)
+            {
+                return this.RedirectToAction("ExportBP");
+            }
+
+            var byteArray = await System.IO.File.ReadAllBytesAsync(this._bluePrintService.GetBPPath(blueprintResult.uuid)).ConfigureAwait(false);
+
+            return this.File(byteArray, "text/json", $@"{blueprintResult.blueprint_name.Replace(' ', '_').ToLower()}.json");
         }
 
         [HttpGet]
@@ -119,12 +167,12 @@ namespace TheIsland.Website.Controllers
             {
                 var player = this.SelectedPlayer;
 
-                if (player == -1)
+                if (player == 0)
                 {
-                    player = (await this._playerLinkingService.GetPlayerMapping(this.DiscordId).ConfigureAwait(false)).FirstOrDefault()?.dual_id ?? -1;
+                    player = (await this.PlayerLinkingService.GetPlayerMapping(this.DiscordId).ConfigureAwait(false)).FirstOrDefault()?.dual_id ?? -1;
                 }
 
-                if (player == -1)
+                if (player == 0)
                 {
                     model.ErrorMessage = "Failed to find player id, did you link your player yet?";
                     return this.RedirectToAction("ImportBP", model);
@@ -138,7 +186,7 @@ namespace TheIsland.Website.Controllers
                         {
                             blueprint.CopyTo(ms);
                             byte[] fileBytes = ms.ToArray();
-                            model.ErrorMessage += await this._generalBot.ImportBP(Convert.ToUInt64(player), fileBytes).ConfigureAwait(false) + "<br />";
+                            model.ErrorMessage += await this._bluePrintService.ImportBP(Convert.ToUInt64(player), fileBytes).ConfigureAwait(false) + "<br />";
                         }
                     }
                     catch (Exception exception)
@@ -169,7 +217,7 @@ namespace TheIsland.Website.Controllers
                 urlReferrer = "~/";
             }
 
-            var players = await this._playerLinkingService.GetPlayerMapping(this.DiscordId).ConfigureAwait(false);
+            var players = await this.PlayerLinkingService.GetPlayerMapping(this.DiscordId).ConfigureAwait(false);
 
             if (players.Any(item => item.dual_id == playerId))
             {

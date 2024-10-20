@@ -26,6 +26,12 @@ namespace TheIsland.Core.Bots
 
     public interface IBotClient
     {
+        IClusterClient Orleans { get; }
+
+        IDataAccessor DataAccessor { get; }
+
+        IServiceProvider ServiceProvider { get; }
+
         Client Bot { get; }
 
         Task BotConnectionTest();
@@ -43,11 +49,11 @@ namespace TheIsland.Core.Bots
 
         internal IDuClientFactory RestDuClientFactory => this.ServiceProvider.GetRequiredService<IDuClientFactory>();
 
-        internal IServiceProvider ServiceProvider { get; }
+        public IServiceProvider ServiceProvider { get; }
 
-        internal IClusterClient Orleans { get; }
+        public IClusterClient Orleans { get; }
 
-        internal IDataAccessor DataAccessor { get; }
+        public IDataAccessor DataAccessor { get; }
 
         internal BotSettings Settings { get; }
 

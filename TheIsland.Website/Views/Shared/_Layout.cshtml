@@ -52,7 +52,8 @@
                                     <a class="dropdown-item" asp-area="" asp-controller="User" asp-action="Link">Link Game Account(s)</a>
                                     @if (hasPlayerInfo)
                                     {
-                                        <a class="dropdown-item" asp-area="" asp-controller="User" asp-action="ImportBP">Blueprints</a>
+                                        <a class="dropdown-item" asp-area="" asp-controller="User" asp-action="ImportBP">Import Blueprints</a>
+                                        <a class="dropdown-item" asp-area="" asp-controller="User" asp-action="ExportBP">Export Blueprints</a>
                                     }
                                     <a asp-controller="Authentication" asp-action="SignOutCurrentUser" class="dropdown-item">Logout</a>
                                 }
@@ -76,9 +77,15 @@
                                     <select name="playerId" id="playerSelection" value="@selectedPlayer" class="btn btn-primary">
                                     @foreach (var player in players)
                                     {
-                                        <option value="@player.dual_id">@player.player_name</option>
+                                        if (player.dual_id == @selectedPlayer)
+                                        {
+                                            <option value="@player.dual_id" selected>@player.player_name</option>   
+                                        }
+                                        else
+                                        {
+                                            <option value="@player.dual_id">@player.player_name</option>
+                                        }                                            
                                     }
-
                                     </select>
                                 </form>
                             </li>

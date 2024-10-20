@@ -20,7 +20,7 @@ namespace TheIsland.Website.Controllers.Api
     {
         private readonly IMarketBot _marketBot;
 
-        public DataController(IMarketBot marketBot)
+        public DataController(IMarketBot marketBot, PlayerLinkingService playerLinkingService) : base(playerLinkingService)
         {
             this._marketBot = marketBot;
         }
