@@ -256,6 +256,12 @@ namespace TheIsland.Core.Services
             {
                 var bin = await this._dataAccessor.BlueprintExport((long)blueprintId).ConfigureAwait(false);
                 var uuid = Guid.NewGuid();
+
+                if (!System.IO.Directory.Exists(Path.GetFullPath(this._settings.ExportPath)))
+                {
+                    System.IO.Directory.CreateDirectory(Path.GetFullPath(this._settings.ExportPath));
+                }
+
                 await System.IO.File.WriteAllBytesAsync(this.GetBPPath(uuid), bin).ConfigureAwait(false);
                 BluePrintExport blueprintEntry = new BluePrintExport() { uuid = uuid, blueprint_id = blueprintId, player_id = playerId, blueprint_name = blueprintName,  };
                 await this._blueprintExportRepository.AddAsync(blueprintEntry).ConfigureAwait(false);
