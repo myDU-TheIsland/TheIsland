@@ -98,7 +98,10 @@ namespace TheIsland.Core.Services
                 IEnumerable<DualWalletTransaction> walletsTransaction = await this._dualWalletRepository.GetAllBotTransactionOnMarket(marketId).ConfigureAwait(false);
                 logMessage($@"Found {walletsTransaction.Count()} wallet transactions for market {marketId}");
 
-                IEnumerable<Tuple<double, double, double>> groupByItemId = walletsTransaction.Where(item => this._marketBot.ResellItems.Contains(Convert.ToUInt64(item.item_id))).GroupBy(item => item.item_id).Select(item => new Tuple<double, double, double>(item.Key, item.Sum(c => c.quantity), item.Sum(c => c.amount)));
+                IEnumerable<Tuple<double, double, double>> groupByItemId = walletsTransaction
+                    .Where(item => this._marketBot.ResellItems.Contains(Convert.ToUInt64(item.item_id)))
+                    .GroupBy(item => item.item_id)
+                    .Select(item => new Tuple<double, double, double>(item.Key, item.Sum(c => c.quantity), item.Sum(c => c.amount)));
 
                 logMessage($@"Grouped like items together and got {groupByItemId.Count()} results!");
 
@@ -144,11 +147,11 @@ namespace TheIsland.Core.Services
                     }
 
                     long marketQty = slot.itemAndQuantity.quantity.value;
-                    double avgPer = prices[itemId] * this._marketBotConfig.MarketMarkUp;
+                    double avgPer = this._marketBot.GetSellPrice(Convert.ToUInt64(marketId), itemId, prices[itemId]);
 
-                    if (avgPer < this._marketBot.BuyPrices[itemId])
+                    if (avgPer < this._marketBot.GetSellPrice(Convert.ToUInt64(marketId), itemId))
                     {
-                        avgPer = (this._marketBot.BuyPrices[itemId] / 100) * this._marketBotConfig.MarketMarkUp;
+                        avgPer = this._marketBot.GetSellPrice(Convert.ToUInt64(marketId), itemId);
                     }
 
                     logMessage($@"Selling item  {itemId} @ {avgPer}, quantity {marketQty}!");
@@ -226,7 +229,7 @@ namespace TheIsland.Core.Services
                 this._marketBot.MarketBudgetMultiplier.TryAdd(chosenMarket, rate);
 
                 logMessage($@"Saving Config");
-                await this._marketBot.SaveMarketBudgetMultiplier().ConfigureAwait(false);
+                await this._marketBot.SaveDictionaries().ConfigureAwait(false);
 
                 string name = await this._marketBot.GetConstructName(constuctId).ConfigureAwait(false);
                 logMessage($@"Found '{name}'");

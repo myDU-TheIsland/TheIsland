@@ -10,25 +10,12 @@
 
     var markets = (await _marketRepo.GetAsync().ConfigureAwait(false)).ToDictionary(key => key.id, value => value.name.Replace("Market", string.Empty).Replace("District", string.Empty).Trim());
     markets.Add(0, "All Markets");
-    
+
     var itemExists = items.ContainsKey(Model.ItemId);
     var selectedMarket = markets[Model.MarketId];
     var selectedItem = itemExists ? items[Model.ItemId] : string.Empty;
 
-    if (!_marketBot.MarketBudgetMultiplier.TryGetValue(Convert.ToUInt64(Model.MarketId), out double marketMultiplier))
-    {
-        marketMultiplier = 1;
-    }
-
-    if (!_marketBot.BuyPrices.TryGetValue(Convert.ToUInt64(Model.ItemId), out double botPurchasePrice))
-    {
-        botPurchasePrice = 0;
-    }
-    else
-    {
-        botPurchasePrice /= 100;
-        botPurchasePrice *= marketMultiplier;
-    }
+    double botPurchasePrice = _marketBot.GetItemPrice(Convert.ToUInt64(Model.MarketId), Convert.ToUInt64(Model.ItemId)) / 100;
 
     string graphHeader = markets.ContainsKey(Model.MarketId) ? " @ " + markets[Model.MarketId] : string.Empty;
 }

@@ -10,6 +10,8 @@ namespace TheIsland.Core.Settings
 
         public string ExportPath { get; set; } = string.Empty;
 
+        public string ConfigPath { get; set; } = string.Empty;
+
         public ulong[] MarketHeaderIds { get; set; } = { };
 
         public BotSettings WebsiteBot { get; set; } = new BotSettings();

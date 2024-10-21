@@ -30,14 +30,9 @@ namespace TheIsland.Website.Controllers.Api
             type = type.ToLower();
             Dictionary<ulong, double> prices = new Dictionary<ulong, double>();
 
-            if (!this._marketBot.MarketBudgetMultiplier.TryGetValue(Convert.ToUInt64(market), out double multi))
-            {
-                multi = 1;
-            }
-
             foreach (var price in this._marketBot.BuyPrices)
             {
-                prices.TryAdd(price.Key, Math.Ceiling((price.Value / 100) * multi));
+                prices.TryAdd(price.Key, this._marketBot.GetItemPrice(Convert.ToUInt64(market), price.Key) / 100);
             }
 
             switch (type)
