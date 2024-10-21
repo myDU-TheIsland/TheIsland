@@ -86,6 +86,7 @@ namespace TheIsland.Core.Services
 
         public async Task<bool> IsExportAllowed(ulong blueprintId, ulong playerId)
         {
+            await this.ConnectionTest().ConfigureAwait(false);
             ulong coreType = 0;
 
             var blueprintModel = await this._sql.Read(blueprintId).ConfigureAwait(false);
@@ -141,6 +142,8 @@ namespace TheIsland.Core.Services
 
         public async Task<string> ImportBP(ulong playerId, byte[] bp)
         {
+            await this.ConnectionTest().ConfigureAwait(false);
+
             if (this.IsBlueprintSanitationEnabled())
             {
                 var sanitizer = new BlueprintSanitizerService();
@@ -163,7 +166,6 @@ namespace TheIsland.Core.Services
                 }
             }
 
-            await this.ConnectionTest().ConfigureAwait(false);
             BlueprintId blueprintId = 0;
             try
             {
@@ -213,6 +215,7 @@ namespace TheIsland.Core.Services
 
         public async Task<Dictionary<string, ulong>> GetExportableBPs(ulong playerId)
         {
+            await this.ConnectionTest().ConfigureAwait(false);
             IInventoryGrain inventoryGrain = this._orleans.GetInventoryGrain(playerId);
             StorageInfo? inventory = await inventoryGrain.Get(playerId).ConfigureAwait(false);
             Dictionary<string, ulong> output = new Dictionary<string, ulong>();
@@ -247,6 +250,8 @@ namespace TheIsland.Core.Services
 
         public async Task<BluePrintExport?> SaveBP(ulong playerId, ulong blueprintId, string blueprintName)
         {
+            await this.ConnectionTest().ConfigureAwait(false);
+
             if (!await this.IsExportAllowed(blueprintId, playerId).ConfigureAwait(false))
             {
                 return null;

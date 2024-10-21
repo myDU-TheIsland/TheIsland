@@ -171,6 +171,7 @@ namespace TheIsland.Website
             services.AddSingleton<PlayerLinkingService>();
             services.AddSingleton<IIngameMessaging, IngameMessaging>();
             services.AddSingleton<IBlueprintService, BlueprintService>();
+            services.AddSingleton<ITalentPointService, TalentPointService>();
 
             if (this.HostingEnvironment.IsDevelopment())
             {
