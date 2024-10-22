@@ -218,7 +218,7 @@ namespace TheIsland.Core.Bots
             logMessage("Pinging Server (confirming connection)");
             await this.BotConnectionTest().ConfigureAwait(false);
 
-            logMessage(@$"Selling {itemType} @ {marketId} for this {unitPrice}");
+            logMessage(@$"Selling {itemType} @ {marketId} for this {unitPrice / 100}");
 
             MarketOrder order = await this.Bot.Req.MarketPlaceOrder(new MarketRequest
             {
@@ -230,7 +230,7 @@ namespace TheIsland.Core.Bots
                 unitPrice = unitPrice,
             }).ConfigureAwait(false);
 
-            logMessage(@$"Listed {order.itemType} @ {order.marketId} for this {order.unitPrice} ({order.buyQuantity})");
+            logMessage(@$"Listed {order.itemType} @ {order.marketId} for this {order.unitPrice / 100} ({order.buyQuantity})");
             return log;
         }
 
@@ -303,7 +303,7 @@ namespace TheIsland.Core.Bots
                 }
             }
 
-            return (long)Math.Ceiling(inputPrice * (decimal)finalMarketItemMultiplier) * 100;
+            return (long)Math.Ceiling((inputPrice * (decimal)finalMarketItemMultiplier) * (decimal)this._marketBotConfig.MarketMarkUp) * 100;
         }
 
         public void SetItemMultiplier(ulong marketId, string itemType, double value)
