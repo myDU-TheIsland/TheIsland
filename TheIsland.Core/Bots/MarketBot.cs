@@ -227,7 +227,7 @@ namespace TheIsland.Core.Bots
                 itemType = itemType,
                 buyQuantity = -quantity,
                 expirationDate = DateTime.Now.AddDays(30).ToNQTimePoint(),
-                unitPrice = unitPrice * 100,
+                unitPrice = unitPrice,
             }).ConfigureAwait(false);
 
             logMessage(@$"Listed {order.itemType} @ {order.marketId} for this {order.unitPrice} ({order.buyQuantity})");
