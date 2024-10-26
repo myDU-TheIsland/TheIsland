@@ -6,21 +6,22 @@ namespace TheIsland.Core.Entities
 {
     using System;
     using System.ComponentModel.DataAnnotations;
-    using Dapper.Contrib.Extensions;
+    using System.ComponentModel.DataAnnotations.Schema;
     using TheIsland.Core.Classes;
 
     [Table("public.store_items")]
     public class StoreItem : DatabaseEntity
     {
-        [Display(Name = "Item Name")]
+        [Display(Name = "Item name")]
         public string name { get; set; } = string.Empty;
 
-        public string[] images { get; set; } = Array.Empty<string>();
+        [Column(TypeName = "jsonb")]
+        public List<string> images { get; set; } = new List<string>();
 
         [Display(Name = "Description")]
         public string description { get; set; } = string.Empty;
 
-        [Display(Name = "Purchase Limit")]
+        [Display(Name = "Purchase limit")]
         public double limit { get; set; } = 0;
 
         [Display(Name = "Price")]
@@ -28,7 +29,7 @@ namespace TheIsland.Core.Entities
 
         public StoreItemContent content { get; set; } = new StoreItemContent();
 
-        [Display(Name = "IsActive?")]
+        [Display(Name = "Is available for sale?")]
         public bool is_active { get; set; } = false;
     }
 }

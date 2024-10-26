@@ -12,6 +12,10 @@ namespace TheIsland.Core.Settings
 
         public string ConfigPath { get; set; } = string.Empty;
 
+        public string StoreImagePath { get; set; } = string.Empty;
+
+        public string StoreImageUrl { get; set; } = string.Empty;
+
         public ulong[] MarketHeaderIds { get; set; } = { };
 
         public BotSettings WebsiteBot { get; set; } = new BotSettings();

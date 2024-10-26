@@ -2,7 +2,7 @@
 // Copyright (c) Paul Layne. All rights reserved.
 // </copyright>
 
-namespace TheIsland.Website.Models.Admin
+namespace TheIsland.Website.Models
 {
     using TheIsland.Core.Entities;
 

@@ -6,8 +6,10 @@ namespace TheIsland.Website.Areas.Admin.Controllers
 {
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
+    using TheIsland.Core.Entities;
     using TheIsland.Core.Services;
     using TheIsland.Website.Classes;
+    using TheIsland.Website.Models;
     using TheIsland.Website.Models.Admin;
 
     [Area("Admin")]
@@ -51,19 +53,42 @@ namespace TheIsland.Website.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Edit(double id)
+        [HttpPost]
+        public async Task<IActionResult> Edit(StoreItemModel model)
         {
-            var model = new StoreItemModel();
+            model.StoreItem = await this._storeService.GetItem(model.StoreItem.id).ConfigureAwait(false);
 
-            model.StoreItem = await this._storeService.GetItem(id).ConfigureAwait(false);
+            model.StoreItem ??= new StoreItem();
 
             return this.View(model);
         }
 
         [HttpPost]
-        public IActionResult SaveItem(StoreItemModel model)
+        public async Task<IActionResult> SaveItem(StoreItemModel model)
         {
-            return this.View();
+            if (!this.ModelState.IsValid)
+            {
+                return this.RedirectToAction("Edit", model);
+            }
+
+            if (model.Images.Count != 0)
+            {
+                foreach (var image in model.Images)
+                {
+                    model.StoreItem.images.Add(await this._storeService.SaveImage(image).ConfigureAwait(false));
+                }
+            }
+
+            if (model.StoreItem.id == 0)
+            {
+                await this._storeService.CreateItem(model.StoreItem).ConfigureAwait(false);
+            }
+            else
+            {
+                await this._storeService.EditItem(model.StoreItem).ConfigureAwait(false);
+            }
+
+            return this.RedirectToAction("List");
         }
     }
 }

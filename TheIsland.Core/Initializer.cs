@@ -21,7 +21,7 @@ namespace TheIsland.Core
             NQutils.Config.Config.ReadYamlFile("mod", "./dual.yaml");
 
             // Initialize Custom SQL Mappers.
-            SqlMapper.AddTypeHandler(typeof(string[]), new JsonTypeHandler<string[]>());
+            SqlMapper.AddTypeHandler(typeof(List<string>), new JsonTypeHandler<List<string>>());
             SqlMapper.AddTypeHandler(typeof(StoreItemContent), new JsonTypeHandler<StoreItemContent>());
         }
 

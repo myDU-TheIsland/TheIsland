@@ -8,9 +8,11 @@ namespace TheIsland.Core.Services
     using Backend;
     using Backend.Business;
     using Backend.Database;
+    using Microsoft.AspNetCore.Http;
     using Microsoft.Extensions.DependencyInjection;
     using NQ;
     using NQ.Interfaces;
+    using NQutils.Def;
     using NQutils.Sql;
     using Orleans;
     using TheIsland.Core.Bots;
@@ -28,6 +30,8 @@ namespace TheIsland.Core.Services
         Task<StoreItem> CreateItem(StoreItem item);
 
         Task<StoreItem> EditItem(StoreItem item);
+
+        Task<string> SaveImage(IFormFile image);
     }
 
     public class StoreService : IStoreService
@@ -82,6 +86,33 @@ namespace TheIsland.Core.Services
             await this._storeItemRepository.UpdateAsync(item).ConfigureAwait(false);
 
             return item;
+        }
+
+        public async Task<string> SaveImage(IFormFile image)
+        {
+            if (image == null)
+            {
+                return string.Empty;
+            }
+
+            string fileName = image.FileName;
+            string fileExtension = fileName.Split('.').Last();
+            string newFileName = $@"{Guid.NewGuid()}.{fileExtension}";
+            string filePath = Path.Combine(this._settings.StoreImagePath, newFileName);
+
+            if (!System.IO.Directory.Exists(this._settings.StoreImagePath))
+            {
+                System.IO.Directory.CreateDirectory(this._settings.StoreImagePath);
+            }
+
+            using (MemoryStream ms = new MemoryStream())
+            {
+                image.CopyTo(ms);
+                byte[] fileBytes = ms.ToArray();
+                await System.IO.File.WriteAllBytesAsync(filePath, fileBytes).ConfigureAwait(false);
+            }
+
+            return newFileName;
         }
     }
 }

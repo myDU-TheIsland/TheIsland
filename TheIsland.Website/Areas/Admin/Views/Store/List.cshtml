@@ -8,13 +8,32 @@
         <div class="card">
             <div class="card-body text-center">
                 <form asp-controller="Store" asp-action="List" asp-area="Admin" method="post">
-                    <input asp-for="@Model.Name" class="form-control" placeholder="Name"/>
+                    <input asp-for="@Model.Name" class="form-control" placeholder="Name" />
                     <button class="btn btn-default">Search</button>
-               </form>
+                </form>
             </div>
         </div>
     </div>
 </div>
 <div class="row">
+    @foreach (var item in Model.StoreItems)
+    {
+        <div class="col-sm">
+            <div class="card">
+                <form asp-controller="Store" asp-action="Edit" asp-area="Admin" method="post">
+                    <div class="card-body text-center">
+                        @{
+                            var storeItemModel = new StoreItemModel();
+                            storeItemModel.StoreItem = item;
+                        }
+                        <div class="card-header">@item.name</div>
+                        @item.description
+                        <input type="hidden" name="StoreItem.id" value="@storeItemModel.StoreItem.id" />
 
+                    </div>
+                    <div class="card-actions"><button class="btn btn-default">Edit</button></div>
+                </form>
+            </div>
+        </div>
+    }
 </div>

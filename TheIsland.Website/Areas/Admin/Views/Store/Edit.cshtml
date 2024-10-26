@@ -24,7 +24,8 @@
     <div class="col-sm">
         <div class="card">
             <div class="card-body">
-                <form asp-action="SaveItem" asp-controller="Store" asp-area="Admin" method="post">
+                <form asp-action="SaveItem" asp-controller="Store" asp-area="Admin" method="post" enctype="multipart/form-data">
+                    <input type="hidden" asp-for="StoreItem.id" />
                     <div class="form-group">
                         <label asp-for="StoreItem.name"></label>
                         <input asp-for="StoreItem.name" class="form-control" />
@@ -56,44 +57,74 @@
                             <label asp-for="StoreItem.content.RespecTalentPoints"></label>
                             <input asp-for="StoreItem.content.RespecTalentPoints" class="form-check-inline" />
                         </div>
-                    <div class="form-group">
-                    Items:
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Item Id</th>
-                                    <th>Item Count</th>
-                                    <th>Actions (<a><i class="fa-solid fa-plus"></i></a>)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @for (int x = 0; x < Model.StoreItem.content!.Items.Count(); x++)
-                                {
-                                    <tr><td><input asp-for="@Model.StoreItem.content.Items[@x].Key" class="form-control form-inline" /></td><td><input asp-for="@Model.StoreItem.content.Items[@x].Value" class="form-control  form-inline" /></td><td><a ><i class="fa-solid fa-trash"></i></a></td></tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="form-group">
-                        Skins:
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Item Id</th>
-                                    <th>Skin Name</th>
-                                    <th>Actions (<a><i class="fa-solid fa-plus"></i></a>)</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                @for (int x = 0; x < Model.StoreItem.content!.Skins.Count(); x++)
-                                {
-                                    <tr><td><input asp-for="@Model.StoreItem.content.Skins[@x].Key" class="form-control  form-inline" /></td><td><input asp-for="@Model.StoreItem.content.Skins[@x].Value" class="form-control  form-inline" /></td><td><a><i class="fa-solid fa-trash"></i></a></td></tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                    </div>
+                        <div class="form-group">
+                            Items:
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Item Id</th>
+                                        <th>Item Count</th>
+                                        <th>Actions (<a><i class="fa-solid fa-plus"></i></a>)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (int x = 0; x < Model.StoreItem.content!.Items.Count(); x++)
+                                    {
+                                        <tr><td><input asp-for="@Model.StoreItem.content.Items[@x].Key" class="form-control form-inline" /></td><td><input asp-for="@Model.StoreItem.content.Items[@x].Value" class="form-control  form-inline" /></td><td><a><i class="fa-solid fa-trash"></i></a></td></tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="form-group">
+                            Skins:
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Item Id</th>
+                                        <th>Skin Name</th>
+                                        <th>Actions (<a><i class="fa-solid fa-plus"></i></a>)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (int x = 0; x < Model.StoreItem.content!.Skins.Count(); x++)
+                                    {
+                                        <tr><td><input asp-for="@Model.StoreItem.content.Skins[@x].Key" class="form-control  form-inline" /></td><td><input asp-for="@Model.StoreItem.content.Skins[@x].Value" class="form-control  form-inline" /></td><td><a><i class="fa-solid fa-trash"></i></a></td></tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="form-group">
+                            Images:
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>image path</th>
+                                        <th>actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @for (int x = 0; x < Model.StoreItem.images.Count(); x++)
+                                    {
+                                        <tr><td><input asp-for="@Model.StoreItem.images[@x]" class="form-control  form-inline" /></td><td><a><i class="fa-solid fa-trash"></i></a></td></tr>
+                                    }
+                                </tbody>
+                            </table>
 
+                        </div>
+                        <div class="fileinput fileinput-new text-center" data-provides="fileinput">
+                            <div>
+                                <span class="btn btn-primary btn-round btn-file">
+                                    <span class="fileinput-new">Select image</span>
+                                    <span class="fileinput-exists">Change</span>
+                                    <input asp-for="Images" multiple class="form-control" />
+                                </span>
+                                <a href="javascript:;" class="btn btn-danger btn-round fileinput-exists" data-dismiss="fileinput"><i class="fa fa-times"></i> Remove</a>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-success">Save</button>
+                        </div>
+                    </div>
                 </form>
             </div>
         </div>
