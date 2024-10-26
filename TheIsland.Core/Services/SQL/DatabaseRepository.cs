@@ -103,7 +103,7 @@ namespace TheIsland.Core.Services.SQL
         Task<bool> UpdateAsync(TValue item, CancellationToken cancellationToken = default);
     }
 
-    public class EntityRepository<TValue> : IEntityRepository<TValue> where TValue : DatabaseEntity, new()
+    public abstract class EntityRepository<TValue> : IEntityRepository<TValue> where TValue : DatabaseEntity, new()
     {
         protected PostgresSettings Settings { get; }
 

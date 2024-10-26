@@ -10,7 +10,7 @@ namespace TheIsland.Core.Services.SQL
     using TheIsland.Core.Entities;
     using TheIsland.Core.Settings;
 
-    public class LastReadRepository
+    public class LastReadRepository : IAppService
     {
         protected PostgresSettings Settings { get; }
 

@@ -14,7 +14,7 @@ namespace TheIsland.Website.Framework.Filters
             const string nameClaim = "nameidentifier";
             ISiteSettings siteSettings = Startup.SiteSettings;
 
-            bool isAdmin = httpContext.User.Claims.Count(item => item.Type == nameClaim) > 0 ? siteSettings.Admins.ToList().Contains(httpContext.User.Claims.First(claim => claim.Type == nameClaim).Value) : false;
+            bool isAdmin = httpContext.User.Claims.Any(item => item.Type == nameClaim) ? siteSettings.Admins.ToList().Contains(httpContext.User.Claims.First(claim => claim.Type == nameClaim).Value) : false;
 
             // Allow all authenticated users to see the Dashboard (potentially dangerous).
             return httpContext.User.Identity?.IsAuthenticated ?? false;

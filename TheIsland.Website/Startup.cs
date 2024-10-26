@@ -16,6 +16,7 @@ namespace TheIsland.Website
     using Microsoft.AspNetCore.Server.Kestrel.Core;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.IdentityModel.Logging;
+    using TheIsland.Core;
     using TheIsland.Core.Bots;
     using TheIsland.Core.Services;
     using TheIsland.Core.Services.SQL;
@@ -127,7 +128,8 @@ namespace TheIsland.Website
             services.AddSession();
 
             services.AddAuthorizationBuilder()
-                .AddPolicy("Admin", policy => policy.RequireClaim("nameidentifier", SiteSettings.Admins));
+                .AddPolicy("Admin", policy => policy.RequireClaim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", SiteSettings.Admins))
+                .AddPolicy("User", policy => policy.RequireClaim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"));
 
             if (this.HostingEnvironment.IsDevelopment())
             {
@@ -146,8 +148,6 @@ namespace TheIsland.Website
             }
 
             // settings
-            services.AddSingleton<IMarketBot, MarketBot>();
-            services.AddSingleton<IGeneralBot, GeneralBot>();
             services.AddSingleton(SiteSettings);
             services.AddSingleton(SiteSettings.DualUniverse);
             services.AddSingleton(SiteSettings.Postgres);
@@ -155,23 +155,7 @@ namespace TheIsland.Website
             services.AddSingleton<ApiKeyAuthorizationFilter>();
 
             // repositories
-            services.AddSingleton<DualMarketRepository>();
-            services.AddSingleton<DualMarketTransactionRepository>();
-            services.AddSingleton<DualWalletRepository>();
-            services.AddSingleton<LastReadRepository>();
-            services.AddSingleton<LinkTokenRepository>();
-            services.AddSingleton<MarketTransactionRepository>();
-            services.AddSingleton<DualPlayerRepository>();
-            services.AddSingleton<UserMappingRepository>();
-            services.AddSingleton<BlueprintExportRepository>();
-
-            // services
-            services.AddSingleton<MarketService>();
-            services.AddSingleton<IImportMarketService, ImportMarketService>();
-            services.AddSingleton<PlayerLinkingService>();
-            services.AddSingleton<IIngameMessaging, IngameMessaging>();
-            services.AddSingleton<IBlueprintService, BlueprintService>();
-            services.AddSingleton<ITalentPointService, TalentPointService>();
+            services.AddCoreDependencies();
 
             if (this.HostingEnvironment.IsDevelopment())
             {

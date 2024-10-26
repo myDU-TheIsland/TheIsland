@@ -81,7 +81,7 @@ namespace TheIsland.Core.Bots
 
                 IEnumerable<IGameplayDefinition> childrenObjects = baseEntry.GetChildren();
 
-                if (childrenObjects != null && childrenObjects.Count() > 0)
+                if (childrenObjects != null && childrenObjects.Any())
                 {
                     ulong[] childrenIds = childrenObjects.Select(item => item.Id).ToArray();
 
@@ -265,7 +265,7 @@ namespace TheIsland.Core.Bots
 
                 IEnumerable<IGameplayDefinition> childrenObjects = baseEntry.GetChildren();
 
-                if (childrenObjects != null && childrenObjects.Count() > 0)
+                if (childrenObjects != null && childrenObjects.Any())
                 {
                     ulong[] childrenIds = childrenObjects.Select(item => item.Id).ToArray();
 

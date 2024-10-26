@@ -1,101 +1,126 @@
 ﻿@using System.Security.Claims
 @using Microsoft.AspNetCore.Http;
-@inject TheIsland.Core.Services.PlayerLinkingService _playerLinkingService
 @{
-    bool hasPlayerInfo = false;
-    double discordId = -1;
+    bool hasPlayerInfo = this.SelectedPlayer != 0;
+    double discordId = this.DiscordId;
+    var players = await this.PlayerLinkingService.GetPlayerMapping(discordId).ConfigureAwait(false);
 
-    if (User?.Identity?.IsAuthenticated ?? false)
-    {
-        discordId = double.Parse(Context.User.Claims.FirstOrDefault(item => item.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value ?? "-1");
-        hasPlayerInfo = await _playerLinkingService.HasPlayerMapping(discordId).ConfigureAwait(false);
-    }
+    bool? addGutterWrapper = ViewBag.InsertGutter as bool?;
+    bool addGutter = addGutterWrapper != null && addGutterWrapper == true;
+
+    string wrapperClass = addGutter ? "container" : "container-fluid";
 }
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - TheIsland</title>
+    <title>@ViewData["Title"] - The Island</title>
     <meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
     <!--     Fonts and icons     -->
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css" integrity="sha512-Kc323vGBEqzTmouAECnVceyQqyqdsSiqLQISBL29aUW4U/M7pSPA/gEUZQqv1cwx4OnYxTxve5UMg5GT6L4JJg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
     <!-- CSS Files -->
     <link href="~/css/material-dashboard.css" rel="stylesheet" asp-append-version="true" />
     <link href="~/css/site.css" rel="stylesheet" asp-append-version="true" />
     @await RenderSectionAsync("Head", required: false)
 </head>
-<body class="dark-edition off-canvas-sidebar" style="background-image: url('/img/starfield.jpg'); background-size: cover;">
-    <div class="wrapper wrapper-full-page">
-        <div>
-            <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-                <a class="navbar-brand" href="~/"><img src="/img/ninja-72.png"></a>
-
-                <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul class="navbar-nav mr-auto">
-
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">About</a>
-                            <div class="dropdown-menu">
-                                <a class="dropdown-item" asp-controller="Home" asp-action="Community" asp-area="">The Community</a>
-                                <a class="dropdown-item" href="https://discord.gg/6zsBcDX5Rz" target="_blank">Our Discord</a>
-                            </div>
-                        </li>
-
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">Site Ops</a>
-                            <div class="dropdown-menu">
-                                <a asp-controller="Market" asp-action="Index" asp-area="" class="dropdown-item">Market Data</a>
-                                @if (User?.Identity?.IsAuthenticated ?? false)
-                                {
-                                    <a class="dropdown-item" asp-area="" asp-controller="User" asp-action="Link">Link Game Account(s)</a>
-                                    @if (hasPlayerInfo)
-                                    {
-                                        <a class="dropdown-item" asp-area="" asp-controller="User" asp-action="ImportBP">Import Blueprints</a>
-                                        <a class="dropdown-item" asp-area="" asp-controller="User" asp-action="ExportBP">Export Blueprints</a>
-                                    }
-                                    <a asp-controller="Authentication" asp-action="SignOutCurrentUser" class="dropdown-item">Logout</a>
-                                }
-                                else
-                                {
-                                    <a asp-controller="Authentication" asp-action="Signin" class="dropdown-item">Sign In</a>
-                                }
-                            </div>
-                        </li>
-                    </ul>
+<body class="dark-edition">
+    <nav class="navbar navbar-expand-lg navbar-absolute fixed-top text-white navbar-dark bg-dark">
+        <div class="container-fluid">
+            <div class="navbar-wrapper">
+                <a class="navbar-brand" href="~/"><img style="height: 75px" src="/img/the-isle.png"></a>
+            </div>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" aria-controls="navigation-index" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="navbar-toggler-icon icon-bar"></span>
+                <span class="navbar-toggler-icon icon-bar"></span>
+                <span class="navbar-toggler-icon icon-bar"></span>
+            </button>
+            <div class="collapse navbar-collapse justify-content-end">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" asp-controller="Home" asp-action="Community" asp-area="">The Community</a>
+                    </li>
+                    <li class="nav-item ">
+                        <a asp-controller="Market" asp-action="Index" asp-area="" class="nav-link">Market</a>
+                    </li>
                     @if (hasPlayerInfo)
                     {
-                        <ul class="navbar-nav pull-right">
-                            <li class="nav-item">
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
+                                Blueprints
+                            </a>
+                            <div class="dropdown-menu">
+                                <a class="dropdown-item" asp-area="" asp-controller="User" asp-action="ImportBP">Import Blueprints</a>
+                                <a class="dropdown-item" asp-area="" asp-controller="User" asp-action="ExportBP">Export Blueprints</a>
+                            </div>
+                        </li>
+                        <li class="nav-item ">
+                            <a class="nav-link">Store</a>
+                        </li>
+                    }
+                    <li class="nav-item ">
+                        <a class="nav-link" href="https://discord.gg/6zsBcDX5Rz" target="_blank">Our Discord</a>
+                    </li>
+                    <li class="nav-item ">
+                        <a class="nav-link" href="https://www.paypal.com/donate/?hosted_button_id=SGK46VC2GYFM2" target="_blank">Donate</a>
+                    </li>
+                    <li class="nav-item ">
+                        <span class="nav-link"></span>
+                    </li>
+                    @if (!this.IsLoggedIn)
+                    {
+                        <li class="nav-item ">
+                            <a asp-controller="Authentication" asp-action="Signin" class="nav-link">Sign In</a>
+                        </li>
+                    }
+                    else
+                    {
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
+                                Hi, @players.First(item => item.dual_id == this.SelectedPlayer).player_name
+                            </a>
+                            <div class="dropdown-menu">
                                 <form id="playerChange" asp-action="SetPlayerId" asp-controller="User" method="post">
                                     @{
-                                        var players = await _playerLinkingService.GetPlayerMapping(discordId).ConfigureAwait(false);
-                                        var selectedPlayer = double.Parse(this.Context.Session.GetString("Player")??"-1");
+                                        var selectedPlayer = this.SelectedPlayer;
                                     }
-
-                                    <select name="playerId" id="playerSelection" value="@selectedPlayer" class="btn btn-primary">
-                                    @foreach (var player in players)
-                                    {
-                                        if (player.dual_id == @selectedPlayer)
+                                    <select name="playerId" id="playerSelection" value="@selectedPlayer" class="dropdown-item">
+                                        @foreach (var player in players)
                                         {
-                                            <option value="@player.dual_id" selected>@player.player_name</option>   
+                                            if (player.dual_id == @selectedPlayer)
+                                            {
+                                                <option value="@player.dual_id" selected>@player.player_name</option>
+                                            }
+                                            else
+                                            {
+                                                <option value="@player.dual_id">@player.player_name</option>
+                                            }
                                         }
-                                        else
-                                        {
-                                            <option value="@player.dual_id">@player.player_name</option>
-                                        }                                            
-                                    }
                                     </select>
                                 </form>
-                            </li>
-                        </ul>
+                                <div class="dropdown-divider"></div>
+                                @if (this.IsAdmin)
+                                {
+                                    <a class="dropdown-item" asp-area="Admin" asp-controller="Admin" asp-action="Index">Admin Center</a>
+                                    <div class="dropdown-divider"></div>
+                                }
+                                <a class="dropdown-item" asp-area="" asp-controller="User" asp-action="Link">Link Game Account(s)</a>
+                                <a class="dropdown-item" asp-controller="Authentication" asp-action="SignOutCurrentUser">Logout</a>
+                            </div>
+                        </li>
                     }
-                </div>
-            </nav>
+                </ul>
+            </div>
         </div>
-        <div class="container-fluid py-4">
-            @RenderBody()
+    </nav>
+
+    <div class="wrapper wrapper-full-page">
+        <div class="page-header" style="background-image: url('/img/starfield.jpg'); background-size: cover;">
+            <div class="@wrapperClass py-4">
+                @RenderBody()
+            </div>
         </div>
     </div>
     <script src="~/js/core/jquery.min.js" asp-append-version="true"></script>
@@ -105,8 +130,8 @@
     <script src="~/js/plugins/jquery.dataTables.min.js" asp-append-version="true"></script>
     <script src="~/js/material-dashboard.min.js" asp-append-version="true"></script>
     <script type="text/javascript">
-        $("#playerSelection").on( "change",  function(){
-          $("#playerChange").trigger( "submit" );
+        $("#playerSelection").on("change", function () {
+            $("#playerChange").trigger("submit");
         });
     </script>
     @await RenderSectionAsync("Scripts", required: false)

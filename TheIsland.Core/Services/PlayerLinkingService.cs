@@ -10,7 +10,7 @@ namespace TheIsland.Core.Services
     using TheIsland.Core.Entities;
     using TheIsland.Core.Services.SQL;
 
-    public class PlayerLinkingService
+    public class PlayerLinkingService : IAppService
     {
         private readonly DualPlayerRepository _playerRepository;
         private readonly LinkTokenRepository _linkTokenRepository;

@@ -2,7 +2,7 @@
 // Copyright (c) Paul Layne. All rights reserved.
 // </copyright>
 
-namespace TheIsland.Website.Controllers.Admin
+namespace TheIsland.Website.Areas.Admin.Controllers.API
 {
     using Microsoft.AspNetCore.Mvc;
     using TheIsland.Core.Bots;
@@ -12,6 +12,7 @@ namespace TheIsland.Website.Controllers.Admin
     using TheIsland.Website.Models;
 
     [Area("Admin")]
+    [Route("~/[area]/API/[controller]/[action]")]
     public class MarketController : IslandController
     {
         private readonly IMarketBot _marketBot;

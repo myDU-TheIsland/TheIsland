@@ -18,27 +18,12 @@ namespace TheIsland.Website.Controllers.Api
     public class MarketController : IslandController
     {
         private readonly MarketService _marketService;
-        private readonly IImportMarketService _importMarketService;
-        private readonly DualMarketRepository _dualMarketRepository;
-        private readonly IGeneralBot _generalBot;
-        private readonly IMarketBot _marketBot;
-        private readonly DualMarketRepository _marketRepo;
 
         public MarketController(
-            IImportMarketService importMarketService,
             MarketService marketService,
-            DualMarketRepository dualMarketRepository,
-            IGeneralBot generalBot,
-            IMarketBot marketBot,
-            DualMarketRepository marketRepo,
             PlayerLinkingService playerLinkingService) : base(playerLinkingService)
         {
-            this._importMarketService = importMarketService;
             this._marketService = marketService;
-            this._dualMarketRepository = dualMarketRepository;
-            this._generalBot = generalBot;
-            this._marketBot = marketBot;
-            this._marketRepo = marketRepo;
         }
 
         [HttpGet]

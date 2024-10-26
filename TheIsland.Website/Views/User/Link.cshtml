@@ -19,7 +19,7 @@
                         <div class="col-6">
                             <label class="form-label">Player Name</label>
                             <div class="input-group">
-                                @Html.TextBoxFor(model => model.PlayerName, new { @class = "form-control" })
+                                <input asp-for="PlayerName" class="form-control" />
                             </div>
                         </div>
                         <div class="button-row d-flex mt-4">

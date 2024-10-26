@@ -1,0 +1,101 @@
+﻿@model StoreItemModel
+@{
+    ViewData["Title"] = "Home Page";
+    ViewBag.InsertGutter = true;
+
+    if (Model.StoreItem.content == null)
+    {
+        Model.StoreItem.content = new StoreItemContent();
+    }
+
+    int itemCount = Model.StoreItem.content?.Items.Count() ?? 0;
+    int skinCount = Model.StoreItem.content?.Skins.Count() ?? 0;
+
+    if (itemCount == 0)
+    {
+        Model.StoreItem.content!.Items.Add(new KeyValuePair<double, double>());
+    }
+    if (skinCount == 0)
+    {
+        Model.StoreItem.content!.Skins.Add(new KeyValuePair<double, string>());
+    }
+}
+<div class="row">
+    <div class="col-sm">
+        <div class="card">
+            <div class="card-body">
+                <form asp-action="SaveItem" asp-controller="Store" asp-area="Admin" method="post">
+                    <div class="form-group">
+                        <label asp-for="StoreItem.name"></label>
+                        <input asp-for="StoreItem.name" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="StoreItem.description"></label>
+                        <input asp-for="StoreItem.description" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="StoreItem.limit"></label>
+                        <input asp-for="StoreItem.limit" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="StoreItem.price"></label>
+                        <input asp-for="StoreItem.price" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label asp-for="StoreItem.is_active"></label>
+                        <input asp-for="StoreItem.is_active" class="form-check-inline" />
+                    </div>
+
+                    <div>
+                        <p>What the user will receive?</p>
+                        <div class="form-group">
+                            <label asp-for="StoreItem.content.TalentPoints"></label>
+                            <input asp-for="StoreItem.content.TalentPoints" class="form-control" />
+                        </div>
+                        <div class="form-group">
+                            <label asp-for="StoreItem.content.RespecTalentPoints"></label>
+                            <input asp-for="StoreItem.content.RespecTalentPoints" class="form-check-inline" />
+                        </div>
+                    <div class="form-group">
+                    Items:
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Item Id</th>
+                                    <th>Item Count</th>
+                                    <th>Actions (<a><i class="fa-solid fa-plus"></i></a>)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (int x = 0; x < Model.StoreItem.content!.Items.Count(); x++)
+                                {
+                                    <tr><td><input asp-for="@Model.StoreItem.content.Items[@x].Key" class="form-control form-inline" /></td><td><input asp-for="@Model.StoreItem.content.Items[@x].Value" class="form-control  form-inline" /></td><td><a ><i class="fa-solid fa-trash"></i></a></td></tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="form-group">
+                        Skins:
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Item Id</th>
+                                    <th>Skin Name</th>
+                                    <th>Actions (<a><i class="fa-solid fa-plus"></i></a>)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @for (int x = 0; x < Model.StoreItem.content!.Skins.Count(); x++)
+                                {
+                                    <tr><td><input asp-for="@Model.StoreItem.content.Skins[@x].Key" class="form-control  form-inline" /></td><td><input asp-for="@Model.StoreItem.content.Skins[@x].Value" class="form-control  form-inline" /></td><td><a><i class="fa-solid fa-trash"></i></a></td></tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                    </div>
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

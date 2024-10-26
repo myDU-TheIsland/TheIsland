@@ -8,7 +8,7 @@ namespace TheIsland.Core.Services
     using TheIsland.Core.Services.SQL;
     using static TheIsland.Core.Helpers.MarketTransactionHelpers;
 
-    public interface IImportMarketService
+    public interface IImportMarketService : IAppService
     {
         Task<bool> ImportAsync();
     }
@@ -41,7 +41,7 @@ namespace TheIsland.Core.Services
 
             IEnumerable<DualWalletTransaction> walletTransactions = await this._dualWalletRepository.GetAllAfterIdAsync(lastReadWallet.table_id).ConfigureAwait(false);
 
-            if (walletTransactions.Count() == 0)
+            if (!walletTransactions.Any())
             {
                 return true;
             }

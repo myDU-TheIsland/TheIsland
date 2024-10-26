@@ -2,7 +2,7 @@
 // Copyright (c) Paul Layne. All rights reserved.
 // </copyright>
 
-namespace TheIsland.Website.Controllers.Admin
+namespace TheIsland.Website.Areas.Admin.Controllers
 {
     using System.Linq;
     using Microsoft.AspNetCore.Mvc;

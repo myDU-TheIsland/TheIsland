@@ -13,7 +13,7 @@ namespace TheIsland.Core.Services
     using TheIsland.Core.Bots;
     using TheIsland.Core.Settings;
 
-    public interface IWalletService
+    public interface IWalletService : IAppService
     {
     }
 

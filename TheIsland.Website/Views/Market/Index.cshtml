@@ -108,9 +108,10 @@
             <div class="card">
                 <div class="card-header card-header-warning" id="graphHeader">
                     @items[Model.ItemId] Prices (Last 72hrs)@graphHeader
+                        
                     @if (botPurchasePrice > 0)
                     {
-                        <div class="pull-right">(Honjos Minion is buying at <i>@botPurchasePrice quanta per unit</i>)</div>
+                        <div class="pull-right"> - Honjos Minion is buying at <i>@botPurchasePrice quanta per unit</i> </div>
                     }
                 </div>
                 <div class="card-body">

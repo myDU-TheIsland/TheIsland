@@ -14,6 +14,10 @@ namespace TheIsland.Website.Classes
 
         protected double SelectedPlayer => this.GetPlayer();
 
+        protected bool IsAdmin => this.HttpContext?.User?.IsInRole("Admin") ?? false;
+
+        protected bool IsLoggedIn => this.HttpContext?.User?.Identity?.IsAuthenticated ?? false;
+
         protected PlayerLinkingService PlayerLinkingService { get; }
 
         public IslandController(PlayerLinkingService playerLinkingService)
@@ -37,7 +41,7 @@ namespace TheIsland.Website.Classes
 
             var players = this.PlayerLinkingService.GetPlayerMapping(this.DiscordId).GetAwaiter().GetResult();
 
-            if (players.Count() > 0)
+            if (players.Any())
             {
                 var first = players.First().dual_id;
 

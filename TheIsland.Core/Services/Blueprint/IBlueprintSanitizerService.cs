@@ -5,7 +5,7 @@ namespace TheIsland.Core.Services.Blueprint
 {
     using Backend;
 
-    public interface IBlueprintSanitizerService
+    public interface IBlueprintSanitizerService : IAppService
     {
         Task<BlueprintSanitationResult> SanitizeAsync(IGameplayBank bank, byte[] blueprintBytes, CancellationToken cancellationToken);
     }

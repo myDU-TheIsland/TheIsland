@@ -2,7 +2,7 @@
 // Copyright (c) Paul Layne. All rights reserved.
 // </copyright>
 
-namespace TheIsland.Website.Controllers.Admin
+namespace TheIsland.Website.Areas.Admin.Controllers.API
 {
     using System.Linq;
     using Microsoft.AspNetCore.Mvc;
@@ -15,6 +15,7 @@ namespace TheIsland.Website.Controllers.Admin
     using TheIsland.Website.Framework.Helpers;
 
     [Area("Admin")]
+    [Route("~/[area]/API/[action]")]
     public class AdminController : IslandController
     {
         private readonly IGeneralBot _generalBot;

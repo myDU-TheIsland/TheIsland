@@ -19,7 +19,7 @@ namespace TheIsland.Core.Services
     using TheIsland.Core.Services.SQL;
     using TheIsland.Core.Settings;
 
-    public interface IBlueprintService
+    public interface IBlueprintService : IAppService
     {
         Task<string> ImportBP(ulong playerId, byte[] bp);
 

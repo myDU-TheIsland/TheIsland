@@ -15,7 +15,7 @@ namespace TheIsland.Core.Services
     using TheIsland.Core.Settings;
     using static TheIsland.Core.Helpers.RandomHelpers;
 
-    public class MarketService
+    public class MarketService : IAppService
     {
         private readonly MarketTransactionRepository _transactionRepository;
         private readonly DualMarketTransactionRepository _dualMarketTransactionRepository;

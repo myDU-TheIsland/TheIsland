@@ -7,7 +7,7 @@ namespace TheIsland.Core.Services
     using System.Threading.Tasks;
     using TheIsland.Core.Bots;
 
-    public interface IIngameMessaging
+    public interface IIngameMessaging : IAppService
     {
         Task SendMessage(ulong who, string message);
     }

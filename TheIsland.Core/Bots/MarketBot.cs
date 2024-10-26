@@ -344,7 +344,7 @@ namespace TheIsland.Core.Bots
                 return;
             }
 
-            if (entry.GetChildren().Count() != 0)
+            if (entry.GetChildren().Any())
             {
                 // most likely a category, just continue
                 return;
@@ -375,7 +375,7 @@ namespace TheIsland.Core.Bots
                     continue;
                 }
 
-                if (entry.GetChildren().Count() != 0)
+                if (entry.GetChildren().Any())
                 {
                     // most likely a category, just continue
                     continue;
@@ -484,7 +484,7 @@ namespace TheIsland.Core.Bots
                     continue;
                 }
 
-                if (entry.GetChildren().Count() != 0)
+                if (entry.GetChildren().Any())
                 {
                     // most likely a category, just continue
                     continue;
@@ -513,7 +513,7 @@ namespace TheIsland.Core.Bots
                         continue;
                     }
 
-                    if (entry.GetChildren().Count() != 0)
+                    if (entry.GetChildren().Any())
                     {
                         // most likely a category, just continue
                         continue;
@@ -543,7 +543,7 @@ namespace TheIsland.Core.Bots
                         continue;
                     }
 
-                    if (entry.GetChildren().Count() != 0)
+                    if (entry.GetChildren().Any())
                     {
                         // most likely a category, just continue
                         continue;
