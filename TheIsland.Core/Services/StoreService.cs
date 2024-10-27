@@ -364,7 +364,7 @@ namespace TheIsland.Core.Services
             {
                 var multi = this.GetTalentPointPercentage(totalPoints + addPoints);
                 var addition = step * multi;
-                logMessage($@"Adding TP via injector[{x}]: {addition} to {totalPoints} | {multi * 100}% Used");
+                logMessage($@"Adding TP via injector[{x}]: {addition} to {totalPoints + addPoints} | {multi * 100}% Used");
                 addPoints += addition;
             }
 

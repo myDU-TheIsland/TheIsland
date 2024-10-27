@@ -8,6 +8,7 @@ namespace TheIsland.Website.Areas.Admin.Controllers
     using Microsoft.AspNetCore.Mvc;
     using TheIsland.Core.Entities;
     using TheIsland.Core.Services;
+    using TheIsland.Core.Services.SQL;
     using TheIsland.Website.Classes;
     using TheIsland.Website.Models.Admin;
     using TheIsland.Website.Models.Store;
@@ -18,16 +19,38 @@ namespace TheIsland.Website.Areas.Admin.Controllers
     public class StoreController : IslandController
     {
         private readonly IStoreService _storeService;
+        private readonly StorePurchaseHistoryRepository _storePurchaseHistoryRepository;
 
-        public StoreController(IStoreService storeService, PlayerLinkingService playerLinkingService) : base(playerLinkingService)
+        public StoreController(
+            IStoreService storeService,
+            StorePurchaseHistoryRepository storePurchaseHistoryRepository,
+            PlayerLinkingService playerLinkingService) : base(playerLinkingService)
         {
             this._storeService = storeService;
+            this._storePurchaseHistoryRepository = storePurchaseHistoryRepository;
         }
 
         [HttpGet]
         public IActionResult Index()
         {
             return this.View();
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> History()
+        {
+            var model = (await this._storePurchaseHistoryRepository.GetAsync().ConfigureAwait(false))?.ToArray() ?? Array.Empty<StorePurchaseHistory>();
+
+            return this.View(model);
+        }
+
+        [HttpGet]
+        [Route("~/[area]/[controller]/[action]/{purchaseId}")]
+        public async Task<IActionResult> ViewLog(double purchaseId)
+        {
+            var model = (await this._storePurchaseHistoryRepository.GetAsync(purchaseId).ConfigureAwait(false)) ?? new StorePurchaseHistory();
+
+            return this.View(model);
         }
 
         [HttpGet]

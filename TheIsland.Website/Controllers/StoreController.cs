@@ -6,6 +6,7 @@ namespace TheIsland.Website.Controllers
 {
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
+    using TheIsland.Core.Entities;
     using TheIsland.Core.Services;
     using TheIsland.Core.Services.SQL;
     using TheIsland.Website.Classes;
@@ -33,6 +34,14 @@ namespace TheIsland.Website.Controllers
             model ??= new StoreSearchModel();
 
             model.StoreItems = await this._storeService.GetItemList(false).ConfigureAwait(false);
+
+            return this.View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> History()
+        {
+            var model = (await this._storePurchaseHistoryRepository.GetPlayerPurchaseHistory(this.SelectedPlayer).ConfigureAwait(false))?.ToArray() ?? Array.Empty<StorePurchaseHistory>();
 
             return this.View(model);
         }

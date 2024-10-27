@@ -1,0 +1,44 @@
+﻿@inject DualPlayerRepository playerRepo
+@model StorePurchaseHistory[]
+@{
+    ViewData["Title"] = "Purchase History";
+}
+<div class="row">
+    <div class="col-md-6  ml-auto mr-auto">
+        <div class="card">
+            <div class="card-header card-header-info">
+                Purchase History
+            </div>
+            <div class="card-body">
+                <table id="sellTable" class="table table-striped table-no-bordered table-hover" cellspacing="0" width="100%" style="width:100%">
+                    <thead>
+                        <tr>
+                            <th>Id</th>
+                            <th>Date</th>
+                            <th>Player</th>
+                            <th>Price</th>
+                            <th>Item</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var po in Model)
+                        {
+                            var playerName = (await playerRepo.GetAsync(po.player_id).ConfigureAwait(false)).display_name;
+                            <tr>
+                                <td>@po.id</td>
+                                <td>@po.timestamp.ToString("g")</td>
+                                <td>@playerName</td>
+                                <td>@po.price.ToString("n0")</td>
+                                <td>@(po.quantity)x @po.store_item.name</td>
+                                <td>@(po.success ? "Purchased" : "Failed")</td>
+                                <td><a asp-action="ViewLog" asp-controller="Store" asp-area="Admin" asp-route-purchaseId="@po.id">Log</a></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
