@@ -88,15 +88,26 @@
                        You have more then 40million talent points. You can no longer purchase this item.
                     </p>
                 }
+                else if (Model.StoreItem.content.RespecTalentPoints && (await _storeService.GetTalentPointsSpent(this.SelectedPlayer)) == 0)
+                {
+                    <p class="card-category">
+                      You haven't spent any talent points. No reset for you.
+                    </p>
+                }
                 else
                 {
                     StorePurchaseModel purchaseModel = new StorePurchaseModel() { ItemId = Model.StoreItem.id, Quantity = 1};
                     string quantityClass = Model.StoreItem.limit == 1 ? "hidden" : string.Empty;
                     double limit = Model.StoreItem.limit == 0 ? 100 : (Model.StoreItem.limit - myPurchaseHistory);
+                    if (Model.StoreItem.content.RespecTalentPoints)
+                    {
+                        limit = 1;
+                    }
+
                     <form asp-action="Purchase" asp-controller="Store" asp-area="" method="post">
                         <p class="card-category">
                             <div class="form-group form-inline">
-                                @if (Model.StoreItem.limit == 1)
+                                @if (limit == 1)
                                 {
                                 <input asp-for="@purchaseModel.Quantity" type="number" min="1" max="@limit" type="hidden" />
                                 }

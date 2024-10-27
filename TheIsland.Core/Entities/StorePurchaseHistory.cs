@@ -20,6 +20,8 @@ namespace TheIsland.Core.Entities
 
         public double discord_user { get; set; } = 0;
 
+        public bool success { get; set; } = false;
+
         public StoreItem store_item { get; set; } = new StoreItem();
 
         public List<string> log { get; set; } = new List<string>();

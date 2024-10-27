@@ -7,6 +7,7 @@ namespace TheIsland.Website.Controllers
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using TheIsland.Core.Services;
+    using TheIsland.Core.Services.SQL;
     using TheIsland.Website.Classes;
     using TheIsland.Website.Models.Store;
 
@@ -15,10 +16,15 @@ namespace TheIsland.Website.Controllers
     public class StoreController : IslandController
     {
         private readonly IStoreService _storeService;
+        private readonly StorePurchaseHistoryRepository _storePurchaseHistoryRepository;
 
-        public StoreController(IStoreService storeService, PlayerLinkingService playerLinkingService) : base(playerLinkingService)
+        public StoreController(
+            IStoreService storeService,
+            StorePurchaseHistoryRepository storePurchaseHistoryRepository,
+            PlayerLinkingService playerLinkingService) : base(playerLinkingService)
         {
             this._storeService = storeService;
+            this._storePurchaseHistoryRepository = storePurchaseHistoryRepository;
         }
 
         [HttpGet]
@@ -50,17 +56,28 @@ namespace TheIsland.Website.Controllers
                 return this.RedirectToAction("Index");
             }
 
-            await this._storeService.PurchaseItem(this.SelectedPlayer, this.DiscordId, purchaseModel.ItemId, purchaseModel.Quantity).ConfigureAwait(false);
-            return this.RedirectToAction("CompletedPurchase", purchaseModel);
+            var result = await this._storeService.PurchaseItem(this.SelectedPlayer, this.DiscordId, purchaseModel.ItemId, purchaseModel.Quantity).ConfigureAwait(false);
+
+            if (result.success)
+            {
+                return this.RedirectToAction("CompletedPurchase", new { purchaseId = result.id });
+            }
+
+            return this.RedirectToAction("FailedPurchase", new { purchaseId = result.id });
         }
 
         [HttpGet]
-        public IActionResult CompletedPurchase(StorePurchaseModel model)
+        public async Task<IActionResult> CompletedPurchase(double purchaseId)
         {
-            if (!this.ModelState.IsValid)
-            {
-                return this.RedirectToAction("Index");
-            }
+            var model = await this._storePurchaseHistoryRepository.GetAsync(purchaseId).ConfigureAwait(false);
+
+            return this.View(model);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> FailedPurchase(double purchaseId)
+        {
+            var model = await this._storePurchaseHistoryRepository.GetAsync(purchaseId).ConfigureAwait(false);
 
             return this.View(model);
         }

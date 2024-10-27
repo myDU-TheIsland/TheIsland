@@ -36,7 +36,9 @@ namespace TheIsland.Core.Services
 
         Task<double> GetTalentPoints(double playerId);
 
-        Task<List<string>> PurchaseItem(double playerId, double discordId, double itemId, double quantity);
+        Task<double> GetTalentPointsSpent(double playerId);
+
+        Task<StorePurchaseHistory> PurchaseItem(double playerId, double discordId, double itemId, double quantity);
 
         double GetTalentPointPercentage(double talentPoints);
     }
@@ -133,13 +135,21 @@ namespace TheIsland.Core.Services
             return newFileName;
         }
 
+        public async Task<double> GetTalentPointsSpent(double playerId)
+        {
+            await this.ConnectionTest().ConfigureAwait(false);
+            PlayerTalentState playerState = await this._dataAccessor.PlayerTalentAsync(Convert.ToUInt64(playerId)).ConfigureAwait(false);
+            return playerState.pointsSpent;
+        }
+
         public async Task<double> GetTalentPoints(double playerId)
         {
+            await this.ConnectionTest().ConfigureAwait(false);
             PlayerTalentState playerState = await this._dataAccessor.PlayerTalentAsync(Convert.ToUInt64(playerId)).ConfigureAwait(false);
             return playerState.pointsAcquired;
         }
 
-        public async Task<List<string>> PurchaseItem(double playerId, double discordId, double itemId, double quantity)
+        public async Task<StorePurchaseHistory> PurchaseItem(double playerId, double discordId, double itemId, double quantity)
         {
             List<string> log = new List<string>();
 
@@ -152,48 +162,7 @@ namespace TheIsland.Core.Services
 
             StoreItemEntity item = await this.GetItem(itemId).ConfigureAwait(false);
 
-            if (item == null)
-            {
-                logMessage("could not find item to purchase");
-                return log;
-            }
-
-            if (!item.is_active)
-            {
-                logMessage("This item is not currently able to be purchased.");
-                return log;
-            }
-
-            var historyOfPurchase = await this._storePurchaseHistoryRepository.GetPlayerPurchaseHistory(playerId).ConfigureAwait(false);
-
-            double howManyHaveBeenPurchased = historyOfPurchase?.Where(historyItem => historyItem.store_item.id == itemId).Sum(historyItem => historyItem.quantity) ?? 0;
-
-            if (item.limit > 0 && item.limit < howManyHaveBeenPurchased + quantity)
-            {
-                logMessage(@$"Can not purchase that many {item.name}.");
-                return log;
-            }
-
-            DualPlayer player = await this._dualPlayerRepository.GetAsync(playerId).ConfigureAwait(false);
-            if (player.connected)
-            {
-                logMessage("You must log out of the game to perform website purchases.");
-                return log;
-            }
-
             double total = item.price * quantity;
-
-            if (player.wallet < total)
-            {
-                logMessage("You do not have enough quanta to finish this purchase.");
-                return log;
-            }
-
-            if (!await this.DebitPlayerWallet(playerId, total, @$"Purchase of {quantity}x {item.name}").ConfigureAwait(false))
-            {
-                logMessage("Failed to take quanta for purchase");
-                return log;
-            }
 
             StorePurchaseHistory newHistoryRecord = new StorePurchaseHistory()
             {
@@ -207,6 +176,36 @@ namespace TheIsland.Core.Services
 
             try
             {
+                if (!item.is_active)
+                {
+                    throw new Exception("This item is not currently able to be purchased.");
+                }
+
+                var historyOfPurchase = await this._storePurchaseHistoryRepository.GetPlayerPurchaseHistory(playerId).ConfigureAwait(false);
+
+                double howManyHaveBeenPurchased = historyOfPurchase?.Where(historyItem => historyItem.store_item.id == itemId).Sum(historyItem => historyItem.quantity) ?? 0;
+
+                if (item.limit > 0 && item.limit < howManyHaveBeenPurchased + quantity)
+                {
+                    throw new Exception(@$"Can not purchase that many {item.name}.");
+                }
+
+                DualPlayer player = await this._dualPlayerRepository.GetAsync(playerId).ConfigureAwait(false);
+                if (player.connected)
+                {
+                    throw new Exception("You must log out of the game to perform website purchases.");
+                }
+
+                if (player.wallet < total)
+                {
+                    throw new Exception("You do not have enough quanta to finish this purchase.");
+                }
+
+                if (!await this.DebitPlayerWallet(playerId, total, @$"Purchase of {quantity}x {item.name}").ConfigureAwait(false))
+                {
+                    throw new Exception("Failed to take quanta for purchase");
+                }
+
                 //execute actual giving of stuff
                 if (item.content.RespecTalentPoints)
                 {
@@ -272,15 +271,18 @@ namespace TheIsland.Core.Services
                         log.AddRange(await this.GiveTalentPointGrant(playerId, item.content.TalentPoints).ConfigureAwait(false));
                     }
                 }
+
+                newHistoryRecord.success = true;
             }
             catch (Exception exception)
             {
                 logMessage(@$"Error: {exception}");
+                newHistoryRecord.success = false;
             }
 
             await this._storePurchaseHistoryRepository.AddAsync(newHistoryRecord).ConfigureAwait(false);
 
-            return log;
+            return newHistoryRecord;
         }
 
         public double GetTalentPointPercentage(double talentPoints)

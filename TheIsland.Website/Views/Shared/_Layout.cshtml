@@ -9,6 +9,7 @@
     bool addGutter = addGutterWrapper != null && addGutterWrapper == true;
 
     string wrapperClass = addGutter ? "container" : "container-fluid";
+    string currentPlayerName = players.FirstOrDefault(item => item.dual_id == this.SelectedPlayer)?.player_name ?? "User";
 }
 <!DOCTYPE html>
 <html lang="en">
@@ -79,28 +80,31 @@
                     {
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" role="button" data-toggle="dropdown" aria-expanded="false">
-                                Hi, @players.First(item => item.dual_id == this.SelectedPlayer).player_name
+                                Hi, @currentPlayerName
                             </a>
                             <div class="dropdown-menu">
-                                <form id="playerChange" asp-action="SetPlayerId" asp-controller="User" method="post">
-                                    @{
-                                        var selectedPlayer = this.SelectedPlayer;
-                                    }
-                                    <select name="playerId" id="playerSelection" value="@selectedPlayer" class="dropdown-item">
-                                        @foreach (var player in players)
-                                        {
-                                            if (player.dual_id == @selectedPlayer)
-                                            {
-                                                <option value="@player.dual_id" selected>@player.player_name</option>
-                                            }
-                                            else
-                                            {
-                                                <option value="@player.dual_id">@player.player_name</option>
-                                            }
+                                @if (currentPlayerName != "User")
+                                {
+                                    <form id="playerChange" asp-action="SetPlayerId" asp-controller="User" method="post">
+                                        @{
+                                            var selectedPlayer = this.SelectedPlayer;
                                         }
-                                    </select>
-                                </form>
-                                <div class="dropdown-divider"></div>
+                                        <select name="playerId" id="playerSelection" value="@selectedPlayer" class="dropdown-item">
+                                            @foreach (var player in players)
+                                            {
+                                                if (player.dual_id == @selectedPlayer)
+                                                {
+                                                    <option value="@player.dual_id" selected>@player.player_name</option>
+                                                }
+                                                else
+                                                {
+                                                    <option value="@player.dual_id">@player.player_name</option>
+                                                }
+                                            }
+                                        </select>
+                                    </form>
+                                    <div class="dropdown-divider"></div>
+                                }                                
                                 @if (this.IsAdmin)
                                 {
                                     <a class="dropdown-item" asp-area="Admin" asp-controller="Admin" asp-action="Index">Admin Center</a>

@@ -1,16 +1,16 @@
 ﻿@model StorePurchaseHistory
 @{
-    ViewData["Title"] = "Completed Purchase";
+    ViewData["Title"] = "Home Page";
 }
 <partial name="_UserData" />
 <div class="row">
     <div class="col-md-6  ml-auto mr-auto">
         <div class="card card-product">
             <div class="card-body">
-                <h4 class="card-title card-header-success">Purchase Complete!</h4>
+                <h4 class="card-title card-header-danger">Purchase Failed!</h4>
             </div>
             <div class="card-body">
-                <p class="card-description">We have taken @(Model.price.ToString("n0"))&#8463; from you ingame account. You can login now to get your items.</p>
+                <p class="card-description">Please reach out to the #help channel, and ask someone to look into purchase '@Model.id'</p>
             </div>
         </div>
     </div>
