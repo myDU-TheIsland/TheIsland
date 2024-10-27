@@ -25,7 +25,7 @@ namespace TheIsland.Core.Services
             this._ingameMessaging = ingameMessaging;
         }
 
-        public async Task<bool> SendToken(double playerId, double discordId)
+        public async Task<bool> SendToken(double playerId, string discordId)
         {
             // check for existing token
             LinkToken? token = await this._linkTokenRepository.FindByPlayerId(playerId).ConfigureAwait(false);
@@ -74,7 +74,7 @@ namespace TheIsland.Core.Services
             return this._playerRepository.FindByDisplayName(playerName);
         }
 
-        public async Task<bool> HasPlayerMapping(double discordId)
+        public async Task<bool> HasPlayerMapping(string discordId)
         {
             IEnumerable<UserMapping> result = await this._userMappingRepository.FindByDiscordId(discordId).ConfigureAwait(false);
 
@@ -95,7 +95,7 @@ namespace TheIsland.Core.Services
             return result != null && result.Any();
         }
 
-        public async Task<IEnumerable<UserMapping>> GetPlayerMapping(double discordId)
+        public async Task<IEnumerable<UserMapping>> GetPlayerMapping(string discordId)
         {
             IEnumerable<UserMapping> results = await this._userMappingRepository.FindByDiscordId(discordId).ConfigureAwait(false);
 

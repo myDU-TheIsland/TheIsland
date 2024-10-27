@@ -38,7 +38,7 @@ namespace TheIsland.Core.Services
 
         Task<double> GetTalentPointsSpent(double playerId);
 
-        Task<StorePurchaseHistory> PurchaseItem(double playerId, double discordId, double itemId, double quantity);
+        Task<StorePurchaseHistory> PurchaseItem(double playerId, string discordId, double itemId, double quantity);
 
         double GetTalentPointPercentage(double talentPoints);
     }
@@ -149,7 +149,7 @@ namespace TheIsland.Core.Services
             return playerState.pointsAcquired;
         }
 
-        public async Task<StorePurchaseHistory> PurchaseItem(double playerId, double discordId, double itemId, double quantity)
+        public async Task<StorePurchaseHistory> PurchaseItem(double playerId, string discordId, double itemId, double quantity)
         {
             List<string> log = new List<string>();
 

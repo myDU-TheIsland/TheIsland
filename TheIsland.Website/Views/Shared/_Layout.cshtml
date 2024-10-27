@@ -2,7 +2,7 @@
 @using Microsoft.AspNetCore.Http;
 @{
     bool hasPlayerInfo = this.SelectedPlayer != 0;
-    double discordId = this.DiscordId;
+    string discordId = this.DiscordId;
     var players = await this.PlayerLinkingService.GetPlayerMapping(discordId).ConfigureAwait(false);
 
     bool? addGutterWrapper = ViewBag.InsertGutter as bool?;

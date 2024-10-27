@@ -9,7 +9,7 @@ namespace TheIsland.Core.Entities
     [Table("public.user_mappings")]
     public class UserMapping : DatabaseEntity
     {
-        public double discord_id { get; set; } = 0;
+        public string discord_id { get; set; } = string.Empty;
 
         public double dual_id { get; set; } = 0;
 

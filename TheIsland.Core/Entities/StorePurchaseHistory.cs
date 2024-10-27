@@ -18,7 +18,7 @@ namespace TheIsland.Core.Entities
 
         public double player_id { get; set; } = 0;
 
-        public double discord_user { get; set; } = 0;
+        public string discord_user { get; set; } = string.Empty;
 
         public bool success { get; set; } = false;
 

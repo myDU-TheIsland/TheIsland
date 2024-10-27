@@ -12,7 +12,7 @@ namespace TheIsland.Website.Framework
 
     public abstract class AppViewPage<TModel> : RazorPage<TModel> where TModel : class
     {
-        public double DiscordId => double.Parse(this.Context?.User?.Claims?.FirstOrDefault(item => item.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value ?? "-1");
+        public string DiscordId => this.Context?.User?.Claims?.FirstOrDefault(item => item.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value ?? "0";
 
         public double SelectedPlayer => this.GetPlayer();
 

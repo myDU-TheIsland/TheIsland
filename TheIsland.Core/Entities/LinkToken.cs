@@ -9,7 +9,7 @@ namespace TheIsland.Core.Entities
     [Table("public.tokens")]
     public class LinkToken : DatabaseEntity
     {
-        public double discord_id { get; set; } = 0;
+        public string discord_id { get; set; } = string.Empty;
 
         public double player_id { get; set; } = 0;
 

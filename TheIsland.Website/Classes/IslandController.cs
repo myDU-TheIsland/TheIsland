@@ -11,7 +11,7 @@ namespace TheIsland.Website.Classes
 
     public class IslandController : Controller
     {
-        protected double DiscordId => double.Parse(this.HttpContext?.User?.Claims?.FirstOrDefault(item => item.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value ?? "-1");
+        protected string DiscordId => this.HttpContext?.User?.Claims?.FirstOrDefault(item => item.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value ?? "0";
 
         protected double SelectedPlayer => this.GetPlayer();
 

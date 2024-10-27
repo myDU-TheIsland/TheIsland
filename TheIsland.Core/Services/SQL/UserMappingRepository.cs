@@ -16,7 +16,7 @@ namespace TheIsland.Core.Services.SQL
         {
         }
 
-        public async Task<IEnumerable<UserMapping>> FindByDiscordId(double discordId, CancellationToken cancellationToken = default)
+        public async Task<IEnumerable<UserMapping>> FindByDiscordId(string discordId, CancellationToken cancellationToken = default)
         {
             using (DbConnection databaseConnection = this.GetConnection())
             {
