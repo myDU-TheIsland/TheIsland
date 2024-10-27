@@ -4,12 +4,11 @@
 
 namespace TheIsland.Core
 {
-    using System.Reflection;
     using Dapper;
-    using Microsoft.AspNetCore.Builder;
     using Microsoft.Extensions.DependencyInjection;
     using TheIsland.Core.Bots;
     using TheIsland.Core.Classes;
+    using TheIsland.Core.Entities;
     using TheIsland.Core.Helpers.Database.TypeHandlers;
     using TheIsland.Core.Services;
     using TheIsland.Core.Services.SQL;
@@ -23,16 +22,17 @@ namespace TheIsland.Core
             // Initialize Custom SQL Mappers.
             SqlMapper.AddTypeHandler(typeof(List<string>), new JsonTypeHandler<List<string>>());
             SqlMapper.AddTypeHandler(typeof(StoreItemContent), new JsonTypeHandler<StoreItemContent>());
+            SqlMapper.AddTypeHandler(typeof(StoreItem), new JsonTypeHandler<StoreItem>());
         }
 
         public static IServiceCollection AddCoreDependencies(this IServiceCollection services)
         {
-            var types = AppDomain.CurrentDomain.GetAssemblies()
+            Type[] types = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(assemblies => assemblies.GetTypes())
                 .Where(type => (type.BaseType?.IsGenericType ?? false) && type.BaseType.GetGenericTypeDefinition() == typeof(EntityRepository<>))
                 .ToArray();
 
-            foreach (var typeDefinition in types)
+            foreach (Type? typeDefinition in types)
             {
                 Console.WriteLine($@"Adding Singleton Repository : {typeDefinition.Name}");
                 services.AddSingleton(typeDefinition);
@@ -43,9 +43,9 @@ namespace TheIsland.Core
                 .Where(type => typeof(IAppService).IsAssignableFrom(type) && !type.IsInterface)
                 .ToArray();
 
-            foreach (var typeDefinition in types)
+            foreach (Type? typeDefinition in types)
             {
-                var type = typeDefinition.GetInterfaces().First();
+                Type type = typeDefinition.GetInterfaces().First();
 
                 if (type == typeof(IAppService))
                 {

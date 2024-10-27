@@ -9,8 +9,8 @@ namespace TheIsland.Website.Areas.Admin.Controllers
     using TheIsland.Core.Entities;
     using TheIsland.Core.Services;
     using TheIsland.Website.Classes;
-    using TheIsland.Website.Models;
     using TheIsland.Website.Models.Admin;
+    using TheIsland.Website.Models.Store;
 
     [Area("Admin")]
     [Authorize(Policy = "Admin")]
@@ -58,7 +58,7 @@ namespace TheIsland.Website.Areas.Admin.Controllers
         {
             model.StoreItem = await this._storeService.GetItem(model.StoreItem.id).ConfigureAwait(false);
 
-            model.StoreItem ??= new StoreItem();
+            model.StoreItem ??= new StoreItemEntity();
 
             return this.View(model);
         }
@@ -73,7 +73,7 @@ namespace TheIsland.Website.Areas.Admin.Controllers
 
             if (model.Images.Count != 0)
             {
-                foreach (var image in model.Images)
+                foreach (IFormFile image in model.Images)
                 {
                     model.StoreItem.images.Add(await this._storeService.SaveImage(image).ConfigureAwait(false));
                 }

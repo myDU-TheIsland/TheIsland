@@ -22,21 +22,21 @@ public class BlueprintSanitizerServiceTests
     [Test]
     public void Should_Sanitize_Blueprint()
     {
-        var service = new BlueprintSanitizerService();
+        BlueprintSanitizerService service = new BlueprintSanitizerService();
 
-        var bytes = Encoding.Default.GetBytes(_badBpJson);
+        byte[] bytes = Encoding.Default.GetBytes(_badBpJson);
 
         NQutils.Config.Config.ReadYamlFile("mod", "./dual.yaml");
 
-        var elementType = 1205879482UL;
-        var weapunit = new WeaponUnit();
-        
-        var gameplayDef = Substitute.For<IGameplayDefinition>();
+        ulong elementType = 1205879482UL;
+        WeaponUnit weapunit = new WeaponUnit();
+
+        IGameplayDefinition gameplayDef = Substitute.For<IGameplayDefinition>();
         gameplayDef.BaseObject.Returns(weapunit);
         gameplayDef.GetStaticPropertyOpt(Arg.Is("baseDamage"))
             .Returns(new PropertyValue(10000));
-        
-        var bank = Substitute.For<IGameplayBank>();
+
+        IGameplayBank bank = Substitute.For<IGameplayBank>();
         bank.GetDefinition(Arg.Is(elementType))
             .Returns(gameplayDef);
         
@@ -45,23 +45,23 @@ public class BlueprintSanitizerServiceTests
 
         Assert.DoesNotThrowAsync(async () =>
         {
-            var result = await service.SanitizeAsync(bank, bytes, CancellationToken.None);
+            BlueprintSanitationResult result = await service.SanitizeAsync(bank, bytes, CancellationToken.None);
 
-            using var memoryStream = new MemoryStream(result.BlueprintBytes);
-            using var streamReader = new StreamReader(memoryStream);
-            await using var textReader = new JsonTextReader(streamReader);
+            using MemoryStream memoryStream = new MemoryStream(result.BlueprintBytes);
+            using StreamReader streamReader = new StreamReader(memoryStream);
+            await using JsonTextReader textReader = new JsonTextReader(streamReader);
 
-            var bp = await JToken.ReadFromAsync(textReader).ConfigureAwait(false);
+            JToken bp = await JToken.ReadFromAsync(textReader).ConfigureAwait(false);
 
-            var elements = bp["Elements"];
-            var elementmap = elements !
+            JToken? elements = bp["Elements"];
+            Dictionary<ulong, JToken> elementmap = elements !
                 .DistinctBy(k => k["elementType"] !.Value<ulong>())
                 .ToDictionary(
                     k => k["elementType"] !.Value<ulong>(),
                     v => v);
 
-            var weapprops = elementmap[elementType]["properties"];
-            var basedamage = weapprops ![0] ![1] !["value"] !.Value<double>();
+            JToken? weapprops = elementmap[elementType]["properties"];
+            double basedamage = weapprops ![0] ![1] !["value"] !.Value<double>();
 
             Assert.That(weapunit.baseDamage, Is.EqualTo(basedamage));
         });

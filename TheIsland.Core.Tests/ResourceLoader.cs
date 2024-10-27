@@ -10,14 +10,14 @@ namespace TheIsland.Core.Tests
     {
         public static string GetStringContents(string resourceName)
         {
-            var assembly = Assembly.GetAssembly(typeof(BlueprintSanitizerServiceTests)) !;
-            using var stream = assembly.GetManifestResourceStream(resourceName);
+            Assembly assembly = Assembly.GetAssembly(typeof(BlueprintSanitizerServiceTests)) !;
+            using Stream? stream = assembly.GetManifestResourceStream(resourceName);
             if (stream == null)
             {
                 throw new NullReferenceException($"{resourceName} not found or is not an Embedded Resource");
             }
 
-            var sr = new StreamReader(stream);
+            StreamReader sr = new StreamReader(stream);
             return sr.ReadToEnd();
         }
     }

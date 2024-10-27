@@ -6,17 +6,11 @@ namespace TheIsland.Core.Bots
 {
     using System.Collections.Concurrent;
     using Backend;
-    using Backend.AWS;
     using Backend.Database;
     using BotLib.Generated;
-    using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Extensions.Logging;
     using NQ;
-    using NQ.Interfaces;
-    using NQ.Visibility;
-    using NQutils.Sql;
     using TheIsland.Core.Classes;
-    using TheIsland.Core.Services.Blueprint;
     using TheIsland.Core.Services.SQL;
     using TheIsland.Core.Settings;
 

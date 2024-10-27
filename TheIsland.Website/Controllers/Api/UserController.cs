@@ -5,11 +5,9 @@
 namespace TheIsland.Website.Controllers.Api
 {
     using Microsoft.AspNetCore.Mvc;
-    using TheIsland.Core.Bots;
     using TheIsland.Core.Services;
     using TheIsland.Core.Services.SQL;
     using TheIsland.Website.Classes;
-    using TheIsland.Website.Framework.Attributes;
 
     [Area("Api")]
     public class UserController : IslandController

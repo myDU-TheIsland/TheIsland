@@ -9,7 +9,6 @@ namespace TheIsland.Website.Areas.Admin.Controllers.API
     using TheIsland.Core.Services;
     using TheIsland.Website.Classes;
     using TheIsland.Website.Framework.Attributes;
-    using TheIsland.Website.Models;
 
     [Area("Admin")]
     [Route("~/[area]/API/[controller]/[action]")]

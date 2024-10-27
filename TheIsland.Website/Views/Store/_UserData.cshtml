@@ -1,0 +1,23 @@
+﻿@inject IStoreService StoreService
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                Search fo stuff
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-right">
+                @{
+                    var amount = (await StoreService.GetWalletBalance(this.SelectedPlayer)).ToString("n0");
+                    var talentPoints = (await StoreService.GetTalentPoints(this.SelectedPlayer)).ToString("n0");
+                }
+
+                <i class="fa-solid fa-book-open"></i>: @talentPoints points &nbsp;&nbsp; <i class="fa-solid fa-wallet"></i>: @amount&#8463; &nbsp;&nbsp;
+
+            </div>
+        </div>
+    </div>
+</div>

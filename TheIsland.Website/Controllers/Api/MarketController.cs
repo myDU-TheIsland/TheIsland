@@ -4,14 +4,10 @@
 
 namespace TheIsland.Website.Controllers.Api
 {
-    using System.Linq;
     using Microsoft.AspNetCore.Mvc;
-    using TheIsland.Core.Bots;
     using TheIsland.Core.Entities;
     using TheIsland.Core.Services;
-    using TheIsland.Core.Services.SQL;
     using TheIsland.Website.Classes;
-    using TheIsland.Website.Framework.Attributes;
     using TheIsland.Website.Framework.Helpers;
 
     [Area("Api")]

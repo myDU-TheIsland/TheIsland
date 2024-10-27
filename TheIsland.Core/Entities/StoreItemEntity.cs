@@ -1,16 +1,19 @@
-﻿// <copyright file="StoreItem.cs" company="Paul Layne">
+﻿// <copyright file="StoreItemEntity.cs" company="Paul Layne">
 // Copyright (c) Paul Layne. All rights reserved.
 // </copyright>
 
 namespace TheIsland.Core.Entities
 {
-    using System;
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
     using TheIsland.Core.Classes;
 
+    public class StoreItem : StoreItemEntity
+    {
+    }
+
     [Table("public.store_items")]
-    public class StoreItem : DatabaseEntity
+    public class StoreItemEntity : DatabaseEntity
     {
         [Display(Name = "Item name")]
         public string name { get; set; } = string.Empty;

@@ -2,7 +2,7 @@
 // Copyright (c) Paul Layne. All rights reserved.
 // </copyright>
 
-namespace TheIsland.Website.Models
+namespace TheIsland.Website.Models.Store
 {
     using TheIsland.Core.Entities;
 
@@ -10,7 +10,7 @@ namespace TheIsland.Website.Models
     {
         public string ErrorMessage { get; set; } = string.Empty;
 
-        public StoreItem[] StoreItems { get; set; } = Array.Empty<StoreItem>();
+        public StoreItemEntity[] StoreItems { get; set; } = Array.Empty<StoreItemEntity>();
 
         public string Name { get; set; } = string.Empty;
     }

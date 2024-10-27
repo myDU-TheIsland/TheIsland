@@ -19,7 +19,6 @@ namespace TheIsland.Website
     using TheIsland.Core;
     using TheIsland.Core.Bots;
     using TheIsland.Core.Services;
-    using TheIsland.Core.Services.SQL;
     using TheIsland.Core.Settings;
     using TheIsland.Website.Classes;
     using TheIsland.Website.Framework.Activators;

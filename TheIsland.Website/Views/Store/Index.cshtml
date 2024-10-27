@@ -1,17 +1,23 @@
 ﻿@model StoreSearchModel
 @{
     ViewData["Title"] = "Home Page";
-    ViewBag.InsertGutter = true;
 }
+<partial name="_UserData" />
 <div class="row">
     @foreach (var item in Model.StoreItems)
     {
         <div class="col-sm">
-            <div class="card">
+            <div class="card card-product">
                 <a asp-action="View" asp-controller="Store" asp-area="" asp-route-id="@item.id">
-                    <div class="card-body text-center">
-                        <div class="card-header">@item.name</div>
-                        @item.description
+                    <div class="card-body">
+                        <h4 class="card-title">
+                            @item.name
+                        </h4>
+                    </div>
+                    <div class="card-footer">
+                        <div class="price">
+                            <h4>@item.price.ToString("n0") &#8463;</h4>
+                        </div>
                     </div>
                 </a>
             </div>

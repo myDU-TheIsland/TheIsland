@@ -4,15 +4,12 @@
 
 namespace TheIsland.Website.Areas.Admin.Controllers
 {
-    using System.Linq;
     using Microsoft.AspNetCore.Mvc;
     using TheIsland.Core.Bots;
-    using TheIsland.Core.Entities;
     using TheIsland.Core.Services;
     using TheIsland.Core.Services.SQL;
     using TheIsland.Website.Classes;
     using TheIsland.Website.Framework.Attributes;
-    using TheIsland.Website.Framework.Helpers;
 
     [Area("Admin")]
     public class TestController : IslandController

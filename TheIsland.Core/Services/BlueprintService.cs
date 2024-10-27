@@ -89,9 +89,9 @@ namespace TheIsland.Core.Services
             await this.ConnectionTest().ConfigureAwait(false);
             ulong coreType = 0;
 
-            var blueprintModel = await this._sql.Read(blueprintId).ConfigureAwait(false);
+            BlueprintModel blueprintModel = await this._sql.Read(blueprintId).ConfigureAwait(false);
 
-            var creator = blueprintModel.JsonProperties.serverProperties.creatorId;
+            EntityId creator = blueprintModel.JsonProperties.serverProperties.creatorId;
 
             bool isMe = false;
 
@@ -115,8 +115,8 @@ namespace TheIsland.Core.Services
 
             if (!isMe)
             {
-                var requiredItems = await this._sql.GetIngredients(blueprintId).ConfigureAwait(false);
-                foreach (var ri in requiredItems)
+                List<ItemRequired> requiredItems = await this._sql.GetIngredients(blueprintId).ConfigureAwait(false);
+                foreach (ItemRequired ri in requiredItems)
                 {
                     if (this._gameplayBank.GetBaseObject<NQutils.Def.CoreUnit>(ri.id) != null)
                     {
@@ -125,7 +125,7 @@ namespace TheIsland.Core.Services
                     }
                 }
 
-                var coreDrm = await this._sql.BlueprintCoreDRMGet(blueprintId, coreType).ConfigureAwait(false);
+                bool coreDrm = await this._sql.BlueprintCoreDRMGet(blueprintId, coreType).ConfigureAwait(false);
 
                 if (coreDrm)
                 {
@@ -146,11 +146,11 @@ namespace TheIsland.Core.Services
 
             if (this.IsBlueprintSanitationEnabled())
             {
-                var sanitizer = new BlueprintSanitizerService();
+                BlueprintSanitizerService sanitizer = new BlueprintSanitizerService();
 
                 try
                 {
-                    var result = await sanitizer.SanitizeAsync(this._gameplayBank, bp, CancellationToken.None)
+                    BlueprintSanitationResult result = await sanitizer.SanitizeAsync(this._gameplayBank, bp, CancellationToken.None)
                         .ConfigureAwait(false);
 
                     if (!result.Success)
@@ -233,14 +233,14 @@ namespace TheIsland.Core.Services
                     continue;
                 }
 
-                var blueprintId = item.content.id;
+                ulong blueprintId = item.content.id;
 
                 if (!await this.IsExportAllowed(blueprintId, playerId).ConfigureAwait(false))
                 {
                     continue;
                 }
 
-                var blueprintModel = await this._sql.Read(blueprintId).ConfigureAwait(false);
+                BlueprintModel blueprintModel = await this._sql.Read(blueprintId).ConfigureAwait(false);
 
                 output.Add(blueprintModel.Name, blueprintId);
             }
@@ -259,8 +259,8 @@ namespace TheIsland.Core.Services
 
             try
             {
-                var bin = await this._dataAccessor.BlueprintExport((long)blueprintId).ConfigureAwait(false);
-                var uuid = Guid.NewGuid();
+                byte[] bin = await this._dataAccessor.BlueprintExport((long)blueprintId).ConfigureAwait(false);
+                Guid uuid = Guid.NewGuid();
 
                 if (!System.IO.Directory.Exists(Path.GetFullPath(this._settings.ExportPath)))
                 {
@@ -281,7 +281,7 @@ namespace TheIsland.Core.Services
 
         public async Task<BluePrintExport?> GetBP(Guid uuid, ulong playerId)
         {
-            var blueprintData = await this._blueprintExportRepository.GetByUuidAsync(uuid).ConfigureAwait(false);
+            BluePrintExport? blueprintData = await this._blueprintExportRepository.GetByUuidAsync(uuid).ConfigureAwait(false);
 
             if (blueprintData == null)
             {
@@ -298,7 +298,7 @@ namespace TheIsland.Core.Services
 
         public async Task<BluePrintExport[]> GetMyExportedBps(ulong playerId)
         {
-            var results = await this._blueprintExportRepository.GetByPlayerIdAsync(playerId).ConfigureAwait(false);
+            IEnumerable<BluePrintExport> results = await this._blueprintExportRepository.GetByPlayerIdAsync(playerId).ConfigureAwait(false);
             return results.ToArray();
         }
 

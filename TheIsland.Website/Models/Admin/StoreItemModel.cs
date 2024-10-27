@@ -10,7 +10,7 @@ namespace TheIsland.Website.Models.Admin
     {
         public string ErrorMessage { get; set; } = string.Empty;
 
-        public StoreItem StoreItem { get; set; } = new StoreItem();
+        public StoreItemEntity StoreItem { get; set; } = new StoreItemEntity();
 
         public List<IFormFile> Images { get; set; } = new List<IFormFile>();
     }

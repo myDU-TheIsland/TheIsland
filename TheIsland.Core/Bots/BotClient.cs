@@ -22,6 +22,7 @@ namespace TheIsland.Core.Bots
     using NQutils.Sql;
     using Orleans;
     using TheIsland.Core.Helpers;
+    using TheIsland.Core.Services;
     using TheIsland.Core.Settings;
 
     public interface IBotClient

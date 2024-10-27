@@ -32,18 +32,18 @@ namespace TheIsland.Website.Classes
                 return 0;
             }
 
-            var currentPlayer = double.Parse(this.HttpContext?.Session?.GetString("Player") ?? "0");
+            double currentPlayer = double.Parse(this.HttpContext?.Session?.GetString("Player") ?? "0");
 
             if (currentPlayer != 0)
             {
                 return currentPlayer;
             }
 
-            var players = this.PlayerLinkingService.GetPlayerMapping(this.DiscordId).GetAwaiter().GetResult();
+            IEnumerable<Core.Entities.UserMapping> players = this.PlayerLinkingService.GetPlayerMapping(this.DiscordId).GetAwaiter().GetResult();
 
             if (players.Any())
             {
-                var first = players.First().dual_id;
+                double first = players.First().dual_id;
 
                 //set session variable
                 this.HttpContext?.Session?.SetString("Player", first.ToString());

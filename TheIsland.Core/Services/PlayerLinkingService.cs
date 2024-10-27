@@ -97,9 +97,9 @@ namespace TheIsland.Core.Services
 
         public async Task<IEnumerable<UserMapping>> GetPlayerMapping(double discordId)
         {
-            var results = await this._userMappingRepository.FindByDiscordId(discordId).ConfigureAwait(false);
+            IEnumerable<UserMapping> results = await this._userMappingRepository.FindByDiscordId(discordId).ConfigureAwait(false);
 
-            foreach (var result in results)
+            foreach (UserMapping result in results)
             {
                 result.player_name = (await this._playerRepository.GetAsync(result.dual_id).ConfigureAwait(false)).display_name;
             }

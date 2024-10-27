@@ -17,9 +17,9 @@ namespace TheIsland.Core.Helpers
             Console.WriteLine(nameof(StartServicesV2));
             Log.Information(nameof(StartServicesV2));
 
-            var cts = CancellationTokenSource.CreateLinkedTokenSource(externalToken);
+            CancellationTokenSource? cts = CancellationTokenSource.CreateLinkedTokenSource(externalToken);
             cts.CancelAfter(TimeSpan.FromSeconds(600.0));
-            foreach (var service in provider.GetServices<IHostedService>())
+            foreach (IHostedService service in provider.GetServices<IHostedService>())
             {
                 string output = $@"Starting {service.GetType()}";
 

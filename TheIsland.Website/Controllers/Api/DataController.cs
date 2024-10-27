@@ -8,12 +8,8 @@ namespace TheIsland.Website.Controllers.Api
     using System.Text;
     using Microsoft.AspNetCore.Mvc;
     using TheIsland.Core.Bots;
-    using TheIsland.Core.Entities;
     using TheIsland.Core.Services;
-    using TheIsland.Core.Services.SQL;
     using TheIsland.Website.Classes;
-    using TheIsland.Website.Framework.Attributes;
-    using TheIsland.Website.Framework.Helpers;
 
     [Area("Api")]
     public class DataController : IslandController
@@ -30,7 +26,7 @@ namespace TheIsland.Website.Controllers.Api
             type = type.ToLower();
             Dictionary<ulong, double> prices = new Dictionary<ulong, double>();
 
-            foreach (var price in this._marketBot.BuyPrices)
+            foreach (KeyValuePair<ulong, double> price in this._marketBot.BuyPrices)
             {
                 prices.TryAdd(price.Key, this._marketBot.GetItemPrice(Convert.ToUInt64(market), price.Key) / 100);
             }

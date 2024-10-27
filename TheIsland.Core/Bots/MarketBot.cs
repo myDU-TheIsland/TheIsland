@@ -6,17 +6,12 @@ namespace TheIsland.Core.Bots
 {
     using System.Collections.Concurrent;
     using System.Collections.Generic;
-    using System.Text.RegularExpressions;
-    using Amazon.Runtime.Internal.Util;
     using Backend;
     using BotLib.Generated;
     using BotLib.Utils;
-    using Microsoft.AspNetCore.DataProtection.KeyManagement;
     using Microsoft.Extensions.Logging;
     using NQ;
-    using NQ.Interfaces;
     using TheIsland.Core.Settings;
-    using YamlDotNet.Core.Tokens;
 
     public interface IMarketBot : IBotClient
     {
@@ -255,7 +250,7 @@ namespace TheIsland.Core.Bots
 
             if (finalMarketItemMultiplier == 0)
             {
-                if (this.MarketItemMultiplier.TryGetValue(0, out var marketData))
+                if (this.MarketItemMultiplier.TryGetValue(0, out ConcurrentDictionary<ulong, double>? marketData))
                 {
                     if (!marketData.TryGetValue(itemType, out finalMarketItemMultiplier))
                     {
@@ -290,7 +285,7 @@ namespace TheIsland.Core.Bots
 
             if (finalMarketItemMultiplier == 0)
             {
-                if (this.MarketItemSellMultiplier.TryGetValue(0, out var marketData))
+                if (this.MarketItemSellMultiplier.TryGetValue(0, out ConcurrentDictionary<ulong, double>? marketData))
                 {
                     if (!marketData.TryGetValue(itemType, out finalMarketItemMultiplier))
                     {
@@ -391,7 +386,7 @@ namespace TheIsland.Core.Bots
         {
             void ToDictionary(ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, double>> input, Dictionary<ulong, Dictionary<ulong, double>> output)
             {
-                foreach (var entry in input)
+                foreach (KeyValuePair<ulong, ConcurrentDictionary<ulong, double>> entry in input)
                 {
                     output.Add(entry.Key, new Dictionary<ulong, double>(entry.Value.ToArray()));
                 }
@@ -425,7 +420,7 @@ namespace TheIsland.Core.Bots
 
                 foreach (KeyValuePair<ulong, Dictionary<ulong, double>> entry in input)
                 {
-                    var tempDict = new ConcurrentDictionary<ulong, double>();
+                    ConcurrentDictionary<ulong, double> tempDict = new ConcurrentDictionary<ulong, double>();
                     foreach (KeyValuePair<ulong, double> nestedEntry in entry.Value)
                     {
                         tempDict.TryAdd(nestedEntry.Key, nestedEntry.Value);
@@ -437,9 +432,9 @@ namespace TheIsland.Core.Bots
 
             try
             {
-                var textMarketBudgetMultiplier = await File.ReadAllTextAsync(@$"{this._settings.ConfigPath}/marketBudgetMultiplier.json").ConfigureAwait(false);
-                var textMarketItemMultiplier = await File.ReadAllTextAsync(@$"{this._settings.ConfigPath}/marketItemMultiplier.json").ConfigureAwait(false);
-                var textMarketItemSellMultiplier = await File.ReadAllTextAsync(@$"{this._settings.ConfigPath}/marketItemSellMultiplier.json").ConfigureAwait(false);
+                string textMarketBudgetMultiplier = await File.ReadAllTextAsync(@$"{this._settings.ConfigPath}/marketBudgetMultiplier.json").ConfigureAwait(false);
+                string textMarketItemMultiplier = await File.ReadAllTextAsync(@$"{this._settings.ConfigPath}/marketItemMultiplier.json").ConfigureAwait(false);
+                string textMarketItemSellMultiplier = await File.ReadAllTextAsync(@$"{this._settings.ConfigPath}/marketItemSellMultiplier.json").ConfigureAwait(false);
 
                 Dictionary<ulong, double>? dictionaryMarketBudgetMultiplier = System.Text.Json.JsonSerializer.Deserialize<Dictionary<ulong, double>>(textMarketBudgetMultiplier);
                 Dictionary<ulong, Dictionary<ulong, double>>? dictionaryMarketItemMultiplier = System.Text.Json.JsonSerializer.Deserialize<Dictionary<ulong, Dictionary<ulong, double>>>(textMarketItemMultiplier);

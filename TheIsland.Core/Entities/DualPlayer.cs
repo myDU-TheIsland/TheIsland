@@ -16,5 +16,7 @@ namespace TheIsland.Core.Entities
         public bool is_bot { get; set; } = false;
 
         public bool admin { get; set; } = false;
+
+        public double wallet { get; set; } = 0;
     }
 }

@@ -8,6 +8,7 @@ namespace TheIsland.Website.Framework
     using Microsoft.AspNetCore.Mvc.Razor;
     using Microsoft.AspNetCore.Mvc.Razor.Internal;
     using TheIsland.Core.Services;
+    using TheIsland.Core.Services.SQL;
 
     public abstract class AppViewPage<TModel> : RazorPage<TModel> where TModel : class
     {
@@ -19,12 +20,17 @@ namespace TheIsland.Website.Framework
 
         public bool IsLoggedIn => this.Context?.User?.Identity?.IsAuthenticated ?? false;
 
+        public bool IsInGame => this._dualPlayerRepository.GetAsync(this.SelectedPlayer).GetAwaiter().GetResult().connected;
+
 #pragma warning disable CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
         [RazorInject]
         public IAuthorizationService AuthorizationService { get; set; }
 
         [RazorInject]
         public PlayerLinkingService PlayerLinkingService { get; set; }
+
+        [RazorInject]
+        public DualPlayerRepository _dualPlayerRepository { get; set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
         private double GetPlayer()
@@ -34,18 +40,18 @@ namespace TheIsland.Website.Framework
                 return 0;
             }
 
-            var currentPlayer = double.Parse(this.Context?.Session?.GetString("Player") ?? "0");
+            double currentPlayer = double.Parse(this.Context?.Session?.GetString("Player") ?? "0");
 
             if (currentPlayer != 0)
             {
                 return currentPlayer;
             }
 
-            var players = this.PlayerLinkingService.GetPlayerMapping(this.DiscordId).GetAwaiter().GetResult();
+            IEnumerable<Core.Entities.UserMapping> players = this.PlayerLinkingService.GetPlayerMapping(this.DiscordId).GetAwaiter().GetResult();
 
             if (players.Any())
             {
-                var first = players.First().dual_id;
+                double first = players.First().dual_id;
 
                 //set session variable
                 this.Context?.Session?.SetString("Player", first.ToString());

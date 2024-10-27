@@ -6,7 +6,6 @@ namespace TheIsland.Website.Controllers
 {
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
-    using TheIsland.Core.Bots;
     using TheIsland.Core.Entities;
     using TheIsland.Core.Services;
     using TheIsland.Website.Classes;
@@ -135,14 +134,14 @@ namespace TheIsland.Website.Controllers
         [Route("~/BP/{guid}")]
         public async Task<IActionResult> GetBP(Guid guid)
         {
-            var blueprintResult = await this._bluePrintService.GetBP(guid, Convert.ToUInt64(this.SelectedPlayer)).ConfigureAwait(false);
+            BluePrintExport? blueprintResult = await this._bluePrintService.GetBP(guid, Convert.ToUInt64(this.SelectedPlayer)).ConfigureAwait(false);
 
             if (blueprintResult == null)
             {
                 return this.RedirectToAction("ExportBP");
             }
 
-            var byteArray = await System.IO.File.ReadAllBytesAsync(this._bluePrintService.GetBPPath(blueprintResult.uuid)).ConfigureAwait(false);
+            byte[] byteArray = await System.IO.File.ReadAllBytesAsync(this._bluePrintService.GetBPPath(blueprintResult.uuid)).ConfigureAwait(false);
 
             return this.File(byteArray, "text/json", $@"{blueprintResult.blueprint_name.Replace(' ', '_').ToLower()}.json");
         }
@@ -165,7 +164,7 @@ namespace TheIsland.Website.Controllers
         {
             if (this.ModelState.IsValid && model.BluePrint != null)
             {
-                var player = this.SelectedPlayer;
+                double player = this.SelectedPlayer;
 
                 if (player == 0)
                 {
@@ -217,7 +216,7 @@ namespace TheIsland.Website.Controllers
                 urlReferrer = "~/";
             }
 
-            var players = await this.PlayerLinkingService.GetPlayerMapping(this.DiscordId).ConfigureAwait(false);
+            IEnumerable<UserMapping> players = await this.PlayerLinkingService.GetPlayerMapping(this.DiscordId).ConfigureAwait(false);
 
             if (players.Any(item => item.dual_id == playerId))
             {
