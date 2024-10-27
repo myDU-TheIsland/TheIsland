@@ -4,6 +4,8 @@
 
 namespace TheIsland.Website.Controllers.Api
 {
+    using System.Security.Claims;
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using TheIsland.Core.Services;
     using TheIsland.Core.Services.SQL;
@@ -14,7 +16,7 @@ namespace TheIsland.Website.Controllers.Api
     {
         private readonly DualPlayerRepository _playerRepository;
 
-        public UserController(DualPlayerRepository playerRepository, PlayerLinkingService playerLinkingService) : base(playerLinkingService)
+        public UserController(DualPlayerRepository playerRepository, PlayerLinkingService playerLinkingService, IAuthorizationService authorizationService) : base(playerLinkingService, authorizationService)
         {
             this._playerRepository = playerRepository;
         }
@@ -22,6 +24,18 @@ namespace TheIsland.Website.Controllers.Api
         public async Task<IActionResult> Index()
         {
             return this.Json(await this._playerRepository.GetAsync().ConfigureAwait(false));
+        }
+
+        public IActionResult Debug()
+        {
+            var output = new
+            {
+                claims = this.HttpContext?.User?.Claims?.Select(item => new KeyValuePair<string, string>(item.Type, item.Value)) ?? Array.Empty<KeyValuePair<string, string>>(),
+                isAdmin = this.IsAdmin,
+                isUser = this.IsUser,
+            };
+
+            return this.Json(output);
         }
     }
 }

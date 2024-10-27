@@ -4,6 +4,7 @@
 
 namespace TheIsland.Website.Areas.Admin.Controllers.API
 {
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using TheIsland.Core.Bots;
     using TheIsland.Core.Services;
@@ -16,7 +17,7 @@ namespace TheIsland.Website.Areas.Admin.Controllers.API
     {
         private readonly IMarketBot _marketBot;
 
-        public MarketController(IMarketBot marketBot, PlayerLinkingService playerLinkingService) : base(playerLinkingService)
+        public MarketController(IMarketBot marketBot, PlayerLinkingService playerLinkingService, IAuthorizationService authorizationService) : base(playerLinkingService, authorizationService)
         {
             this._marketBot = marketBot;
         }

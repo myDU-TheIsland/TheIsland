@@ -22,7 +22,8 @@ namespace TheIsland.Website.Controllers
         public StoreController(
             IStoreService storeService,
             StorePurchaseHistoryRepository storePurchaseHistoryRepository,
-            PlayerLinkingService playerLinkingService) : base(playerLinkingService)
+            PlayerLinkingService playerLinkingService,
+            IAuthorizationService authorizationService) : base(playerLinkingService, authorizationService)
         {
             this._storeService = storeService;
             this._storePurchaseHistoryRepository = storePurchaseHistoryRepository;

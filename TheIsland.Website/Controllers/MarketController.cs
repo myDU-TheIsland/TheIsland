@@ -4,6 +4,7 @@
 
 namespace TheIsland.Website.Controllers
 {
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using TheIsland.Core.Services;
     using TheIsland.Website.Classes;
@@ -11,7 +12,7 @@ namespace TheIsland.Website.Controllers
 
     public class MarketController : IslandController
     {
-        public MarketController(PlayerLinkingService playerLinkingService) : base(playerLinkingService)
+        public MarketController(PlayerLinkingService playerLinkingService, IAuthorizationService authorizationService) : base(playerLinkingService, authorizationService)
         {
         }
 

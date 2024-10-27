@@ -4,6 +4,7 @@
 
 namespace TheIsland.Website.Controllers.Api
 {
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using TheIsland.Core.Entities;
     using TheIsland.Core.Services;
@@ -17,7 +18,8 @@ namespace TheIsland.Website.Controllers.Api
 
         public MarketController(
             MarketService marketService,
-            PlayerLinkingService playerLinkingService) : base(playerLinkingService)
+            PlayerLinkingService playerLinkingService,
+            IAuthorizationService authorizationService) : base(playerLinkingService, authorizationService)
         {
             this._marketService = marketService;
         }

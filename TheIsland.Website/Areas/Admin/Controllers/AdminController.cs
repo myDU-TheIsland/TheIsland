@@ -13,7 +13,7 @@ namespace TheIsland.Website.Areas.Admin.Controllers
     [Authorize(Policy = "Admin")]
     public class AdminController : IslandController
     {
-        public AdminController(PlayerLinkingService playerLinkingService) : base(playerLinkingService)
+        public AdminController(PlayerLinkingService playerLinkingService, IAuthorizationService authorizationService) : base(playerLinkingService, authorizationService)
         {
         }
 

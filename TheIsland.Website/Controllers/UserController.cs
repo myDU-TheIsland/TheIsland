@@ -15,7 +15,7 @@ namespace TheIsland.Website.Controllers
     {
         private readonly IBlueprintService _bluePrintService;
 
-        public UserController(IBlueprintService bluePrintService, PlayerLinkingService playerLinkingService) : base(playerLinkingService)
+        public UserController(IBlueprintService bluePrintService, PlayerLinkingService playerLinkingService, IAuthorizationService authorizationService) : base(playerLinkingService, authorizationService)
         {
             this._bluePrintService = bluePrintService;
         }

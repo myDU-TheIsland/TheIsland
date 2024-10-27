@@ -6,6 +6,7 @@ namespace TheIsland.Website.Controllers.Api
 {
     using System.Linq;
     using System.Text;
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using TheIsland.Core.Bots;
     using TheIsland.Core.Services;
@@ -16,7 +17,7 @@ namespace TheIsland.Website.Controllers.Api
     {
         private readonly IMarketBot _marketBot;
 
-        public DataController(IMarketBot marketBot, PlayerLinkingService playerLinkingService) : base(playerLinkingService)
+        public DataController(IMarketBot marketBot, PlayerLinkingService playerLinkingService, IAuthorizationService authorizationService) : base(playerLinkingService, authorizationService)
         {
             this._marketBot = marketBot;
         }

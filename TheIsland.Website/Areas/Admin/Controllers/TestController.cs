@@ -4,6 +4,7 @@
 
 namespace TheIsland.Website.Areas.Admin.Controllers
 {
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using TheIsland.Core.Bots;
     using TheIsland.Core.Services;
@@ -28,7 +29,8 @@ namespace TheIsland.Website.Areas.Admin.Controllers
             IGeneralBot generalBot,
             IMarketBot marketBot,
             DualMarketRepository marketRepo,
-            PlayerLinkingService playerLinkingService) : base(playerLinkingService)
+            PlayerLinkingService playerLinkingService,
+            IAuthorizationService authorizationService) : base(playerLinkingService, authorizationService)
         {
             this._importMarketService = importMarketService;
             this._marketService = marketService;

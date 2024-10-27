@@ -18,6 +18,8 @@ namespace TheIsland.Website.Framework
 
         public bool IsAdmin => this.AuthorizationService.AuthorizeAsync(this.Context.User, "Admin").GetAwaiter().GetResult().Succeeded;
 
+        public bool IsUser => this.AuthorizationService.AuthorizeAsync(this.Context.User, "Admin").GetAwaiter().GetResult().Succeeded;
+
         public bool IsLoggedIn => this.Context?.User?.Identity?.IsAuthenticated ?? false;
 
         public bool IsInGame => this._dualPlayerRepository.GetAsync(this.SelectedPlayer).GetAwaiter().GetResult().connected;

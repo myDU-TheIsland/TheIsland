@@ -4,6 +4,7 @@
 
 namespace TheIsland.Website.Classes
 {
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
     using TheIsland.Core.Services;
@@ -14,15 +15,20 @@ namespace TheIsland.Website.Classes
 
         protected double SelectedPlayer => this.GetPlayer();
 
-        protected bool IsAdmin => this.HttpContext?.User?.IsInRole("Admin") ?? false;
+        protected bool IsAdmin => this.AuthorizationService.AuthorizeAsync(this.HttpContext.User, "Admin").GetAwaiter().GetResult().Succeeded;
+
+        protected bool IsUser => this.AuthorizationService.AuthorizeAsync(this.HttpContext.User, "User").GetAwaiter().GetResult().Succeeded;
 
         protected bool IsLoggedIn => this.HttpContext?.User?.Identity?.IsAuthenticated ?? false;
 
+        private IAuthorizationService AuthorizationService { get; set; }
+
         protected PlayerLinkingService PlayerLinkingService { get; }
 
-        public IslandController(PlayerLinkingService playerLinkingService)
+        public IslandController(PlayerLinkingService playerLinkingService, IAuthorizationService authorizationService)
         {
             this.PlayerLinkingService = playerLinkingService;
+            this.AuthorizationService = authorizationService;
         }
 
         internal double GetPlayer()
