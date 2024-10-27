@@ -6,6 +6,7 @@ namespace TheIsland.Website
 {
     using System;
     using System.Globalization;
+    using System.Security.Claims;
     using Hangfire;
     using Hangfire.Dashboard;
     using Microsoft.AspNetCore.Authentication;
@@ -122,13 +123,32 @@ namespace TheIsland.Website
                         user.GetString("id"),
                         user.GetString("avatar"),
                         (user.GetString("avatar") ?? string.Empty).StartsWith("a_") ? "gif" : "png"));
+                options.Events.OnTicketReceived = ctx =>
+                {
+                    var claims = new List<Claim>
+                    {
+                        new Claim(ClaimTypes.Role, "User"),
+                    };
+
+                    if (SiteSettings.Admins.Contains(ctx.Principal?.Claims.FirstOrDefault(item => item.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value ?? "-1"))
+                    {
+                        //Add claim if they are
+                        claims.Add(new Claim(ClaimTypes.Role, "Admin"));
+                    }
+
+                    var appIdentity = new ClaimsIdentity(claims);
+
+                    ctx.Principal?.AddIdentity(appIdentity);
+
+                    return Task.CompletedTask;
+                };
             });
 
             services.AddSession();
 
             services.AddAuthorizationBuilder()
-                .AddPolicy("Admin", policy => policy.RequireClaim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier", SiteSettings.Admins))
-                .AddPolicy("User", policy => policy.RequireClaim("http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier"));
+                .AddPolicy("Admin", policy => policy.RequireRole("Admin"))
+                .AddPolicy("User", policy => policy.RequireRole("User"));
 
             if (this.HostingEnvironment.IsDevelopment())
             {
