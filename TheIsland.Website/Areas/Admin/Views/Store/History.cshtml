@@ -19,7 +19,7 @@
                             <th>Price</th>
                             <th>Item</th>
                             <th>Status</th>
-                            <th>Actions</th>
+                            <th data-orderable="false">Actions</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -42,3 +42,11 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        $(function () {
+            var sellTable = $('#sellTable').DataTable();
+        });
+    </script>
+}

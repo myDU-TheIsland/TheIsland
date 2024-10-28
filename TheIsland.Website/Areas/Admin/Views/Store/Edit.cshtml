@@ -10,15 +10,6 @@
 
     int itemCount = Model.StoreItem.content?.Items.Count() ?? 0;
     int skinCount = Model.StoreItem.content?.Skins.Count() ?? 0;
-
-    if (itemCount == 0)
-    {
-        Model.StoreItem.content!.Items.Add(new KeyValuePair<double, double>());
-    }
-    if (skinCount == 0)
-    {
-        Model.StoreItem.content!.Skins.Add(new KeyValuePair<double, string>());
-    }
 }
 <div class="row">
     <div class="col-sm">
@@ -64,13 +55,13 @@
                                     <tr>
                                         <th>Item Id</th>
                                         <th>Item Count</th>
-                                        <th>Actions (<a><i class="fa-solid fa-plus"></i></a>)</th>
+                                        <th>Actions (<a class="add-item"><i class="fa-solid fa-plus"></i></a>)</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="items">
                                     @for (int x = 0; x < Model.StoreItem.content!.Items.Count(); x++)
                                     {
-                                        <tr><td><input asp-for="@Model.StoreItem.content.Items[@x].Key" class="form-control form-inline" /></td><td><input asp-for="@Model.StoreItem.content.Items[@x].Value" class="form-control  form-inline" /></td><td><a><i class="fa-solid fa-trash"></i></a></td></tr>
+                                        <tr id="items_@x"><td><input asp-for="@Model.StoreItem.content.Items[@x].Key" class="form-control form-inline" /></td><td><input asp-for="@Model.StoreItem.content.Items[@x].Value" class="form-control  form-inline" /></td><td><a class="delete"><i class="fa-solid fa-trash"></i></a></td></tr>
                                     }
                                 </tbody>
                             </table>
@@ -82,13 +73,13 @@
                                     <tr>
                                         <th>Item Id</th>
                                         <th>Skin Name</th>
-                                        <th>Actions (<a><i class="fa-solid fa-plus"></i></a>)</th>
+                                        <th>Actions (<a class="add-skin"><i class="fa-solid fa-plus"></i></a>)</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="skins">
                                     @for (int x = 0; x < Model.StoreItem.content!.Skins.Count(); x++)
                                     {
-                                        <tr><td><input asp-for="@Model.StoreItem.content.Skins[@x].Key" class="form-control  form-inline" /></td><td><input asp-for="@Model.StoreItem.content.Skins[@x].Value" class="form-control  form-inline" /></td><td><a><i class="fa-solid fa-trash"></i></a></td></tr>
+                                        <tr id="skins_@x"><td><input asp-for="@Model.StoreItem.content.Skins[@x].Key" class="form-control  form-inline" /></td><td><input asp-for="@Model.StoreItem.content.Skins[@x].Value" class="form-control  form-inline" /></td><td><a class="delete"><i class="fa-solid fa-trash"></i></a></td></tr>
                                     }
                                 </tbody>
                             </table>
@@ -102,10 +93,10 @@
                                         <th>actions</th>
                                     </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="images">
                                     @for (int x = 0; x < Model.StoreItem.images.Count(); x++)
                                     {
-                                        <tr><td><input asp-for="@Model.StoreItem.images[@x]" class="form-control  form-inline" /></td><td><a><i class="fa-solid fa-trash"></i></a></td></tr>
+                                        <tr id="images_@x"><td><input asp-for="@Model.StoreItem.images[@x]" class="form-control  form-inline" /></td><td><a class="delete"><i class="fa-solid fa-trash"></i></a></td></tr>
                                     }
                                 </tbody>
                             </table>
@@ -118,7 +109,6 @@
                                     <span class="fileinput-exists">Change</span>
                                     <input asp-for="Images" multiple class="form-control" />
                                 </span>
-                                <a href="javascript:;" class="btn btn-danger btn-round fileinput-exists" data-dismiss="fileinput"><i class="fa fa-times"></i> Remove</a>
                             </div>
                         </div>
                         <div class="form-group">
@@ -130,3 +120,39 @@
         </div>
     </div>
 </div>
+
+
+@section Scripts {
+    <script>
+        $(function () {
+            rebindDeletes();
+            $(".add-skin").on('click', appendSkin)
+            $(".add-item").on('click', appendItem)
+        });
+
+        function appendSkin() {
+
+            var lastRow = parseInt(($("#skins").children("tr").last().attr('id') || "").replace("skins_", "") || -1) + 1;
+
+            $("#skins").append('<tr id="skins_' + lastRow + '"><td><input class="form-control  form-inline" type="text" data-val="true" data-val-number="The field Key must be a number." data-val-required="The Key field is required." id="StoreItem_content_Skins_' + lastRow + '__Key" name="StoreItem.content.Skins[' + lastRow + '].Key" value="0"></td><td><input class="form-control  form-inline" type="text" id="StoreItem_content_Skins_' + lastRow + '__Value" name="StoreItem.content.Skins[' + lastRow + '].Value" value=""></td><td><a class="delete"><i class="fa-solid fa-trash"></i></a></td></tr>');
+            rebindDeletes();
+        }
+
+
+        function appendItem() {
+
+            var lastRow = parseInt(($("#items").children("tr").last().attr('id') || "").replace("items_", "") || -1) + 1;
+
+            $("#items").append('<tr id="items_' + lastRow + '"><td><input class="form-control form-inline" type="text" data-val="true" data-val-number="The field Key must be a number." data-val-required="The Key field is required." id="StoreItem_content_Items_' + lastRow + '__Key" name="StoreItem.content.Items[' + lastRow + '].Key" value="0"></td><td><input class="form-control  form-inline" type="text" data-val="true" data-val-number="The field Value must be a number." data-val-required="The Value field is required." id="StoreItem_content_Items_' + lastRow + '__Value" name="StoreItem.content.Items[' + lastRow + '].Value" value="0"></td><td><a class="delete"><i class="fa-solid fa-trash"></i></a></td></tr>');
+            rebindDeletes();
+        }
+
+        function rebindDeletes()
+        {
+            $("tr > td > .delete").on("click", function () {
+                $(this).closest("tr").remove()
+            })
+        }
+
+    </script>
+}
