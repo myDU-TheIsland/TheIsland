@@ -26,6 +26,8 @@ namespace TheIsland.Core.Bots
         Task<List<string>> GiveTalentPoints(double amount);
 
         Task<List<string>> GiveAllQuanta(double amount, string note);
+
+        List<KeyValuePair<string, double>> GetAllItems();
         #endregion
     }
 
@@ -92,6 +94,12 @@ namespace TheIsland.Core.Bots
 
             this._marketEntries = new List<MarketEntry>(output);
             return output;
+        }
+
+        public List<KeyValuePair<string, double>> GetAllItems()
+        {
+            var allItems = this.Bot.GameplayBank.GetDefinitions();
+            return allItems.Select(item => new KeyValuePair<string, double>(item.Name, item.Id)).ToList();
         }
 
         /// <summary>
