@@ -24,6 +24,14 @@ namespace TheIsland.Website.Areas.Admin.Controllers.API
 
         [HttpGet]
         [ApiKey]
+        public async Task<IActionResult> RespecEntireCategoryForAll(string category)
+        {
+            await this._generalBot.RespecEntireCategoryForAllPlayers(category).ConfigureAwait(false);
+            return this.Json(true);
+        }
+
+        [HttpGet]
+        [ApiKey]
         public async Task<IActionResult> GiveQuantaToAll(double amount, string note)
         {
             return this.Json(await this._generalBot.GiveAllQuanta(amount, note).ConfigureAwait(false));

@@ -5,14 +5,17 @@
 namespace TheIsland.Core.Bots
 {
     using System.Collections.Concurrent;
+    using System.Collections.Generic;
     using Backend;
     using Backend.Database;
     using BotLib.Generated;
     using Microsoft.Extensions.Logging;
     using NQ;
+    using StackExchange.Redis;
     using TheIsland.Core.Classes;
     using TheIsland.Core.Services.SQL;
     using TheIsland.Core.Settings;
+    using static Backend.Fixture.Construct.Schema.ConstructFixtureV1;
 
     public interface IGeneralBot : IBotClient
     {
@@ -28,6 +31,8 @@ namespace TheIsland.Core.Bots
         Task<List<string>> GiveAllQuanta(double amount, string note);
 
         List<KeyValuePair<string, double>> GetAllItems();
+
+        Task<List<string>> RespecEntireCategoryForAllPlayers(string category);
         #endregion
     }
 
@@ -227,6 +232,48 @@ namespace TheIsland.Core.Bots
                 logMessage(@$"Exception: {exception}!");
                 return log;
             }
+        }
+
+        public async Task<List<string>> RespecEntireCategoryForAllPlayers(string category)
+        {
+            List<string> log = new List<string>();
+
+            void logMessage(string input)
+            {
+                log.Add($@"{DateTime.Now} :: {input}");
+            }
+
+            IGameplayDefinition? talentGroups = this.Bot.GameplayBank.GetDefinition("TalentGroup");
+            IGameplayDefinition? talentEntry = this.Bot.GameplayBank.GetDefinition("Talent");
+
+            if (talentEntry == null || talentGroups == null)
+            {
+                logMessage(@$"Couldnt get the Talent or TalentGroup definitions");
+                return log;
+            }
+
+            string[] subGroups = talentGroups.GetChildren().Where(item => item.GetStaticProperty("group").stringValue == category).Select(item => item.Name).ToArray();
+            logMessage(@$"Found {subGroups.Length} subgroups");
+            IGameplayDefinition[] subItems = talentEntry.GetChildren().Where(item => subGroups.Contains(item.GetStaticProperty("group").stringValue)).ToArray();
+            logMessage(@$"Found {subItems.Length} actual talents to reset");
+            IEnumerable<Entities.DualPlayer> players = await this._dualPlayerRepository.GetAsync().ConfigureAwait(false);
+
+            foreach (Entities.DualPlayer player in players)
+            {
+                if (player.admin || player.is_bot)
+                {
+                    logMessage(@$"Skipping user '{player.display_name}', is a bot or admin!");
+                    continue;
+                }
+
+                foreach (var subItem in subItems)
+                {
+                    logMessage(@$"Resetting '{player.display_name}' for {subItem.Name}!");
+                    await this.DataAccessor.PlayerTalentRespecAsync(Convert.ToUInt64(player.id), subItem.Id).ConfigureAwait(false);
+                }
+            }
+
+            return log;
         }
         #endregion
 
