@@ -12,7 +12,8 @@ namespace TheIsland.Website.Areas.Admin.Controllers.API
     using TheIsland.Website.Framework.Attributes;
 
     [Area("Admin")]
-    [Route("~/[area]/API/[controller]/[action]")]
+    [Route("~/[area]/api/[controller]/[action]")]
+    [ApiExplorerSettings(IgnoreApi = false)]
     public class MarketController : IslandController
     {
         private readonly IMarketBot _marketBot;

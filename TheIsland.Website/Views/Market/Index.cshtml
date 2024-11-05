@@ -148,7 +148,7 @@
     </script>
     @if (itemExists)
     {
-        string uri = $@"/Api/Market/Stats/Hourly/{Model.ItemId}";
+        string uri = $@"/Api/Market/Hourly/{Model.ItemId}";
         if(Model.MarketId > 0)
         {
             uri += $@"/{Model.MarketId}";

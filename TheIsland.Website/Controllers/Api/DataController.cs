@@ -14,6 +14,8 @@ namespace TheIsland.Website.Controllers.Api
     using TheIsland.Website.Classes;
 
     [Area("Api")]
+    [Route("~/[area]/[controller]/[action]")]
+    [ApiExplorerSettings(IgnoreApi = false)]
     public class DataController : IslandController
     {
         private readonly IMarketBot _marketBot;
@@ -25,6 +27,7 @@ namespace TheIsland.Website.Controllers.Api
             this._generalBot = generalBot;
         }
 
+        [HttpGet]
         public IActionResult GetItems(string type = "JSON")
         {
             var items = this._generalBot.GetAllItems();
@@ -39,6 +42,7 @@ namespace TheIsland.Website.Controllers.Api
             }
         }
 
+        [HttpGet]
         public IActionResult GetBotPricesById(string type = "JSON", double market = 0)
         {
             type = type.ToLower();

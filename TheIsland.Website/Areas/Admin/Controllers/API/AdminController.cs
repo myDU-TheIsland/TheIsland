@@ -12,7 +12,8 @@ namespace TheIsland.Website.Areas.Admin.Controllers.API
     using TheIsland.Website.Framework.Attributes;
 
     [Area("Admin")]
-    [Route("~/[area]/API/[action]")]
+    [Route("~/[area]/actions/[action]")]
+    [ApiExplorerSettings(IgnoreApi = false)]
     public class AdminController : IslandController
     {
         private readonly IGeneralBot _generalBot;
@@ -24,6 +25,7 @@ namespace TheIsland.Website.Areas.Admin.Controllers.API
 
         [HttpGet]
         [ApiKey]
+        [ApiExplorerSettings(IgnoreApi = true)]
         public IActionResult GetAllItems()
         {
             return this.Json(this._generalBot.GetAllItems());

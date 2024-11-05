@@ -9,6 +9,7 @@ namespace TheIsland.Website.Classes
     using Microsoft.AspNetCore.Mvc;
     using TheIsland.Core.Services;
 
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class IslandController : Controller
     {
         protected string DiscordId => this.HttpContext?.User?.Claims?.FirstOrDefault(item => item.Type == "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier")?.Value ?? "0";
