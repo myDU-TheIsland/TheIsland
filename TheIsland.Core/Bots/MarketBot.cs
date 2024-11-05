@@ -268,7 +268,7 @@ namespace TheIsland.Core.Bots
                 botPurchasePrice *= marketMultiplier;
             }
 
-            return (long)Math.Ceiling(botPurchasePrice) * 100;
+            return (long)Math.Ceiling(botPurchasePrice * finalMarketItemMultiplier) * 100;
         }
 
         public long GetSellPrice(ulong marketId, ulong itemType, decimal inputPrice = 0)
