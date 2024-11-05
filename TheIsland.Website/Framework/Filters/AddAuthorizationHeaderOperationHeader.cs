@@ -4,6 +4,7 @@
 
 namespace TheIsland.Website.Framework.Filters
 {
+    using Azure;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.OpenApi.Models;
     using Swashbuckle.AspNetCore.SwaggerGen;
@@ -28,6 +29,9 @@ namespace TheIsland.Website.Framework.Filters
             }
 
             operation.Security = new List<OpenApiSecurityRequirement>();
+
+            operation.Responses.Add("401", new OpenApiResponse { Description = "Unauthorized" });
+            operation.Responses.Add("403", new OpenApiResponse { Description = "Forbidden" });
 
             operation.Security.Add(new OpenApiSecurityRequirement
                 {
