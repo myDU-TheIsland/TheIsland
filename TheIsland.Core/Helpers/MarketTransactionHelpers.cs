@@ -35,7 +35,6 @@ namespace TheIsland.Core.Helpers
 
         public static MarketTransaction ToMarketTransaction(this DualWalletTransaction input)
         {
-            JObject json = JObject.Parse(input.payload);
             MarketTransaction output = new MarketTransaction();
 
             output.price = input.amount / 100;
