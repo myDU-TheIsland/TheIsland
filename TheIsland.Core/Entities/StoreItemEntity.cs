@@ -21,6 +21,9 @@ namespace TheIsland.Core.Entities
         [Column(TypeName = "jsonb")]
         public List<string> images { get; set; } = new List<string>();
 
+        [Display(Name = "Icon")]
+        public string icon { get; set; } = string.Empty;
+
         [Display(Name = "Description")]
         public string description { get; set; } = string.Empty;
 
