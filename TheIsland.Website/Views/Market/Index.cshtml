@@ -290,10 +290,14 @@
 </script>
 @if (itemExists)
 {
+    string uri = $@"/Api/Market/Daily/{Model.ItemId}/-1?type=chartjs";
+    if (Model.MarketId > 0)
+    {
+        uri += $@"/{Model.MarketId}";
+    }
     <text>
         <script>
-            // Use the hardcoded URL directly for now
-            const uri = "https://www.theisle.online/Api/Market/Daily/@Model.ItemId/-1?type=chartjs";
+            const uri = "@uri";
 
             // Chart.js for displaying price trends
             const ctx = document.getElementById('priceChart').getContext('2d');
@@ -375,7 +379,6 @@
             async function fetchDataAndRenderChart() {
                 try {
                     const response = await fetch(uri);
-                    if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
                     const realData = await response.json();
 
                     console.log(realData);
