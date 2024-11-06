@@ -16,7 +16,9 @@ namespace TheIsland.Website
     using Microsoft.AspNetCore.HttpOverrides;
     using Microsoft.AspNetCore.Server.Kestrel.Core;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Extensions.Options;
     using Microsoft.IdentityModel.Logging;
+    using Microsoft.OpenApi.Models;
     using TheIsland.Core;
     using TheIsland.Core.Bots;
     using TheIsland.Core.Services;
@@ -166,6 +168,22 @@ namespace TheIsland.Website
                 });
             }
 
+            services.AddEndpointsApiExplorer();
+            services.AddSwaggerGen(c =>
+            {
+                c.OperationFilter<AddAuthorizationHeaderOperationHeader>();
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "The Island", Version = "v1" });
+                c.AddSecurityDefinition(
+                    "Api Key",
+                    new OpenApiSecurityScheme
+                    {
+                        In = ParameterLocation.Header,
+                        Description = "Please insert your api key",
+                        Name = "X-API-Key",
+                        Type = SecuritySchemeType.ApiKey,
+                    });
+            });
+
             // settings
             services.AddSingleton(SiteSettings);
             services.AddSingleton(SiteSettings.DualUniverse);
@@ -255,12 +273,19 @@ namespace TheIsland.Website
                 IsReadOnlyFunc = (DashboardContext context) => true,
             });
 
+            app.UseSwagger();
+            app.UseSwaggerUI();
+
+            var recurringJobOptions = new RecurringJobOptions()
+            {
+                TimeZone = TimeZoneInfo.Local,
+            };
+
             if (!this.HostingEnvironment.IsDevelopment())
             {
-                RecurringJob.AddOrUpdate("buyStuff", (IMarketBot client) => client.BuyStuff(0), Cron.Minutely);
-                RecurringJob.AddOrUpdate("sellStuff", (MarketService service) => service.SellAllMarketsContainerContents(), Cron.Hourly);
-                RecurringJob.AddOrUpdate("importMarketData", (IImportMarketService service) => service.ImportAsync(), "*/5 * * * *");
-                RecurringJob.AddOrUpdate("hotTime", (MarketService service) => service.HotTimeEvent(), "0 */3 * * *");
+                RecurringJob.AddOrUpdate("buyStuff", (IMarketBot client) => client.BuyStuff(0), Cron.Minutely, options: recurringJobOptions);
+                RecurringJob.AddOrUpdate("sellStuff", (MarketService service) => service.SellAllMarketsContainerContents(), Cron.Hourly, options: recurringJobOptions);
+                RecurringJob.AddOrUpdate("hotTime", (MarketService service) => service.HotTimeEvent(), "0 */3 * * *", options: recurringJobOptions);
             }
         }
     }

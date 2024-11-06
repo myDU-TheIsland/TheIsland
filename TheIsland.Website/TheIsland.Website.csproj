@@ -8,6 +8,8 @@
 		<DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
 		<RazorCompileOnBuild>true</RazorCompileOnBuild>
 		<RazorCompileOnPublish>false</RazorCompileOnPublish>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+		<NoWarn>$(NoWarn);1591</NoWarn>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -44,7 +46,7 @@
 		</AdditionalFiles>
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="AspNet.Security.OAuth.Discord" Version="8.1.0" />
+		<PackageReference Include="AspNet.Security.OAuth.Discord" Version="8.2.0" />
 		<PackageReference Include="AspNetCoreRateLimit" Version="5.0.0" />
 		<PackageReference Include="AsyncFixer" Version="1.6.0">
 			<PrivateAssets>all</PrivateAssets>
@@ -56,16 +58,17 @@
 		</PackageReference>
 		<PackageReference Include="Dapper" Version="2.1.35" />
 		<PackageReference Include="Dapper.Contrib" Version="2.0.78" />
-		<PackageReference Include="Hangfire.AspNetCore" Version="1.8.14" />
+		<PackageReference Include="Hangfire.AspNetCore" Version="1.8.15" />
 		<PackageReference Include="Hangfire.InMemory" Version="1.0.0" />
-		<PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.8" />
-		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.8" />
+		<PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.10" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.10" />
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
 		<PackageReference Include="Npgsql" Version="6.0.11" />
 		<PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
 			<PrivateAssets>all</PrivateAssets>
 			<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
 		</PackageReference>
+		<PackageReference Include="Swashbuckle.AspNetCore" Version="6.9.0" />
 	</ItemGroup>
 	<ItemGroup>
 	  <None Include="..\.editorconfig" Link=".editorconfig" />

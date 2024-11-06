@@ -12,7 +12,8 @@ namespace TheIsland.Website.Areas.Admin.Controllers.API
     using TheIsland.Website.Framework.Attributes;
 
     [Area("Admin")]
-    [Route("~/[area]/API/[action]")]
+    [Route("~/[area]/actions/[action]")]
+    [ApiExplorerSettings(IgnoreApi = false)]
     public class AdminController : IslandController
     {
         private readonly IGeneralBot _generalBot;
@@ -24,12 +25,28 @@ namespace TheIsland.Website.Areas.Admin.Controllers.API
 
         [HttpGet]
         [ApiKey]
+        [ApiExplorerSettings(IgnoreApi = true)]
+        public IActionResult GetAllItems()
+        {
+            return this.Json(this._generalBot.GetAllItems());
+        }
+
+        [HttpPost]
+        [ApiKey]
+        public async Task<IActionResult> RespecEntireCategoryForAll(string category)
+        {
+            await this._generalBot.RespecEntireCategoryForAllPlayers(category).ConfigureAwait(false);
+            return this.Json(true);
+        }
+
+        [HttpPost]
+        [ApiKey]
         public async Task<IActionResult> GiveQuantaToAll(double amount, string note)
         {
             return this.Json(await this._generalBot.GiveAllQuanta(amount, note).ConfigureAwait(false));
         }
 
-        [HttpGet]
+        [HttpPost]
         [ApiKey]
         public async Task<IActionResult> GiveTalentPointsToAll(double amount)
         {

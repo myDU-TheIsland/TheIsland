@@ -4,6 +4,7 @@
 
 namespace TheIsland.Website.Controllers.Api
 {
+    using System.Diagnostics;
     using System.Linq;
     using System.Text;
     using Microsoft.AspNetCore.Authorization;
@@ -13,15 +14,35 @@ namespace TheIsland.Website.Controllers.Api
     using TheIsland.Website.Classes;
 
     [Area("Api")]
+    [Route("~/[area]/[controller]/[action]")]
+    [ApiExplorerSettings(IgnoreApi = false)]
     public class DataController : IslandController
     {
         private readonly IMarketBot _marketBot;
+        private readonly IGeneralBot _generalBot;
 
-        public DataController(IMarketBot marketBot, PlayerLinkingService playerLinkingService, IAuthorizationService authorizationService) : base(playerLinkingService, authorizationService)
+        public DataController(IMarketBot marketBot, IGeneralBot generalBot, PlayerLinkingService playerLinkingService, IAuthorizationService authorizationService) : base(playerLinkingService, authorizationService)
         {
             this._marketBot = marketBot;
+            this._generalBot = generalBot;
         }
 
+        [HttpGet]
+        public IActionResult GetItems(string type = "JSON")
+        {
+            var items = this._generalBot.GetAllItems();
+            switch (type)
+            {
+                case "csv":
+                    byte[] bytes = Encoding.UTF8.GetBytes("name,itemId\r\n" + string.Join("\r\n", items.Select(item => $@"{item.Key},{item.Value}")));
+                    return this.File(bytes, "text/csv", "items.csv");
+                case "json":
+                default:
+                    return this.Json(items);
+            }
+        }
+
+        [HttpGet]
         public IActionResult GetBotPricesById(string type = "JSON", double market = 0)
         {
             type = type.ToLower();

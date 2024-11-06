@@ -15,6 +15,7 @@ namespace TheIsland.Core.Helpers
                 id = input.id,
                 name = input.name,
                 images = input.images,
+                icon = input.icon,
                 description = input.description,
                 limit = input.limit,
                 price = input.price,

@@ -20,5 +20,9 @@ namespace TheIsland.Core.Entities
         public double? transactions { get; set; } = 0;
 
         public double? average_price { get; set; } = 0;
+
+        public double? min_price { get; set; } = 0;
+
+        public double? max_price { get; set; } = 0;
     }
 }

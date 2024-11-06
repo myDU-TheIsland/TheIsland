@@ -2,7 +2,7 @@
 // Copyright (c) Paul Layne. All rights reserved.
 // </copyright>
 
-namespace TheIsland.Website.Models
+namespace TheIsland.Website.Models.Market.API
 {
     public class Graph
     {

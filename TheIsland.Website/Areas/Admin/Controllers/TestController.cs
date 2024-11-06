@@ -16,14 +16,12 @@ namespace TheIsland.Website.Areas.Admin.Controllers
     public class TestController : IslandController
     {
         private readonly MarketService _marketService;
-        private readonly IImportMarketService _importMarketService;
         private readonly DualMarketRepository _dualMarketRepository;
         private readonly IGeneralBot _generalBot;
         private readonly IMarketBot _marketBot;
         private readonly DualMarketRepository _marketRepo;
 
         public TestController(
-            IImportMarketService importMarketService,
             MarketService marketService,
             DualMarketRepository dualMarketRepository,
             IGeneralBot generalBot,
@@ -32,19 +30,11 @@ namespace TheIsland.Website.Areas.Admin.Controllers
             PlayerLinkingService playerLinkingService,
             IAuthorizationService authorizationService) : base(playerLinkingService, authorizationService)
         {
-            this._importMarketService = importMarketService;
             this._marketService = marketService;
             this._dualMarketRepository = dualMarketRepository;
             this._generalBot = generalBot;
             this._marketBot = marketBot;
             this._marketRepo = marketRepo;
-        }
-
-        [HttpGet]
-        [ApiKey]
-        public async Task<IActionResult> Import()
-        {
-            return this.Json(await this._importMarketService.ImportAsync().ConfigureAwait(false));
         }
 
         [HttpGet]

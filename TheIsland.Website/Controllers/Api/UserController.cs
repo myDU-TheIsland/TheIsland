@@ -12,6 +12,7 @@ namespace TheIsland.Website.Controllers.Api
     using TheIsland.Website.Classes;
 
     [Area("Api")]
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class UserController : IslandController
     {
         private readonly DualPlayerRepository _playerRepository;
