@@ -261,12 +261,16 @@ SoftripNext.STServerWeb.WebApi/[Ii]ssue[Mm]anager.json
 
 #Don't commit any .css files (.less only)
 *.css
+!wwwroot/css/style.css
+!wwwroot/css/tailwind.css
 
 *.lock.json
 
 #Don't commit any templates other than DEFAULT
 .idea/
 TheIsland.Website/website.json
+TheIsland.Website/wwwroot/dual.yaml
+TheIsland.Website/wwwroot/dual-old.yaml
 TheIsland.DiscordBot/discordbot.json
 TheIsland.Website/marketBotSettings.json
 TheIsland.Website/websiteSettings.json

@@ -1,8 +1,0 @@
-/*div.bs-searchbox > span > input.form-control, div.bs-searchbox > input.form-control {
-    color: black !important;
-}*/
-/* Show it is fixed to the top */
-body {
-    min-height: 75rem;
-    padding-top: 4.5rem;
-}
