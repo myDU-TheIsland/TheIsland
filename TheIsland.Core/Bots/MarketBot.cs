@@ -17,9 +17,15 @@ namespace TheIsland.Core.Bots
     {
         ConcurrentDictionary<ulong, double> BuyPrices { get; }
 
+        ConcurrentDictionary<ulong, double> MarketBudgetMultiplier { get; }
+
+        ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, double>> MarketItemMultiplier { get;  }
+
+        ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, double>> MarketItemSellMultiplier { get;  }
+
         ConcurrentBag<ulong> ResellItems { get; }
 
-        ConcurrentDictionary<ulong, double> MarketBudgetMultiplier { get; }
+        object GetConfigs();
 
         Task SaveDictionaries();
 
@@ -37,13 +43,13 @@ namespace TheIsland.Core.Bots
 
         long GetSellPrice(ulong marketId, ulong itemType, decimal inputPrice = 0);
 
-        void SetItemMultiplier(ulong marketId, string itemType, double value);
+        Task SetItemMultiplier(ulong marketId, string itemType, double value);
 
-        void SetItemMultiplierRecursive(ulong marketId, string itemType, double value);
+        Task SetItemMultiplierRecursive(ulong marketId, string itemType, double value);
 
-        void SetItemSellMultiplier(ulong marketId, string itemType, double value);
+        Task SetItemSellMultiplier(ulong marketId, string itemType, double value);
 
-        void SetItemSellMultiplierRecursive(ulong marketId, string itemType, double value);
+        Task SetItemSellMultiplierRecursive(ulong marketId, string itemType, double value);
     }
 
     public class MarketBot : BotClient, IMarketBot
@@ -52,9 +58,9 @@ namespace TheIsland.Core.Bots
 
         public ConcurrentDictionary<ulong, double> MarketBudgetMultiplier { get; private set; } = new ConcurrentDictionary<ulong, double>();
 
-        internal ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, double>> MarketItemMultiplier { get; private set; } = new ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, double>>();
+        public ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, double>> MarketItemMultiplier { get; private set; } = new ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, double>>();
 
-        internal ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, double>> MarketItemSellMultiplier { get; private set; } = new ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, double>>();
+        public ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, double>> MarketItemSellMultiplier { get; private set; } = new ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, double>>();
 
         public ConcurrentBag<ulong> ResellItems { get; private set; } = new ConcurrentBag<ulong>();
 
@@ -301,32 +307,32 @@ namespace TheIsland.Core.Bots
             return (long)Math.Ceiling((inputPrice * (decimal)finalMarketItemMultiplier) * (decimal)this._marketBotConfig.MarketMarkUp) * 100;
         }
 
-        public void SetItemMultiplier(ulong marketId, string itemType, double value)
+        public Task SetItemMultiplier(ulong marketId, string itemType, double value)
         {
             value = Math.Clamp(value, .1, 10);
             this.SetDictionaryMultiplier(marketId, itemType, value, this.MarketItemMultiplier);
-            this.SaveDictionaries().GetAwaiter().GetResult();
+            return this.SaveDictionaries();
         }
 
-        public void SetItemSellMultiplier(ulong marketId, string itemType, double value)
+        public Task SetItemSellMultiplier(ulong marketId, string itemType, double value)
         {
             value = Math.Clamp(value, 1, 10);
             this.SetDictionaryMultiplier(marketId, itemType, value, this.MarketItemSellMultiplier);
-            this.SaveDictionaries().GetAwaiter().GetResult();
+            return this.SaveDictionaries();
         }
 
-        public void SetItemMultiplierRecursive(ulong marketId, string itemType, double value)
+        public Task SetItemMultiplierRecursive(ulong marketId, string itemType, double value)
         {
             value = Math.Clamp(value, .1, 10);
             this.SetDictionaryMultiplierRecursive(marketId, itemType, value, this.MarketItemMultiplier);
-            this.SaveDictionaries().GetAwaiter().GetResult();
+            return this.SaveDictionaries();
         }
 
-        public void SetItemSellMultiplierRecursive(ulong marketId, string itemType, double value)
+        public Task SetItemSellMultiplierRecursive(ulong marketId, string itemType, double value)
         {
             value = Math.Clamp(value, 1, 10);
             this.SetDictionaryMultiplierRecursive(marketId, itemType, value, this.MarketItemSellMultiplier);
-            this.SaveDictionaries().GetAwaiter().GetResult();
+            return this.SaveDictionaries();
         }
 
         private void SetDictionaryMultiplier(ulong marketId, string itemType, double value, ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, double>> inputDictionary)
@@ -382,6 +388,26 @@ namespace TheIsland.Core.Bots
             }
         }
 
+        public object GetConfigs()
+        {
+            void ToDictionary(ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, double>> input, Dictionary<ulong, Dictionary<ulong, double>> output)
+            {
+                foreach (KeyValuePair<ulong, ConcurrentDictionary<ulong, double>> entry in input)
+                {
+                    output.Add(entry.Key, new Dictionary<ulong, double>(entry.Value.ToArray()));
+                }
+            }
+
+            Dictionary<ulong, Dictionary<ulong, double>> item = new Dictionary<ulong, Dictionary<ulong, double>>();
+            Dictionary<ulong, Dictionary<ulong, double>> itemSell = new Dictionary<ulong, Dictionary<ulong, double>>();
+            Dictionary<ulong, double> market = new Dictionary<ulong, double>(this.MarketBudgetMultiplier.ToArray());
+
+            ToDictionary(this.MarketItemMultiplier, item);
+            ToDictionary(this.MarketItemSellMultiplier, itemSell);
+
+            return new { MarketBudgetMultiplier = market, MarketItemMultiplier = item, MarketItemSellMultiplier = itemSell };
+        }
+
         public async Task SaveDictionaries()
         {
             void ToDictionary(ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, double>> input, Dictionary<ulong, Dictionary<ulong, double>> output)
@@ -396,12 +422,12 @@ namespace TheIsland.Core.Bots
             {
                 Dictionary<ulong, Dictionary<ulong, double>> item = new Dictionary<ulong, Dictionary<ulong, double>>();
                 Dictionary<ulong, Dictionary<ulong, double>> itemSell = new Dictionary<ulong, Dictionary<ulong, double>>();
-
                 Dictionary<ulong, double> market = new Dictionary<ulong, double>(this.MarketBudgetMultiplier.ToArray());
+
                 ToDictionary(this.MarketItemMultiplier, item);
                 ToDictionary(this.MarketItemSellMultiplier, itemSell);
 
-                await File.WriteAllTextAsync(@$"{this._settings.ConfigPath}/marketBudgetMultiplier.json", System.Text.Json.JsonSerializer.Serialize(item)).ConfigureAwait(false);
+                await File.WriteAllTextAsync(@$"{this._settings.ConfigPath}/marketBudgetMultiplier.json", System.Text.Json.JsonSerializer.Serialize(market)).ConfigureAwait(false);
                 await File.WriteAllTextAsync(@$"{this._settings.ConfigPath}/marketItemMultiplier.json", System.Text.Json.JsonSerializer.Serialize(item)).ConfigureAwait(false);
                 await File.WriteAllTextAsync(@$"{this._settings.ConfigPath}/marketItemSellMultiplier.json", System.Text.Json.JsonSerializer.Serialize(itemSell)).ConfigureAwait(false);
                 return;
@@ -459,6 +485,8 @@ namespace TheIsland.Core.Bots
                 {
                     ToDictionary(dictionaryMarketItemSellMultiplier, this.MarketItemSellMultiplier);
                 }
+
+                return;
             }
             catch
             {

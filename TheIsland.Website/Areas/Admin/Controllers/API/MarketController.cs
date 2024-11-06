@@ -25,34 +25,41 @@ namespace TheIsland.Website.Areas.Admin.Controllers.API
 
         [HttpPost]
         [ApiKey]
-        public IActionResult AddItemMultiplier(ulong marketId, string itemType, double value)
+        public async Task<IActionResult> AddItemMultiplier(ulong marketId, string itemType, double value)
         {
-            this._marketBot.SetItemMultiplier(marketId, itemType, value);
+            await this._marketBot.SetItemMultiplier(marketId, itemType, value).ConfigureAwait(false);
             return this.Json(true);
         }
 
         [HttpPost]
         [ApiKey]
-        public IActionResult AddItemSellMultiplier(ulong marketId, string itemType, double value)
+        public async Task<IActionResult> AddItemSellMultiplier(ulong marketId, string itemType, double value)
         {
-            this._marketBot.SetItemSellMultiplier(marketId, itemType, value);
+            await this._marketBot.SetItemSellMultiplier(marketId, itemType, value).ConfigureAwait(false);
             return this.Json(true);
         }
 
         [HttpPost]
         [ApiKey]
-        public IActionResult AddItemMultiplierRecursive(ulong marketId, string itemType, double value)
+        public async Task<IActionResult> AddItemMultiplierRecursive(ulong marketId, string itemType, double value)
         {
-            this._marketBot.SetItemMultiplierRecursive(marketId, itemType, value);
+            await this._marketBot.SetItemMultiplierRecursive(marketId, itemType, value).ConfigureAwait(false);
             return this.Json(true);
         }
 
         [HttpPost]
         [ApiKey]
-        public IActionResult AddItemSellMultiplierRecursive(ulong marketId, string itemType, double value)
+        public async Task<IActionResult> AddItemSellMultiplierRecursive(ulong marketId, string itemType, double value)
         {
-            this._marketBot.SetItemSellMultiplierRecursive(marketId, itemType, value);
+            await this._marketBot.SetItemSellMultiplierRecursive(marketId, itemType, value).ConfigureAwait(false);
             return this.Json(true);
+        }
+
+        [HttpGet]
+        [ApiKey]
+        public IActionResult GetConfigs()
+        {
+            return this.Json(this._marketBot.GetConfigs());
         }
     }
 }
