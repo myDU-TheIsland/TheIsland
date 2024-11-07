@@ -23,7 +23,7 @@ namespace TheIsland.Core.Services
     {
         Task<string> ImportBP(ulong playerId, byte[] bp);
 
-        Task<Dictionary<string, ulong>> GetExportableBPs(ulong playerId);
+        Task<Dictionary<ulong, string>> GetExportableBPs(ulong playerId);
 
         Task<bool> IsExportAllowed(ulong blueprintId, ulong playerId);
 
@@ -213,12 +213,12 @@ namespace TheIsland.Core.Services
             return "Blueprint '" + blueprintInfo.name + "' imported and should be in your nano pack.";
         }
 
-        public async Task<Dictionary<string, ulong>> GetExportableBPs(ulong playerId)
+        public async Task<Dictionary<ulong, string>> GetExportableBPs(ulong playerId)
         {
             await this.ConnectionTest().ConfigureAwait(false);
             IInventoryGrain inventoryGrain = this._orleans.GetInventoryGrain(playerId);
             StorageInfo? inventory = await inventoryGrain.Get(playerId).ConfigureAwait(false);
-            Dictionary<string, ulong> output = new Dictionary<string, ulong>();
+            Dictionary<ulong, string> output = new Dictionary<ulong, string>();
 
             foreach (StorageSlot? item in inventory.content)
             {
@@ -242,7 +242,7 @@ namespace TheIsland.Core.Services
 
                 BlueprintModel blueprintModel = await this._sql.Read(blueprintId).ConfigureAwait(false);
 
-                output.Add(blueprintModel.Name, blueprintId);
+                output.TryAdd(blueprintId, blueprintModel.Name);
             }
 
             return output;
