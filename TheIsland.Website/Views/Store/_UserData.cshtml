@@ -1,6 +1,6 @@
 ﻿@inject IStoreService StoreService
 
-<div class="max-w-7xl mx-auto">
+<div class="max-w-7xl mx-auto pt-35">
     <div class="flex justify-between items-center mb-8">
         <h1 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
             The Isle Store
@@ -10,11 +10,15 @@
                 var amount = (await StoreService.GetWalletBalance(this.SelectedPlayer)).ToString("n0");
                 var talentPoints = (await StoreService.GetTalentPoints(this.SelectedPlayer)).ToString("n0");
             }
-            <div class="flex items-center bg-darkBlue rounded-full px-4 py-2">
+            <div class="flex items-center bg-darkBlue rounded-md px-4 py-2">
+                <img src="/svg/receipt.svg" class="h-5 w-5 mr-2" />
+                <a asp-area="" asp-controller="Store" asp-action="History">Purchase History</a>
+            </div>
+            <div class="flex items-center bg-darkBlue rounded-md px-4 py-2">
                 <img src="/svg/zap.svg" class="h-5 w-5 mr-2" />
                 <span>@talentPoints TP</span>
             </div>
-            <div class="flex items-center bg-darkBlue rounded-full px-4 py-2">
+            <div class="flex items-center bg-darkBlue rounded-md px-4 py-2">
                 <img src="/svg/wallet-minimal.svg" class="h-5 w-5 mr-2" />
                 <span>@amount &#8463;</span>
             </div>
