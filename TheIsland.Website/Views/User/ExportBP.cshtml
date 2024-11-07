@@ -20,9 +20,9 @@
                 <table id="export" class="w-full text-left text-sm text-gray-300">
                     <thead>
                         <tr class="uppercase text-xs text-gray-400 font-medium border-b border-gray-600">
-                            <th class="py-4 px-6">Name</th>
-                            <th class="py-4 px-6">Type</th>
-                            <th class="py-4 px-6">Action</th>
+                            <th class="py-4 px-6 w-1/4">Name</th>
+                            <th class="py-4 px-6 w-1/4">Type</th>
+                            <th class="py-4 px-6 w-1/4 text-center">Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -32,7 +32,7 @@
                             {
                                 continue;
                             }
-
+                
                             <tr class="border-b border-gray-700 hover:bg-slate-900">
                                 <td class="py-4 px-6 font-semibold">@bp.Key</td>
                                 <td class="py-4 px-6">
@@ -41,8 +41,8 @@
                                         <p>Static</p>
                                     </div>
                                 </td>
-                                <td class="py-4 px-6">
-                                    <form asp-action="GenerateBP" asp-controller="User" asp-area="" method="post">
+                                <td class="py-4 px-6 text-center">
+                                    <form asp-action="GenerateBP" asp-controller="User" asp-area="" method="post" class="inline-block">
                                         <input type="hidden" asp-for="@Model.SelectedBP" value="@bp.Value" />
                                         <input type="hidden" asp-for="@Model.SelectedBPName" value="@bp.Key" />
                                         <button
