@@ -12,7 +12,7 @@ namespace TheIsland.Website.Models
 
         public string SelectedBPName { get; set; } = string.Empty;
 
-        public Dictionary<string, ulong> ExportableBPs { get; set; } = new Dictionary<string, ulong>();
+        public Dictionary<ulong, string> ExportableBPs { get; set; } = new Dictionary<ulong, string>();
 
         public BluePrintExport[] ExportedBPs { get; set; } = { };
 
