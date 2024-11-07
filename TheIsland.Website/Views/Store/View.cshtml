@@ -7,122 +7,132 @@
     bool needTPExplain = Model.StoreItem.description.Contains("{talentPointExplanation}");
     Model.StoreItem.description = Model.StoreItem.description.Replace("{talentPointExplanation}", string.Empty);
 
-    double myPurchaseHistory = (await _storePurchaseHistoryRepository.GetPlayerPurchaseHistory(SelectedPlayer))?.Where(item => item.store_item.id == Model.StoreItem.id)?.Sum(item => item.quantity) ?? 0;
+    double myPurchaseHistory = (await _storePurchaseHistoryRepository.GetPlayerPurchaseHistory(SelectedPlayer))?.Where(item
+    => item.store_item.id == Model.StoreItem.id)?.Sum(item => item.quantity) ?? 0;
 }
 <partial name="_UserData" />
-<div class="row">
-    <div class="col-md-6 ml-auto mr-auto">
-        @if (Model.StoreItem.images.Any())
-        {
-            var images = Model.StoreItem.images.ToArray();
+<div class="max-w-5xl mx-auto">
+    <div>
+        <div class="col-md-6 ml-auto mr-auto">
+            @if (Model.StoreItem.images.Any())
+            {
+                var images = Model.StoreItem.images.ToArray();
 
-            <div id="itemPageCarousel" class="carousel slide" data-ride="carousel">
-                <ol class="carousel-indicators">
-                    @for (int x = 0; x < images.Count(); x++)
+                <div id="itemPageCarousel" class="carousel slide" data-ride="carousel">
+                    <ol class="carousel-indicators">
+                        @for (int x = 0; x < images.Count(); x++)
+                        {
+                            var className = x == 0 ? "active" : string.Empty;
+                            <li data-target="#itemPageCarousel" data-slide-to="@x" class="@className"></li>
+                        }
+                    </ol>
+                    <div class="carousel-inner">
+                        @for (int x = 0; x < images.Count(); x++)
+                        {
+                            var imageUrl = $@"{_settings.StoreImageUrl}{images[x]}";
+                            var className = x == 0 ? "active" : string.Empty;
+                            <div class="carousel-item @className">
+                                <img src="@imageUrl" class="d-block w-100" alt="...">
+                            </div>
+                        }
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-target="#itemPageCarousel" data-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-target="#itemPageCarousel" data-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="sr-only">Next</span>
+                    </button>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="w-full bg-darkBlue rounded-md text-gray-100 border border-slate-800">
+        <!-- Card Header -->
+        <div class="space-y-1 p-6">
+            <h2 class="flex items-center gap-2 text-2xl">
+                <!-- Zap Icon -->
+                <img src="/svg/zap.svg" class="w-6 h-6 text-primary" />
+                @Model.StoreItem.name
+            </h2>
+            <p class="text-slate-400">@Model.StoreItem.description</p>
+        </div>
+        @if (needTPExplain)
+        {
+            <partial name="_TalentPointInjectorExplanation" />
+        }
+        <div class="flex items-center gap-4 border-t border-slate-800 pt-6 p-6">
+            <div class="flex items-center gap-2">
+                <div class="text-sm font-medium text-slate-400">Price:</div>
+                <div class="text-lg font-semibold text-primary">@Model.StoreItem.price.ToString("n0") &#8463;</div>
+            </div>
+            @if (this.IsInGame)
+            {
+                <p class="card-category">
+                    Please log out to be able to make purchases
+                </p>
+            }
+            else if (Model.StoreItem.limit > 0 && myPurchaseHistory >= Model.StoreItem.limit)
+            {
+                <p class="card-category">
+                    You have reached your limit on this item.
+                </p>
+            }
+            else if (Model.StoreItem.price == 0 && Model.StoreItem.limit == 1 &&
+            Model.StoreItem.content.TalentPoints == 10000000 && (await
+            _storeService.GetTalentPoints(this.SelectedPlayer)) > 40000000)
+            {
+                <p class="card-category">
+                    You have more then 40million talent points. You can no longer purchase this item.
+                </p>
+            }
+            else if (Model.StoreItem.content.RespecTalentPoints && (await
+            _storeService.GetTalentPointsSpent(this.SelectedPlayer)) == 0)
+            {
+                <p class="card-category">
+                    You haven't spent any talent points. No reset for you.
+                </p>
+            }
+            else
+            {
+                StorePurchaseModel purchaseModel = new StorePurchaseModel()
+                {
+                    ItemId = Model.StoreItem.id,
+                    Quantity =
+                1
+                };
+                string quantityClass = Model.StoreItem.limit == 1 ? "hidden" : string.Empty;
+                double limit = Model.StoreItem.limit == 0 ? 100 : (Model.StoreItem.limit - myPurchaseHistory);
+                if (Model.StoreItem.content.RespecTalentPoints)
+                {
+                    limit = 1;
+                }
+                <form asp-action="Purchase" asp-controller="Store" asp-area="" method="post"
+                    class="flex items-center gap-2 ml-auto">
+                    @if (limit == 1)
                     {
-                        var className = x == 0 ? "active" : string.Empty;
-                        <li data-target="#itemPageCarousel" data-slide-to="@x" class="@className"></li>
-                    }
-                </ol>
-                <div class="carousel-inner">
-                    @for (int x = 0; x < images.Count(); x++)
-                    {
-                        var imageUrl = $@"{_settings.StoreImageUrl}{images[x]}";
-                        var className = x == 0 ? "active" : string.Empty;
-                        <div class="carousel-item @className">
-                            <img src="@imageUrl" class="d-block w-100" alt="...">
+                        <div>
+                            <label>Qty</label>
+                            <input asp-for="@purchaseModel.Quantity" type="number" min="1" max="@limit" type="hidden"
+                                placeholder="Qty"
+                                class="w-24 bg-slate-900 border border-slate-800 text-slate-50 p-2 rounded-md" />
                         </div>
                     }
-                </div>
-                <button class="carousel-control-prev" type="button" data-target="#itemPageCarousel" data-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="sr-only">Previous</span>
-                </button>
-                <button class="carousel-control-next" type="button" data-target="#itemPageCarousel" data-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="sr-only">Next</span>
-                </button>
-            </div>
-        }
-    </div>
-</div>
-
-<div class="row">
-    <div class="col-md-6  ml-auto mr-auto">
-        <div class="card card-product">
-            <div class="card-body">
-                <h4 class="card-title">
-                    @Model.StoreItem.name
-                </h4>
-                <div class="card-description">
-                    @Model.StoreItem.description
-                    @if (needTPExplain)
+                    else
                     {
-                        <br />
-                        <br />
-                        <partial name="_TalentPointInjectorExplanation" />
+                        <div>
+                            <label>Qty</label>
+                            <input asp-for="@purchaseModel.Quantity" type="number" min="1" max="@limit" placeholder="Qty"
+                                class="@quantityClass w-24 bg-slate-900 border border-slate-800 text-slate-50 p-2 rounded-md" />
+                        </div>
                     }
-                </div>
-            </div>
-            <div class="card-footer">
-                <div class="price">
-                    <h4>
-                        @Model.StoreItem.price.ToString("n0") &#8463; &nbsp;&nbsp;
-                    </h4>
-                </div>
-                @if (this.IsInGame)
-                {
-                    <p class="card-category">
-                        Please log out to be able to make purchases
-                    </p>
-                }
-                else if (Model.StoreItem.limit > 0 && myPurchaseHistory >= Model.StoreItem.limit)
-                    {
-                    <p class="card-category">
-                        You have reached your limit on this item.
-                    </p>                    
-                }
-                else if (Model.StoreItem.price == 0 && Model.StoreItem.limit == 1 && Model.StoreItem.content.TalentPoints == 10000000 && (await _storeService.GetTalentPoints(this.SelectedPlayer)) > 40000000)
-                {
-                    <p class="card-category">
-                       You have more then 40million talent points. You can no longer purchase this item.
-                    </p>
-                }
-                else if (Model.StoreItem.content.RespecTalentPoints && (await _storeService.GetTalentPointsSpent(this.SelectedPlayer)) == 0)
-                {
-                    <p class="card-category">
-                      You haven't spent any talent points. No reset for you.
-                    </p>
-                }
-                else
-                {
-                    StorePurchaseModel purchaseModel = new StorePurchaseModel() { ItemId = Model.StoreItem.id, Quantity = 1};
-                    string quantityClass = Model.StoreItem.limit == 1 ? "hidden" : string.Empty;
-                    double limit = Model.StoreItem.limit == 0 ? 100 : (Model.StoreItem.limit - myPurchaseHistory);
-                    if (Model.StoreItem.content.RespecTalentPoints)
-                    {
-                        limit = 1;
-                    }
-
-                    <form asp-action="Purchase" asp-controller="Store" asp-area="" method="post">
-                        <p class="card-category">
-                            <div class="form-group form-inline">
-                                @if (limit == 1)
-                                {
-                                <input asp-for="@purchaseModel.Quantity" type="number" min="1" max="@limit" type="hidden" />
-                                }
-                                else
-                                {
-                                <input asp-for="@purchaseModel.Quantity" type="number" min="1" max="@limit" class="@quantityClass form-control" />
-                                }
-
-                                <input asp-for="@purchaseModel.ItemId" class="hidden" type="hidden" /> &nbsp;&nbsp;
-                                <button class="btn btn-primary text-right">Buy</button>
-                            </div>
-                        </p>
-                    </form>
-                }
-            </div>
+                    <button class="font-semibold px-4 py-2 bg-purple-600 text-white rounded-md">
+                        Buy Now
+                    </button>
+                </form>
+            }
         </div>
     </div>
 </div>
