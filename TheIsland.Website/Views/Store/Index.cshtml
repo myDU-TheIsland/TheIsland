@@ -3,24 +3,20 @@
     ViewData["Title"] = "Home Page";
 }
 <partial name="_UserData" />
-<div class="row">
+<div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
     @foreach (var item in Model.StoreItems)
     {
-        <div class="col-sm">
-            <div class="card card-product">
-                <a asp-action="View" asp-controller="Store" asp-area="" asp-route-id="@item.id">
-                    <div class="card-body">
-                        <h4 class="card-title">
-                            @item.name
-                        </h4>
-                    </div>
-                    <div class="card-footer">
-                        <div class="price">
-                            <h4>@item.price.ToString("n0") &#8463;</h4>
-                        </div>
-                    </div>
-                </a>
-            </div>
+        <div class="bg-darkBlue rounded-lg p-6 flex flex-col items-center text-center ">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-16 h-16 text-purple-400 mb-4" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+            <h2 class="text-xl font-bold mb-2">@item.name</h2>
+            <p class="text-purple-300 mb-4">@item.price.ToString("N0") &#8463;</p>
+            <a asp-action="View" asp-controller="Store" asp-area="" asp-route-id="@item.id"
+                class="bg-purple-600 hover:bg-purple-700 text-white py-2 px-4 rounded-md transition-colors">
+                Details
+            </a>
         </div>
     }
 </div>

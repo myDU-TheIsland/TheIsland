@@ -8,196 +8,404 @@
 
     var items = _generalBot.GetListOfSellableItems().OrderBy(items => items.Value).ToDictionary();
 
-    var markets = (await _marketRepo.GetAsync().ConfigureAwait(false)).ToDictionary(key => key.id, value => value.name.Replace("Market", string.Empty).Replace("District", string.Empty).Trim());
+    var markets = (await _marketRepo.GetAsync().ConfigureAwait(false)).ToDictionary(key => key.id, value =>
+    value.name.Replace("Market", string.Empty).Replace("District", string.Empty).Trim());
     markets.Add(0, "All Markets");
 
     var itemExists = items.ContainsKey(Model.ItemId);
     var selectedMarket = markets[Model.MarketId];
     var selectedItem = itemExists ? items[Model.ItemId] : string.Empty;
 
-    double botPurchasePrice = _marketBot.GetItemPrice(Convert.ToUInt64(Model.MarketId), Convert.ToUInt64(Model.ItemId)) / 100;
+    double botPurchasePrice = _marketBot.GetItemPrice(Convert.ToUInt64(Model.MarketId), Convert.ToUInt64(Model.ItemId)) /
+    100;
 
     string graphHeader = markets.ContainsKey(Model.MarketId) ? " @ " + markets[Model.MarketId] : string.Empty;
 }
-<div class="row">
-    <div class="col-md-12">
-        <div class="card">
-            <div class="card-body">
-                <select asp-for="ItemId" class="selectpicker" data-size="7" data-live-search="true" data-style="btn btn-primary" id="input-itemId">
-                    @foreach (var item in items)
-                    {
-                        <option value="@item.Key">@item.Value</option>
-                    }
-                </select>
-                <select asp-for="MarketId" class="selectpicker" data-size="7" data-live-search="true" data-style="btn btn-primary" id="input-marketId">
-                    @foreach (var market in markets.OrderBy(item => item.Value).ToArray())
-                    {
-                        <option value="@market.Key">@market.Value</option>
-                    }
-                </select>
-                <button type="button" class="btn btn-fill btn-primary" id="btnSearch">Search<div class="ripple-container"></div></button>
-            </div>
-        </div>
-    </div>
-</div>
-<div class="row">
-    @if (itemExists)
-    {
-        string varyByString = $@"{Model.ItemId}/{Model.MarketId}";
 
-        var orders = itemExists ? await this._marketService.GetAllActiveAsync(Model.MarketId, Model.ItemId).ConfigureAwait(false) : Enumerable.Empty<MarketTransaction>();
-        var buyOrders = orders.Where(item => item.type == TheIsland.Core.Entities.TransactionType.BuyOrder);
-        var sellOrders = orders.Where(item => item.type == TheIsland.Core.Entities.TransactionType.SellOrder);
+<div class="min-h-screen text-white font-sans pt-35">
+    <div class="max-w-7xl mx-auto space-y-4">
+        <!-- Navigation Bar -->
+        <div class="text-white rounded-lg">
+            <nav class="bg-darkBlue p-2 rounded-lg shadow-lg border border-purple-500/30">
+                <div class="flex items-center space-x-2">
 
-        <div class="col-md-5">
-            <div class="card">
-                <div class="card-header card-header-warning">
-                    Buy Orders
+                    <div class="relative w-1/3">
+                        <!-- Item Dropdown with Search Input -->
+                        <input type="text" id="dropdownSearch" autocomplete="off" placeholder="Search Item..."
+                            class="block w-full px-4 py-2 text-white bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
+                            onfocus="showDropdown('dropdownMenu')" onkeyup="debouncedFilterOptions()">
+                        <input type="hidden" asp-for="ItemId" id="selectedItemId" name="ItemId">
+                        <div class="absolute z-10 mt-2 w-full bg-[#2a2a3e] rounded-md shadow-lg max-h-80 overflow-y-auto hidden"
+                            id="dropdownMenu">
+                            <ul id="dropdownOptions">
+                                @foreach (var item in items)
+                                {
+                                    <li class="px-4 py-2 text-white hover:bg-purple-600 cursor-pointer"
+                                        data-value="@item.Key"
+                                        onclick="selectOption('@item.Value.Replace("'", "\\'")', '@item.Key', 'dropdownSearch', 'dropdownMenu')">
+                                        @item.Value
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="relative w-1/3">
+                        <!-- Market Dropdown with Search Input -->
+                        <input type="text" id="marketSearch" autocomplete="off" placeholder="Select Market..."
+                            value="All Markets" class="block w-full px-4 py-2 text-white bg-gray-700 rounded-md focus:outline-none focus:ring-2
+                        focus:ring-purple-600" onfocus="showDropdown('marketDropDown')"
+                            onkeyup="debouncedMarketFilter()">
+                        <!-- Hidden input to store selected market ID -->
+                        <input type="hidden" id="selectedMarketId" name="MarketId" value="0">
+                        <!-- Default value 0 (All Markets) -->
+                        <div class="absolute z-10 mt-2 w-full bg-[#2a2a3e] rounded-md shadow-lg max-h-80 overflow-y-auto hidden"
+                            id="marketDropDown">
+                            <ul id="marketOptions">
+                                @foreach (var market in markets.OrderBy(item => item.Value).ToArray())
+                                {
+                                    <li class="px-4 py-2 text-white hover:bg-purple-600 cursor-pointer"
+                                        data-value="@market.Key"
+                                        onclick="selectOption('@market.Value', '@market.Key', 'marketSearch', 'marketDropDown')">
+                                        @market.Value
+                                    </li>
+                                }
+                            </ul>
+                        </div>
+                    </div>
+
+                    <!-- Search Button -->
+                    <button onclick="updateMarketPage()"
+                        class="px-4 py-2 bg-purple-600 rounded-md text-white hover:bg-purple-500 ml-2">Search</button>
+
+                    <!-- Hidden inputs to store selected IDs -->
+                    <input type="hidden" id="selectedItemId" name="ItemId" value="">
+                    <input type="hidden" id="selectedMarketId" name="MarketId" value="0">
+
                 </div>
-                <div class="card-body">
-                    <table id="buyTable" class="table table-striped table-no-bordered table-hover" cellspacing="0" width="100%" style="width:100%">
-                        <thead>
-                            <tr>
-                                <th>Unit Price</th>
-                                <th>Quantity</th>
-                                <th>Market</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var buyOrder in buyOrders)
-                            {
-                                <tr>
-                                    <td>@(buyOrder.price / 100)</td>
-                                    <td>@Math.Abs(buyOrder.quantity)</td>
-                                    <td>@markets[buyOrder.market_id]</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-            <div class="card">
-                <div class="card-header card-header-warning">
-                    Sell Orders
-                </div>
-                <div class="card-body">
-                    <table id="sellTable" class="table table-striped table-no-bordered table-hover" cellspacing="0" width="100%" style="width:100%">
-                        <thead>
-                            <tr>
-                                <th>Unit Price</th>
-                                <th>Quantity</th>
-                                <th>Market</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach (var sellOrder in sellOrders)
-                            {
-                                <tr>
-                                    <td>@(sellOrder.price / 100)</td>
-                                    <td>@Math.Abs(sellOrder.quantity)</td>
-                                    <td>@markets[sellOrder.market_id]</td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            </div>
+            </nav>
         </div>
 
-        <div class="col-md-7">
-            <div class="card">
-                <div class="card-header card-header-warning" id="graphHeader">
-                    @items[Model.ItemId] Prices (Last 72hrs)@graphHeader
-                        
+        <!-- Main Content Grid -->
+        <div class="flex flex-col space-y-4">
+            @if (itemExists)
+            {
+                string varyByString = $@"{Model.ItemId}/{Model.MarketId}";
+
+                var orders = itemExists ? await this._marketService.GetAllActiveAsync(Model.MarketId,
+                Model.ItemId).ConfigureAwait(false) : Enumerable.Empty<MarketTransaction>();
+                var buyOrders = orders.Where(item => item.type == TheIsland.Core.Entities.TransactionType.BuyOrder);
+                var sellOrders = orders.Where(item => item.type == TheIsland.Core.Entities.TransactionType.SellOrder);
+
+                @* <!-- Chart Section --> *@
+                <div class="bg-darkBlue rounded-lg shadow-lg px-2 py-3 border border-purple-500/30">
+                    <h2 class="text-2xl font-bold mb-4 text-white">@items[Model.ItemId] (Last 72hrs) @graphHeader
+                    </h2>
                     @if (botPurchasePrice > 0)
                     {
-                        <div class="pull-right"> - Honjos Minion is buying at <i>@botPurchasePrice quanta per unit</i> </div>
+                        <p class="text-purple-400 mb-4 pb-4">⭐ <i>Honjos Minion is buying at
+                                @botPurchasePrice quanta per unit</i> ⭐</p>
                     }
+                    <div class="border border-purple-500 w-full"></div>
+                    <canvas id="priceChart" class="pt-5" style="max-height: 300px;"></canvas>
                 </div>
-                <div class="card-body">
-                    <div id="chart_div" style="height: 500px"></div>
+
+                @* <!-- Orders Section --> *@
+                <div class="flex w-full space-x-4">
+                    @* <!-- Buy Orders --> *@
+                    <div id="buyOrdersSection" class="bg-darkBlue rounded-lg w-1/2 shadow-lg border border-purple-500/30">
+                        <div class="p-4 bg-purple-600 rounded-lg">
+                            <h2 class="text-xl font-bold text-white">Buy Orders</h2>
+                        </div>
+                        <div class="p-4">
+                            <table class="w-full">
+                                <thead>
+                                    <tr class="border-b border-purple-500 text-left text-purple-400">
+                                        <th class="pb-2 w-1/3">Unit Price <span class="inline-block ml-1">▲▼</span></th>
+                                        <th class="pb-2 w-1/3">Quantity <span class="inline-block ml-1">▲▼</span></th>
+                                        <th class="pb-2 w-1/3">Market <span class="inline-block ml-1">▲▼</span></th>
+                                    </tr>
+                                </thead>
+                            </table>
+
+                            <div class="overflow-y-auto max-h-80">
+                                <table class="w-full">
+                                    <tbody class="text-white">
+                                        @* Buy order rows *@
+                                        @foreach (var buyOrder in buyOrders)
+                                        {
+                                            <tr class="border-b border-purple-500/40">
+                                                <td class="py-2 w-1/3">@((buyOrder.price) / 100)</td>
+                                                <td class="py-2 w-1/3">@Math.Abs(buyOrder.quantity)</td>
+                                                <td class="py-2 w-1/3">@markets[buyOrder.market_id]</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    @* <!-- Sell Orders --> *@
+                    <div id="sellOrdersSection" class="bg-darkBlue rounded-lg w-1/2 shadow-lg border border-purple-500/30">
+                        <div class="p-4 bg-purple-600 rounded-lg">
+                            <h2 class="text-xl font-bold text-white">Sell Orders</h2>
+                        </div>
+                        <div class="p-4">
+                            <table class="w-full">
+                                <thead class="bg-darkBlue">
+                                    <tr class="border-b border-purple-500 text-left text-purple-400">
+                                        <th class="pb-2 w-1/3">Unit Price <span class="inline-block ml-1">▲▼</span></th>
+                                        <th class="pb-2 w-1/3">Quantity <span class="inline-block ml-1">▲▼</span></th>
+                                        <th class="pb-2 w-1/3">Market <span class="inline-block ml-1">▲▼</span></th>
+                                    </tr>
+                                </thead>
+                            </table>
+
+                            <div class="overflow-y-auto max-h-80">
+                                <table class="w-full">
+                                    <tbody id="sellOrdersTable" class="text-white">
+                                        @foreach (var sellOrder in sellOrders)
+                                        {
+                                            <tr class="border-b border-purple-500/40">
+                                                <td class="py-2 w-1/3">@((sellOrder.price) / 100)</td>
+                                                <td class="py-2 w-1/3">@Math.Abs(sellOrder.quantity)</td>
+                                                <td class="py-2 w-1/3">@markets[sellOrder.market_id]</td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
                 </div>
-            </div>
-        </div>
-    }
-</div>
-@section Head {
-    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-}
-@section Scripts {
-    <!-- Latest compiled and minified JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
-
-    <script>
-        $(function () {
-            $('#input-itemId').selectpicker();
-            $('#input-marketId').selectpicker();
-        });
-
-        $("#btnSearch").on("click", function () {
-            var itemId = $("#input-itemId").val();
-            var marketId = $("#input-marketId").val();
-            if (itemId == 0) return;
-            if (marketId == 0) {
-                return window.location.replace("/Market/" + itemId);
-            } else if (marketId > 0) {
-                return window.location.replace("/Market/" + itemId + "/" + marketId);
             }
-        });
+        </div>
+    </div>
 
-    </script>
-    @if (itemExists)
-    {
-        string uri = $@"/Api/Market/Hourly/{Model.ItemId}";
-        if(Model.MarketId > 0)
-        {
-            uri += $@"/{Model.MarketId}";
+</div>
+<script>
+    function showDropdown(dropdownId) {
+        const dropdown = document.getElementById(dropdownId);
+        if (dropdown) dropdown.classList.remove('hidden');
+    }
+
+    function selectOption(text, value, inputId, dropdownId) {
+        const inputElement = document.getElementById(inputId);
+        const dropdown = document.getElementById(dropdownId);
+
+        if (inputElement) {
+            inputElement.value = text; // Show selected name in the input field
+            if (inputId === 'dropdownSearch') {
+                document.getElementById('selectedItemId').value = value; // Store item ID in hidden input to bind to model
+            } else if (inputId === 'marketSearch') {
+                document.getElementById('selectedMarketId').value = value; // Store market ID in hidden input to bind to model
+            }
+        }
+        if (dropdown) dropdown.classList.add('hidden');
+    }
+
+    function updateMarketPage() {
+        const itemId = document.getElementById('selectedItemId').value || ""; // Get item ID from hidden input
+        const marketId = document.getElementById('selectedMarketId').value || "0"; // Get market ID from hidden input
+
+        if (!itemId) {
+            console.log("No item selected");
+            return; // Exit if no item is selected
         }
 
-        <script type="text/javascript">
-            var table = $('#buyTable').DataTable({
-                searching: false,
-                lengthChange: false
-            });
-            var table = $('#sellTable').DataTable({
-                searching: false,
-                lengthChange: false
-            });
-
-            google.charts.load('current', { packages: ['corechart', 'line'] });
-
-            window.onload = drawChart;
-            window.onresize = drawChart;
-
-            function drawChart() {
-                var jsonData = $.ajax({
-                    url: "@uri",
-                    dataType: "json",
-                    async: false
-                }).responseText;
-
-                var realData = JSON.parse(jsonData)
-
-                function castDate(item) {
-                    item.c[0].v = new Date(item.c[0].v);
-                }
-
-                realData.rows.forEach(castDate);
-                var data = new google.visualization.DataTable(realData);
-
-                var options = {
-                    series: {
-                        // Gives each series an axis name that matches the Y-axis below.
-                        0: { axis: 'Average Price' },
-                        1: { axis: 'Quantity Sold' }
-                    },
-                    tooltip: { trigger: 'selection' }
-                };
-
-                var chart = new google.charts.Line(document.getElementById('chart_div'));
-
-                chart.draw(data, options);
-            }
-        </script>
+        // Redirect based on selected item and market ID without changing the display value
+        if (marketId === "0") {
+            window.location.replace(`/Market/${itemId}`);
+        } else {
+            window.location.replace(`/Market/${itemId}/${marketId}`);
+        }
     }
+
+    document.addEventListener("DOMContentLoaded", function () {
+        // Set default selection for the market dropdown
+        const marketSearchInput = document.getElementById('marketSearch');
+        const selectedMarketIdInput = document.getElementById('selectedMarketId');
+
+        // Set the displayed text to "All Markets" and hidden value to 0
+        marketSearchInput.value = "All Markets";
+        selectedMarketIdInput.value = "0";
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const dropdownSearch = document.getElementById('dropdownSearch');
+        const dropdownMenu = document.getElementById('dropdownMenu');
+        const marketSearch = document.getElementById('marketSearch');
+        const marketDropDown = document.getElementById('marketDropDown');
+
+        // Filter function for items
+        function filterOptions() {
+            if (!dropdownMenu) return;
+            const filter = dropdownSearch.value.toLowerCase();
+            const dropdownOptions = dropdownMenu.getElementsByTagName('li');
+
+            for (let i = 0; i < dropdownOptions.length; i++) {
+                const txtValue = dropdownOptions[i].textContent || dropdownOptions[i].innerText;
+                dropdownOptions[i].style.display = txtValue.toLowerCase().includes(filter) ? '' : 'none';
+            }
+        }
+
+        // Filter function for markets
+        function filterMarketOptions() {
+            if (!marketDropDown) return;
+            const filter = marketSearch.value.toLowerCase();
+            const marketOptions = marketDropDown.getElementsByTagName('li');
+
+            for (let i = 0; i < marketOptions.length; i++) {
+                const txtValue = marketOptions[i].textContent || marketOptions[i].innerText;
+                marketOptions[i].style.display = txtValue.toLowerCase().includes(filter) ? '' : 'none';
+            }
+        }
+
+        // Debounce function to optimize search
+        function debounce(func, delay) {
+            let debounceTimeout;
+            return function (...args) {
+                clearTimeout(debounceTimeout);
+                debounceTimeout = setTimeout(() => func.apply(this, args), delay);
+            };
+        }
+
+        const debouncedFilterOptions = debounce(filterOptions, 300);
+        const debouncedMarketFilter = debounce(filterMarketOptions, 300);
+
+        if (dropdownSearch) dropdownSearch.addEventListener('keyup', debouncedFilterOptions);
+        if (marketSearch) marketSearch.addEventListener('keyup', debouncedMarketFilter);
+
+        // Close dropdown if clicking outside
+        document.addEventListener('click', (event) => {
+            if (dropdownMenu && !event.target.closest('#dropdownSearch') && !event.target.closest('#dropdownMenu')) {
+                dropdownMenu.classList.add('hidden');
+            }
+            if (marketDropDown && !event.target.closest('#marketSearch') && !event.target.closest('#marketDropDown')) {
+                marketDropDown.classList.add('hidden');
+            }
+        });
+    });
+
+</script>
+@if (itemExists)
+{
+    string uri = "";
+    if (Model.MarketId > 0)
+    {
+        uri = $@"/Api/Market/Daily/{Model.ItemId}/{Model.MarketId}/?type=chartjs";
+    }
+    else
+    {
+        uri = $@"/Api/Market/Daily/{Model.ItemId}/-1?type=chartjs";
+    }
+    <text>
+        <script>
+            const uri = "@uri";
+
+            // Chart.js for displaying price trends
+            const ctx = document.getElementById('priceChart').getContext('2d');
+
+            // Initialize an empty Chart.js chart
+            const priceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [], // Labels will be populated dynamically
+                    datasets: [
+                        {
+                            label: 'Total Sold',
+                            data: [], // Data will be populated dynamically
+                            borderColor: '#8884d8',
+                            backgroundColor: 'rgba(136, 132, 216, 0.2)',
+                            yAxisID: 'y1',
+                            tension: 0.4,
+                            pointRadius: 5,
+                            pointBackgroundColor: '#8884d8',
+                        },
+                        {
+                            label: 'Average Price',
+                            data: [], // Data will be populated dynamically
+                            borderColor: '#82ca9d',
+                            backgroundColor: 'rgba(130, 202, 157, 0.2)',
+                            yAxisID: 'y2',
+                            tension: 0.4,
+                            pointRadius: 5,
+                            pointBackgroundColor: '#82ca9d',
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Day'
+                            }
+                        },
+                        y1: {
+                            type: 'linear',
+                            position: 'left',
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Total Sold'
+                            }
+                        },
+                        y2: {
+                            type: 'linear',
+                            position: 'right',
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Average Price'
+                            },
+                            grid: {
+                                drawOnChartArea: false // Prevent grid lines from overlapping
+                            }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top'
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                        }
+                    }
+                }
+            });
+
+            // Fetch data and update the chart
+            async function fetchDataAndRenderChart() {
+                try {
+                    const response = await fetch(uri);
+                    const realData = await response.json();
+
+                    // Transform the data
+                    const labels = realData.labels;
+                    const totalSoldData = realData.datasets[0].data;
+                    const averagePriceData = realData.datasets[1].data;
+
+                    // Update chart data
+                    priceChart.data.labels = labels;
+                    priceChart.data.datasets[0].data = totalSoldData;
+                    priceChart.data.datasets[1].data = averagePriceData;
+
+                    // Refresh chart
+                    priceChart.update();
+                } catch (error) {
+                    console.error('Error fetching chart data:', error);
+                }
+            }
+
+            // Fetch data and render chart on page load
+            window.onload = fetchDataAndRenderChart;
+        </script>
+    </text>
 }

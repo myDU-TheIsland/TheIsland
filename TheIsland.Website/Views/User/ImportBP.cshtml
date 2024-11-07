@@ -3,34 +3,107 @@
     ViewData["Title"] = "Import Blueprint";
 }
 
-<div class="row">
-    <div class="col-md-5 pt-0">
-        <img src="/img/blueprint.jpg" class='card-img-top'>
-        <div class="card">
-            <div class="card-header">
-                <h3 class='text-center'>Blueprint Import</h3>
+<div class="min-h-screen text-white font-sans pt-35">
+    <div class="max-w-6xl mx-auto flex items-stretch space-x-5 h-full">
+        <!-- Left Side (Upload & Preview) -->
+        <div class="flex flex-col w-1/2 space-y-5 h-full">
+            <!-- Blueprint Preview Section -->
+            <div class="bg-darkBlue p-6 rounded-lg shadow-lg flex flex-col items-center flex-grow">
+                <div class="aspect-video flex items-center justify-center w-full">
+                    <img src="/img/blueprint.jpg?height=300&width=400" class="rounded-md" alt="Blueprint"
+                        class="max-w-full max-h-full object-contain" />
+                </div>
             </div>
-            <div class="card-body">
-                @if (!string.IsNullOrEmpty(Model.ErrorMessage))
-                {
-                    <p>@Html.Raw(Model.ErrorMessage)</p>
-                }
-                <form asp-action="ImportBPFile" method="post" enctype="multipart/form-data">
-                    <div class="row">
-                        <div class="col-6">
-                            <label class="form-label">Blueprint</label>
-                            <div class="input-group">
-                                <input type="file" asp-for="BluePrint" class="form-control" multiple="true">
-                            </div>
-                        </div>
-                        <div class="button-row d-flex mt-4">
-                            <button class="btn bg-gradient-dark ms-auto mb-0 js-btn-next" type="submit" title="Next">Import</button>
-                        </div>
-                    </div>
 
-                </form>
+            <!-- Upload Blueprint Section -->
+            <div class="bg-darkBlue p-6 rounded-lg shadow-lg flex flex-col items-center flex-grow">
+                <h2 class="text-2xl font-semibold mb-4 text-center">Import Your Blueprints</h2>
+                <div class="mb-4 w-full">
+                    <label for="blueprint" class="block text-sm font-medium mb-2">Choose Blueprint Files (JSON
+                        format)</label>
+                    <div class="flex items-center space-x-4">
+                        <label for="blueprint"
+                            class="cursor-pointer bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md transition-colors flex items-center">
+                            Choose Files
+                        </label>
+                        <span class="text-gray-400" id="file-chosen">No file chosen</span>
+                    </div>
+                    <input type="file" id="blueprint" accept=".json" class="hidden" name="uploadedFiles" multiple
+                        onchange="handleFileChange(event)" />
+                </div>
+                <button type="button"
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors flex items-center justify-center"
+                    onclick="submitFiles()">
+                    Import Blueprint
+                </button>
             </div>
         </div>
+
+        <!-- Right Side (Instructions) -->
+        <div class="bg-darkBlue p-6 rounded-lg shadow-lg w-1/2 flex flex-col flex-grow">
+            <h2 class="text-2xl font-semibold flex items-center mb-4">Blueprint Import Process</h2>
+            <ol class="list-decimal list-inside space-y-2 text-gray-300 text-sm">
+                <li>Follow the directions at the MMO's MeshExporter to download the blueprint from the MMO. Use the
+                    MeshExporter's "Export" button, not the STL or GLTF buttons.</li>
+                <li>Start the MyDualUniverse game, connect to the server "[NA East] The Island", and log in.</li>
+                <li>If you've not done this yet, select this site's "Site Ops->Sign in" page. It will take you to a
+                    Discord account association page; hit the 'Authorize' button.</li>
+                <li>Select the "Site Ops->Link Game Account" within The Isle's website.</li>
+                <li>Enter the user name for your MyDU account (case Sensitive) and click search.</li>
+                <li>Within the MyDU chat window (lower left corner of the game), you'll see a message from the TheIsle
+                    bot, with a text token string.</li>
+                <li>Enter the token string into the web site's token form field.</li>
+                <li>Once linked, other functions within the "Site Ops" menu will become visible. Click on the "Upload
+                    Blueprints" option, and select your blueprint.</li>
+                <li>Within your nanopack in game, you'll find the blueprint you've uploaded.</li>
+                <li>You can now purchase parts from the market or make them in your factory, and deploy your new
+                    construct!</li>
+            </ol>
+        </div>
     </div>
-    <partial name="_BlueprintInstructions" />
 </div>
+
+<script>
+    function handleFileChange(event) {
+        const fileInput = event.target;
+        const files = fileInput.files;
+        const maxFiles = 10;
+        const maxSize = 75 * 1024 * 1024; // 75MB in bytes
+
+        let totalSize = 0;
+        let fileNames = [];
+
+        if (files.length > maxFiles) {
+            alert(`You can only upload up to ${maxFiles} files.`);
+            fileInput.value = ""; // Clear the file input
+            document.getElementById('file-chosen').textContent = 'No file chosen';
+            return;
+        }
+
+        for (const file of files) {
+            totalSize += file.size;
+            fileNames.push(file.name);
+        }
+
+        if (totalSize > maxSize) {
+            alert(`Total file size must not exceed ${maxSize / (1024 * 1024)} MB.`);
+            fileInput.value = ""; // Clear the file input
+            document.getElementById('file-chosen').textContent = 'No file chosen';
+            return;
+        }
+
+        document.getElementById('file-chosen').textContent = fileNames.join(', ');
+    }
+
+    function submitFiles() {
+        const fileInput = document.getElementById('blueprint');
+        if (!fileInput.files.length) {
+            alert("Please select files to upload.");
+            return;
+        }
+
+        // Here you could perform further validations or submit the form.
+        alert("Files ready to be uploaded.");
+        // For example: document.getElementById('yourFormId').submit();
+    }
+</script>

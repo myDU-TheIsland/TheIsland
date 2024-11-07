@@ -11,178 +11,273 @@
     int itemCount = Model.StoreItem.content?.Items.Count() ?? 0;
     int skinCount = Model.StoreItem.content?.Skins.Count() ?? 0;
 }
-<div class="row">
-    <div class="col-sm">
-        <div class="card">
-            <div class="card-body">
-                <form asp-action="SaveItem" asp-controller="Store" asp-area="Admin" method="post" enctype="multipart/form-data">
-                    <input type="hidden" asp-for="StoreItem.id" />
-                    <div class="form-group">
-                        <label asp-for="StoreItem.name"></label>
-                        <input asp-for="StoreItem.name" class="form-control" />
+
+<div class="pt-35">
+    <div class="w-full max-w-6xl mx-auto bg-darkBlue rounded-md p-5">
+        <form asp-action="SaveItem" asp-controller="Store" asp-area="Admin" method="post" enctype="multipart/form-data"
+            class="flex space-x-4">
+            <div class="space-y-4 border-r border-gray-700 pr-4 w-2/5">
+                <div class="py-3">
+                    <h2 class="text-xl font-bold">Configure Item</h2>
+                </div>
+                <input type="hidden" asp-for="StoreItem.id" />
+                <!-- Basic Info -->
+                <div class="space-y-3">
+                    <h3 class="font-semibold">Basic Info</h3>
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <div class="flex flex-col space-y-2">
+                            <label asp-for="StoreItem.name"></label>
+                            <input asp-for="StoreItem.name" class="bg-gray-700 py-1 px-2 rounded-md text-gray-100" />
+                        </div>
+                        <div class="flex flex-col space-y-2">
+                            <label asp-for="StoreItem.icon"></label>
+                            <input asp-for="StoreItem.icon" class="bg-gray-700 py-1 px-2 rounded-md text-gray-100" />
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label asp-for="StoreItem.icon"></label>
-                        <input asp-for="StoreItem.icon" class="form-control" />
-                    </div>
-                    <div class="form-group">
+                    <div class="flex flex-col space-y-2">
                         <label asp-for="StoreItem.description"></label>
-                        <input asp-for="StoreItem.description" class="form-control" />
+                        <input asp-for="StoreItem.description" class="bg-gray-700 py-1 px-2 rounded-md text-gray-100" />
                     </div>
-                    <div class="form-group">
-                        <label asp-for="StoreItem.limit"></label>
-                        <input asp-for="StoreItem.limit" class="form-control" />
+                </div>
+
+                <div class="border border-gray-700"></div>
+
+                <!-- Purchase Settings -->
+                <div class="space-y-4">
+                    <h3 class="font-semibold">Purchase Settings</h3>
+                    <div class="grid gap-4 sm:grid-cols-2">
+                        <div class="flex flex-col space-y-2">
+                            <label asp-for="StoreItem.limit"></label>
+                            <input asp-for="StoreItem.limit" class="bg-gray-700 py-1 px-2 rounded-md text-gray-100" />
+                        </div>
+                        <div class="flex flex-col space-y-2">
+                            <label asp-for="StoreItem.price"></label>
+                            <input asp-for="StoreItem.price" class="bg-gray-700 py-1 px-2 rounded-md text-gray-100" />
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label asp-for="StoreItem.price"></label>
-                        <input asp-for="StoreItem.price" class="form-control" />
+                    <div class="flex items-center space-x-2">
+                        <input type="checkbox" asp-for="StoreItem.is_active" />
+                        <label asp-for="StoreItem.is_active">Available for Sale</label>
                     </div>
-                    <div class="form-group">
-                        <label asp-for="StoreItem.is_active"></label>
-                        <input asp-for="StoreItem.is_active" class="form-check-inline" />
+                </div>
+
+                <div class="border border-gray-700"></div>
+
+                <!-- Items & Skins -->
+                <div class="space-y-4">
+                    <h3 class="font-semibold">Images</h3>
+                    <div class="grid gap-4">
+                        <div class="grid grid-cols-2 gap-4 text-sm font-medium">
+                            <div>Image Path</div>
+                        </div>
+                        <div class="border border-gray-700 rounded-md p-2">
+                            <Input asp-for="Images" type="file" class="w-full" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Save Button -->
+                <button class="w-full bg-purple-600 rounded-md p-1">Save Changes</button>
+            </div>
+            <div class="w-3/5">
+                <!-- Items & Skins -->
+                <div class="space-y-4">
+                    <div class="py-3">
+                        <h2 class="text-xl font-bold">Rewards</h2>
                     </div>
 
-                    <div>
-                        <p>What the user will receive?</p>
-                        <div class="form-group">
-                            <label asp-for="StoreItem.content.TalentPoints"></label>
-                            <input asp-for="StoreItem.content.TalentPoints" class="form-control" />
+                    <!-- Talent Point Settings -->
+                    <div class="space-y-4">
+                        <h3 class="font-semibold">Talent Point Settings</h3>
+                        <div class="grid gap-4 sm:grid-cols-2">
+                            <div class="flex flex-col space-y-2">
+                                <label asp-for="StoreItem.content.TalentPoints"></label>
+                                <input asp-for="StoreItem.content.TalentPoints"
+                                    class="bg-gray-700 py-1 px-2 rounded-md text-gray-100" />
+                            </div>
+                            <div class="flex items-center space-x-2 pt-8">
+                                <label asp-for="StoreItem.content.RespecTalentPoints"></label>
+                                <input asp-for="StoreItem.content.RespecTalentPoints" class="text-black" />
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label asp-for="StoreItem.content.RespecTalentPoints"></label>
-                            <input asp-for="StoreItem.content.RespecTalentPoints" class="form-check-inline" />
-                        </div>
-                        <div class="form-group">
-                            Items:
-                            <table>
+                    </div>
+
+                    <div class="border border-gray-700"></div>
+
+                    <div class="space-y-2">
+                        <h3 class="font-semibold">Items</h3>
+                        <div class="overflow-x-auto">
+                            <table class="table-fixed w-full">
                                 <thead>
-                                    <tr>
-                                        <th>Item Id</th>
-                                        <th>Item Count</th>
-                                        <th>Actions (<a class="add-item"><i class="fa-solid fa-plus"></i></a>)</th>
+                                    <tr class="bg-gray-800 text-gray-100 text-left">
+                                        <th class="w-1/2 p-2">Item Id</th>
+                                        <th class="w-1/4 p-2">Item Count</th>
+                                        <th class="w-1/4 p-2">Actions <a class="add-item"><i
+                                                    class="fa-solid fa-plus"></i></a></th>
                                     </tr>
                                 </thead>
                                 <tbody id="items">
                                     @for (int x = 0; x < Model.StoreItem.content!.Items.Count(); x++)
                                     {
-                                        <tr id="items_@x"><td><select asp-for="@Model.StoreItem.content.Items[@x].Key" class="selectpicker" data-size="7"  data-live-search-normalize="true" data-select-on-tab="true"  data-live-search="true" data-style="btn btn-primary" />&nbsp;&nbsp;</td><td><input asp-for="@Model.StoreItem.content.Items[@x].Value" class="form-control  form-inline" /></td><td><a class="delete"><i class="fa-solid fa-trash"></i></a></td></tr>
+                                        <tr id="items_@x" class="bg-gray-700 text-gray-100">
+                                            <td class="p-2">
+                                                <select asp-for="@Model.StoreItem.content.Items[@x].Key"
+                                                    class="w-full bg-gray-600 border border-gray-500 rounded-md p-2 text-gray-100">
+                                                </select>
+                                            </td>
+                                            <td class="p-2">
+                                                <input asp-for="@Model.StoreItem.content.Items[@x].Value"
+                                                    class="w-full bg-gray-600 border border-gray-500 rounded-md p-2 text-gray-100" />
+                                            </td>
+                                            <td class="p-2 text-center">
+                                                <a class="delete text-red-500 hover:text-red-700"><i
+                                                        class="fa-solid fa-trash"></i></a>
+                                            </td>
+                                        </tr>
                                     }
                                 </tbody>
                             </table>
                         </div>
-                        <div class="form-group">
-                            Skins:
-                            <table>
+                    </div>
+
+                    <div class="space-y-2">
+                        <h3 class="font-semibold">Skins</h3>
+                        <div class="overflow-x-auto">
+                            <table class="table-fixed w-full">
                                 <thead>
-                                    <tr>
-                                        <th>Item Id</th>
-                                        <th>Skin Name</th>
-                                        <th>Actions (<a class="add-skin"><i class="fa-solid fa-plus"></i></a>)</th>
+                                    <tr class="bg-gray-800 text-gray-100 text-left">
+                                        <th class="w-1/2 p-2">Item Id</th>
+                                        <th class="w-1/4 p-2">Skin Name</th>
+                                        <th class="w-1/4 p-2">Actions <a class="add-skin"><i
+                                                    class="fa-solid fa-plus"></i></a></th>
                                     </tr>
                                 </thead>
                                 <tbody id="skins">
                                     @for (int x = 0; x < Model.StoreItem.content!.Skins.Count(); x++)
                                     {
-                                        <tr id="skins_@x"><td><select asp-for="@Model.StoreItem.content.Skins[@x].Key" class="selectpicker" data-size="7" data-live-search-normalize="true" data-select-on-tab="true"  data-live-search="true" data-style="btn btn-primary"  />&nbsp;&nbsp;</td><td><input asp-for="@Model.StoreItem.content.Skins[@x].Value" class="form-control  form-inline" /></td><td><a class="delete"><i class="fa-solid fa-trash"></i></a></td></tr>
+                                        <tr id="skins_@x" class="bg-gray-700 text-gray-100">
+                                            <td class="p-2">
+                                                <select asp-for="@Model.StoreItem.content.Skins[@x].Key"
+                                                    class="w-full bg-gray-600 border border-gray-500 rounded-md p-2 text-gray-100">
+                                                </select>
+                                            </td>
+                                            <td class="p-2">
+                                                <input asp-for="@Model.StoreItem.content.Skins[@x].Value"
+                                                    class="w-full bg-gray-600 border border-gray-500 rounded-md p-2 text-gray-100" />
+                                            </td>
+                                            <td class="p-2 text-center">
+                                                <a class="delete text-red-500 hover:text-red-700"><i
+                                                        class="fa-solid fa-trash"></i></a>
+                                            </td>
+                                        </tr>
                                     }
                                 </tbody>
                             </table>
-                        </div>
-                        <div class="form-group">
-                            Images:
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>image path</th>
-                                        <th>actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="images">
-                                    @for (int x = 0; x < Model.StoreItem.images.Count(); x++)
-                                    {
-                                        <tr id="images_@x"><td><input asp-for="@Model.StoreItem.images[@x]" class="form-control form-inline" /></td><td><a class="delete"><i class="fa-solid fa-trash"></i></a></td></tr>
-                                    }
-                                </tbody>
-                            </table>
-
-                        </div>
-                        <div class="fileinput fileinput-new text-center" data-provides="fileinput">
-                            <div>
-                                <span class="btn btn-primary btn-round btn-file">
-                                    <span class="fileinput-new">Select image</span>
-                                    <span class="fileinput-exists">Change</span>
-                                    <input asp-for="Images" multiple class="form-control" />
-                                </span>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <button class="btn btn-success">Save</button>
                         </div>
                     </div>
-                </form>
+                </div>
+
             </div>
-        </div>
+        </form>
     </div>
 </div>
 
 
 @section Scripts {
-    <!-- Latest compiled and minified JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap-select@1.13.14/dist/js/bootstrap-select.min.js"></script>
     <script>
-        $(function () {
+        document.addEventListener('DOMContentLoaded', function () {
             rebindDeletes();
-            $(".add-skin").on('click', appendSkin)
-            $(".add-item").on('click', appendItem)
+            document.querySelector(".add-skin").addEventListener('click', appendSkin);
+            document.querySelector(".add-item").addEventListener('click', appendItem);
 
-            
-            setSelect();
+            setSelect(); // Populate existing select elements on load
         });
 
-        function setSelect(){
-            $('select[class~="selectpicker"]').each(function()
-            {
-                var select = $(this);
-                $.getJSON('/Api/Data/GetItems', function(data)
-                {
-                    select.html('');
+        async function setSelect() {
+            const selects = document.querySelectorAll('select.selectpicker');
+            try {
+                const response = await fetch('/Api/Data/GetItems');
+                const data = await response.json();
 
-                    $.each(data, function(key, val)
-                    {
-                        select.append('<option value="' +  val.value + '">' + val.key  + '</option>');
+                selects.forEach(select => {
+                    select.innerHTML = ''; // Clear existing options
+
+                    // Populate the select with new options
+                    data.forEach(({ key, value }) => {
+                        const option = document.createElement('option');
+                        option.value = value;
+                        option.textContent = key;
+                        select.appendChild(option);
                     });
 
-                    select.selectpicker('refresh');
+                    select.classList.remove('selectpicker'); // Remove the class after population
                 });
-                select.removeClass('selectpicker');
-            });
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
         }
 
         function appendSkin() {
+            const lastRowId = document.querySelector("#skins").lastElementChild?.id || "skins_-1";
+            const lastRow = parseInt(lastRowId.replace("skins_", "")) + 1;
 
-            var lastRow = parseInt(($("#skins").children("tr").last().attr('id') || "").replace("skins_", "") || -1) + 1;
+            const row = document.createElement('tr');
+            row.id = `skins_${lastRow}`;
+            row.classList.add("bg-gray-700", "text-gray-100");
 
-            $("#skins").append('<tr id="skins_' + lastRow + '"><td><select class="selectpicker" data-size="7" data-live-search="true" data-live-search-normalize="true" data-select-on-tab="true" data-style="btn btn-primary" id="StoreItem_content_Skins_' + lastRow + '__Key" name="StoreItem.content.Skins[' + lastRow + '].Key" value="0"></select>&nbsp;&nbsp;</td><td><input class="form-control  form-inline" type="text" id="StoreItem_content_Skins_' + lastRow + '__Value" name="StoreItem.content.Skins[' + lastRow + '].Value" value=""></td><td><a class="delete"><i class="fa-solid fa-trash"></i></a></td></tr>');
+            row.innerHTML = `
+                                                                                            <td class="p-2">
+                                                                                                <select class="selectpicker w-full bg-gray-600 border border-gray-500 rounded-md p-2 text-gray-100" id="StoreItem_content_Skins_${lastRow}__Key" name="StoreItem.content.Skins[${lastRow}].Key">
+                                                                                                    <option value="">Loading...</option>
+                                                                                                </select>
+                                                                                            </td>
+                                                                                            <td class="p-2">
+                                                                                                <input class="w-full bg-gray-600 border border-gray-500 rounded-md p-2 text-gray-100" type="text" id="StoreItem_content_Skins_${lastRow}__Value" name="StoreItem.content.Skins[${lastRow}].Value" value="">
+                                                                                            </td>
+                                                                                            <td class="p-2 text-center">
+                                                                                                <a class="delete text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></a>
+                                                                                            </td>
+                                                                                        `;
+
+            document.querySelector("#skins").appendChild(row);
             rebindDeletes();
-            setSelect();
+            setSelect(); // Populate the new select element with options
         }
-
 
         function appendItem() {
+            const lastRowId = document.querySelector("#items").lastElementChild?.id || "items_-1";
+            const lastRow = parseInt(lastRowId.replace("items_", "")) + 1;
 
-            var lastRow = parseInt(($("#items").children("tr").last().attr('id') || "").replace("items_", "") || -1) + 1;
+            const row = document.createElement('tr');
+            row.id = `items_${lastRow}`;
+            row.classList.add("bg-gray-700", "text-gray-100");
 
-                $("#items").append('<tr id="items_' + lastRow + '"><td><select class="selectpicker" data-size="7" data-live-search="true"  data-live-search-normalize="true" data-select-on-tab="true"  data-style="btn btn-primary" id="StoreItem_content_Items_' + lastRow + '__Key" name="StoreItem.content.Items[' + lastRow + '].Key" value="0"></select>&nbsp;&nbsp;</td><td><input class="form-control  form-inline" type="text" data-val="true" data-val-number="The field Value must be a number." data-val-required="The Value field is required." id="StoreItem_content_Items_' + lastRow + '__Value" name="StoreItem.content.Items[' + lastRow + '].Value" value="0"></td><td><a class="delete"><i class="fa-solid fa-trash"></i></a></td></tr>');
+            row.innerHTML = `
+                                                                                            <td class="p-2">
+                                                                                                <select class="selectpicker w-full bg-gray-600 border border-gray-500 rounded-md p-2 text-gray-100" id="StoreItem_content_Items_${lastRow}__Key" name="StoreItem.content.Items[${lastRow}].Key">
+                                                                                                    <option value="">Loading...</option>
+                                                                                                </select>
+                                                                                            </td>
+                                                                                            <td class="p-2">
+                                                                                                <input class="w-full bg-gray-600 border border-gray-500 rounded-md p-2 text-gray-100" type="text" data-val="true" data-val-number="The field Value must be a number." data-val-required="The Value field is required." id="StoreItem_content_Items_${lastRow}__Value" name="StoreItem.content.Items[${lastRow}].Value" value="0">
+                                                                                            </td>
+                                                                                            <td class="p-2 text-center">
+                                                                                                <a class="delete text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></a>
+                                                                                            </td>
+                                                                                        `;
+
+            document.querySelector("#items").appendChild(row);
             rebindDeletes();
-            setSelect();
+            setSelect(); // Populate the new select element with options
         }
 
-        function rebindDeletes()
-        {
-            $("tr > td > .delete").on("click", function () {
-                $(this).closest("tr").remove()
-            })
+        function rebindDeletes() {
+            const deleteButtons = document.querySelectorAll("tr > td > .delete");
+            deleteButtons.forEach(button => {
+                button.onclick = function () {
+                    this.closest("tr").remove();
+                };
+            });
         }
-
     </script>
 }
