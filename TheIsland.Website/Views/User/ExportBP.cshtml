@@ -20,7 +20,7 @@
                     <tbody>
                         @foreach (var bp in Model.ExportableBPs)
                         {
-                            if (Model.ExportedBPs.Any(item => item.blueprint_id == bp.Value))
+                            if (Model.ExportedBPs.Any(item => item.blueprint_id == bp.Key))
                             {
                                 continue;
                             }
