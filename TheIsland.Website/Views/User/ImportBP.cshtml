@@ -19,20 +19,21 @@
             <div class="bg-darkBlue p-6 rounded-lg shadow-lg flex flex-col items-center flex-grow">
                 <h2 class="text-2xl font-semibold mb-4 text-center">Import Your Blueprints</h2>
                 <div class="mb-4 w-full">
-                    <label for="blueprint" class="block text-sm font-medium mb-2">Choose Blueprint File (JSON
+                    <label for="blueprint" class="block text-sm font-medium mb-2">Choose Blueprint Files (JSON
                         format)</label>
                     <div class="flex items-center space-x-4">
                         <label for="blueprint"
                             class="cursor-pointer bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md transition-colors flex items-center">
-                            Choose File
+                            Choose Files
                         </label>
                         <span class="text-gray-400" id="file-chosen">No file chosen</span>
                     </div>
-                    <input type="file" id="blueprint" accept=".json" class="hidden" name="uploadedFile"
+                    <input type="file" id="blueprint" accept=".json" class="hidden" name="uploadedFiles" multiple
                         onchange="handleFileChange(event)" />
                 </div>
                 <button type="button"
-                    class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors flex items-center justify-center">
+                    class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors flex items-center justify-center"
+                    onclick="submitFiles()">
                     Import Blueprint
                 </button>
             </div>
@@ -65,7 +66,44 @@
 <script>
     function handleFileChange(event) {
         const fileInput = event.target;
-        const fileName = fileInput.files && fileInput.files.length > 0 ? fileInput.files[0].name : 'No file chosen';
-        document.getElementById('file-chosen').textContent = fileName;
+        const files = fileInput.files;
+        const maxFiles = 10;
+        const maxSize = 75 * 1024 * 1024; // 75MB in bytes
+
+        let totalSize = 0;
+        let fileNames = [];
+
+        if (files.length > maxFiles) {
+            alert(`You can only upload up to ${maxFiles} files.`);
+            fileInput.value = ""; // Clear the file input
+            document.getElementById('file-chosen').textContent = 'No file chosen';
+            return;
+        }
+
+        for (const file of files) {
+            totalSize += file.size;
+            fileNames.push(file.name);
+        }
+
+        if (totalSize > maxSize) {
+            alert(`Total file size must not exceed ${maxSize / (1024 * 1024)} MB.`);
+            fileInput.value = ""; // Clear the file input
+            document.getElementById('file-chosen').textContent = 'No file chosen';
+            return;
+        }
+
+        document.getElementById('file-chosen').textContent = fileNames.join(', ');
+    }
+
+    function submitFiles() {
+        const fileInput = document.getElementById('blueprint');
+        if (!fileInput.files.length) {
+            alert("Please select files to upload.");
+            return;
+        }
+
+        // Here you could perform further validations or submit the form.
+        alert("Files ready to be uploaded.");
+        // For example: document.getElementById('yourFormId').submit();
     }
 </script>

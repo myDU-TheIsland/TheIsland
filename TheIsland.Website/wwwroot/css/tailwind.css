@@ -14,6 +14,30 @@
   @apply transform -translate-y-1.5 -rotate-45 origin-top-left;
 }
 
+/* Scrollbar width */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+  background: #1e293b;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #1e293b; /* Tailwind's slate-900 */
+  border-radius: 4px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #9834ec; /* Tailwind's blue-500 */
+  border-radius: 4px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #9854ec; /* Tailwind's blue-600 */
+}
+
 /* Background star animation */
 .stars,
 .stars2,
@@ -67,7 +91,6 @@
 
 .tab-button {
   padding: 8px 16px;
-  background-color: #2a2a3e;
   color: #a78bfa;
   border: none;
   cursor: pointer;

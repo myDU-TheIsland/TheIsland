@@ -1,27 +1,19 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
-    ViewBag.InsertGutter = true;
+@{
+  ViewData["Title"] = "Home Page";
+  ViewBag.InsertGutter = true;
 }
 
-<div class="row">
-    <div class="col-sm">
-        <div class="card">
-            <div class="card-body text-center">
-                <a asp-action="Index" asp-controller="Store" asp-area="Admin">
-                    <h5 class="card-title">Store</h5>
-                    <i class="fas fa-shop fa-6x"></i>
-                </a>
-            </div>
-        </div>
-    </div>
-    <div class="col-sm">
-        <div class="card">
-            <div class="card-body text-center">
-                <a asp-action="Index" asp-controller="Market" asp-area="Admin">
-                    <h5 class="card-title">Market</h5>
-                    <i class="fas fa-arrow-trend-up fa-6x"></i>
-                </a>
-            </div>
-        </div>
-    </div>
+<div class="flex items-center justify-center max-w-7xl mx-auto space-x-3">
+  <div class="bg-darkBlue rounded-md text-center p-5">
+    <a asp-action="Index" asp-controller="Store" asp-area="Admin">
+      <h5 class="card-title">Store</h5>
+      <i class="fas fa-shop fa-6x"></i>
+    </a>
+  </div>
+  <div class="bg-darkBlue rounded-md text-center p-5">
+    <a asp-action="Index" asp-controller="Market" asp-area="Admin">
+      <h5 class="card-title">Market</h5>
+      <i class="fas fa-arrow-trend-up fa-6x"></i>
+    </a>
+  </div>
 </div>
