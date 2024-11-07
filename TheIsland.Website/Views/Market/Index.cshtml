@@ -292,10 +292,14 @@
 </script>
 @if (itemExists)
 {
-    string uri = $@"/Api/Market/Daily/{Model.ItemId}/-1?type=chartjs";
+    string uri = "";
     if (Model.MarketId > 0)
     {
-        uri += $@"/{Model.MarketId}";
+        uri = $@"/Api/Market/Daily/{Model.ItemId}/{Model.MarketId}?type=chartjs";
+    }
+    else
+    {
+        uri = $@"/Api/Market/Daily/{Model.ItemId}-1?type=chartjs";
     }
     <text>
         <script>
