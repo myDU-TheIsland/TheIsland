@@ -101,11 +101,12 @@
                 <div class="bg-darkBlue rounded-lg shadow-lg px-2 py-3 border border-purple-500/30">
                     <h2 class="text-2xl font-bold mb-4 text-white">@items[Model.ItemId] (Last 72hrs) @graphHeader
                     </h2>
-                    @if (botPurchasePrice == 0)
+                    @if (botPurchasePrice > 0)
                     {
-                        <p class="text-purple-400 mb-4 border-b border-purple-500 pb-4">⭐ <i>Honjos Minion is buying at
+                        <p class="text-purple-400 mb-4 pb-4">⭐ <i>Honjos Minion is buying at
                                 @botPurchasePrice quanta per unit</i> ⭐</p>
                     }
+                    <div class="border border-purple-500 w-full"></div>
                     <canvas id="priceChart" class="pt-5" style="max-height: 300px;"></canvas>
                 </div>
 
