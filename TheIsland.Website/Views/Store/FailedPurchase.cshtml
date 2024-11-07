@@ -3,14 +3,32 @@
     ViewData["Title"] = "Failed Purchase";
 }
 <partial name="_UserData" />
-<div class="row">
-    <div class="col-md-6  ml-auto mr-auto">
-        <div class="card card-product">
-            <div class="card-body">
-                <h4 class="card-title card-header-danger">Purchase Failed!</h4>
+<div class="max-w-7xl mx-auto">
+    <div class="w-full max-w-md mx-auto rounded-md bg-darkBlue border-slate-800 p-3">
+        <div class="space-y-4 flex flex-col items-center text-center pb-2">
+            <div class="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center">
+                <img src="/svg/x-mark.svg" class="w-6 h-6" />
             </div>
-            <div class="card-body">
-                <p class="card-description">Please reach out to the #help channel, and ask someone to look into purchase '@Model.id'</p>
+            <h4 class="text-2xl text-slate-50">Purchase Failed!</h4>
+            <div class="text-center space-y-4 pb-6">
+                <div class="space-y-2">
+                    <p class="text-slate-300">We have NOT taken</p>
+                    <p class="text-3xl font-bold text-slate-50">
+                        @(Model.price.ToString("n0")) ħ
+                    </p>
+                    <p class="text-slate-300">from your ingame account.</p>
+                </div>
+                <div class="bg-slate-900 rounded-md p-4 text-sm text-slate-400">
+                    Please reach out to the #help channel, and ask someone to look into purchase
+                    '@Model.id'
+                </div>
+            </div>
+            <div class="flex justify-center pb-6">
+                <a asp-controller="Store" asp-action="Index" asp-area=""
+                    class="flex w-full max-w-md rounded-md p-2 bg-purple-600 space-x-2">
+                    <img src="/svg/store.svg" class="w-6 h-6 ml-2" />
+                    <p>Return to Store</p>
+                </a>
             </div>
         </div>
     </div>
