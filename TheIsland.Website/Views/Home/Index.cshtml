@@ -2,6 +2,89 @@
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <img style='width: 800px; height: auto;' src='/img/theisle.png'>
+<div class="relative z-10 max-w-7xl mx-auto pt-35">
+    <header class="mb-5 text-center">
+        <h1 class="text-6xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
+            Welcome to The Isle
+        </h1>
+        <p class="text-xl text-purple-300">
+            The premier gaming community for the space adventure game (My) Dual Universe!
+        </p>
+    </header>
+
+    <div class="grid md:grid-cols-2 gap-6 items-center">
+        <div>
+            <img src="/img/spaceship.png" alt="Futuristic Spaceship" class="rounded-lg shadow-2xl" />
+        </div>
+
+        <div class="bg-[#1a1a2e] p-6 rounded-lg shadow-xl">
+            <div class="flex mb-4">
+                <button class="tab-button active-tab-button rounded-t-lg flex-grow"
+                    onclick="showTab('community')">Community</button>
+                <button class="tab-button rounded-t-lg flex-grow" onclick="showTab('gameplay')">Gameplay</button>
+                <button class="tab-button rounded-t-lg flex-grow" onclick="showTab('features')">Features</button>
+            </div>
+
+            <div id="community" class="tab-content active-tab">
+                <h2 class="text-2xl font-bold mb-4 text-purple-400">Our Community</h2>
+                <p class="pb-5">Our members are known for their unwavering support and camaraderie. Whether
+                    you're a seasoned
+                    space builder/explorer or a newcomer just starting your journey, you'll find a welcoming and
+                    helpful community ready to assist you.</p>
+                <p>In The Isle, you'll meet players from all walks of life, united by a shared passion for space
+                    exploration, coding/voxelmancy, and gaming. Together, we celebrate victories, learn from
+                    defeats, and create unforgettable memories.</p>
+            </div>
+
+            <div id="gameplay" class="tab-content">
+                <h2 class="text-2xl font-bold mb-4 text-purple-400">Gameplay</h2>
+                <p class="pb-5">In My Dual Universe, players embark on interstellar journeys, create gorgeous
+                    ships from mere
+                    points of light, architect productive factories, battle formidable foes, and uncover the
+                    mysteries of the universe.</p>
+                <p>Need tips on the best strategies for flying? Looking for advice on how to optimize your
+                    spaceship? Our experienced players are always eager to share their knowledge and lend a
+                    hand.</p>
+            </div>
+
+            <div id="features" class="tab-content">
+                <h2 class="text-2xl font-bold mb-4 text-purple-400">Key Features</h2>
+                <ul class="list-disc list-inside space-y-2">
+                    <li>Vast, player-driven universe to explore</li>
+                    <li>Complex ship building and customization</li>
+                    <li>Resource management and factory construction</li>
+                    <li>Player-run economy and markets</li>
+                    <li>Exciting space combat and territorial warfare</li>
+                    <li>Rich supportive community of players</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-5 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 text-center">
+        <div class="card">
+            <img src="/svg/sparkles.svg" alt="Icon" class="w-10 h-10 mx-auto mb-4" />
+            <h2>Explore</h2>
+            <p class="text-purple-400">Discover new worlds and uncharted territories</p>
+        </div>
+        <div class="card">
+            <img src="/svg/rocket.svg" alt="Icon" class="w-10 h-10 mx-auto mb-4" />
+            <h2>Build</h2>
+            <p class="text-purple-400">Create your own ships and structures</p>
+        </div>
+        <div class="card">
+            <img src="/svg/users.svg" alt="Icon" class="w-10 h-10 mx-auto mb-4" />
+            <h2>Connect</h2>
+            <p class="text-purple-400">Join a thriving community of space enthusiasts</p>
+        </div>
+        <div class="card">
+            <img src="/svg/code.svg" alt="Icon" class="w-10 h-10 mx-auto mb-4" />
+            <h2>Innovate</h2>
+            <p class="text-purple-400">Push the boundaries of what's possible with voxel technology</p>
+        </div>
+    </div>
+
+    <div class="mt-12 text-center">
+        <a href="https://discord.gg/6zsBcDX5Rz" class="join-button">Join The Isle Today</a>
+    </div>
 </div>

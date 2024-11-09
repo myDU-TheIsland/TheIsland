@@ -8,6 +8,7 @@ namespace TheIsland.Website.Controllers
     using Microsoft.AspNetCore.Authentication.Cookies;
     using Microsoft.AspNetCore.Mvc;
 
+    [ApiExplorerSettings(IgnoreApi = true)]
     public class AuthenticationController : Controller
     {
         [HttpGet("~/signin")]

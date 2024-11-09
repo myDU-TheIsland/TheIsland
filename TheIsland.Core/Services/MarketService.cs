@@ -17,7 +17,6 @@ namespace TheIsland.Core.Services
 
     public class MarketService : IAppService
     {
-        private readonly MarketTransactionRepository _transactionRepository;
         private readonly DualMarketTransactionRepository _dualMarketTransactionRepository;
         private readonly DualMarketRepository _dualMarketRepository;
         private readonly DualWalletRepository _dualWalletRepository;
@@ -25,14 +24,12 @@ namespace TheIsland.Core.Services
         private readonly IMarketBot _marketBot;
 
         public MarketService(
-            MarketTransactionRepository transactionRepository,
             DualMarketRepository dualMarketRepository,
             DualMarketTransactionRepository dualMarketTransactionRepository,
             DualWalletRepository dualWalletRepository,
             MarketBotConfig marketBotConfig,
             IMarketBot dualClient)
         {
-            this._transactionRepository = transactionRepository;
             this._dualMarketRepository = dualMarketRepository;
             this._dualMarketTransactionRepository = dualMarketTransactionRepository;
             this._dualWalletRepository = dualWalletRepository;
@@ -166,9 +163,23 @@ namespace TheIsland.Core.Services
             return log;
         }
 
+        public async Task<IEnumerable<MarketStatistics>> GetDailyStats(double itemId, double marketId = -1)
+        {
+            IEnumerable<MarketStatistics> results = await this._dualWalletRepository.GetDailyStats(itemId, marketId).ConfigureAwait(false);
+
+            IEnumerable<DualMarket> markets = await this._dualMarketRepository.GetAsync().ConfigureAwait(false);
+
+            foreach (MarketStatistics item in results)
+            {
+                item.market_name = markets.FirstOrDefault(market => market.id == item.market_id)?.name ?? string.Empty;
+            }
+
+            return results;
+        }
+
         public async Task<IEnumerable<MarketStatistics>> GetHourlyStats(double itemId, double marketId = -1)
         {
-            IEnumerable<MarketStatistics> results = await this._transactionRepository.GetHourlyStats(itemId, marketId).ConfigureAwait(false);
+            IEnumerable<MarketStatistics> results = await this._dualWalletRepository.GetHourlyStats(itemId, marketId).ConfigureAwait(false);
 
             IEnumerable<DualMarket> markets = await this._dualMarketRepository.GetAsync().ConfigureAwait(false);
 

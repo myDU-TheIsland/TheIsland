@@ -3,32 +3,37 @@
     ViewData["Title"] = "Link Discord to Player Account";
 }
 
-@if (!string.IsNullOrEmpty(Model.ErrorMessage))
-{
-    <p>@Model.ErrorMessage</p>
-}
-<div class="row">
-    <div class="col-md-5">
-        <div class="card">
-            <div class="card-header">
-                <h2 class='text-center'>Link Ingame Player to Discord</h2>
-            </div>
-            <div class="card-body">
-                <form asp-action="LinkUser">
-                    <div class="row">
-                        <div class="col-6">
-                            <label class="form-label">Player Name</label>
-                            <div class="input-group">
-                                <input asp-for="PlayerName" class="form-control" />
-                            </div>
-                        </div>
-                        <div class="button-row d-flex mt-4">
-                            <button class="btn bg-gradient-dark ms-auto mb-0 js-btn-next" type="submit" title="Next">Find Player</button>
-                        </div>
-                    </div>
-                </form>
+<div class="space-y-4 pt-35">
+    <!-- Header Section -->
+    <div class="space-y-2 text-center">
+        <h1
+            class="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl lg:text-6xl/none bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-pink-600">
+            Account Connection
+        </h1>
+        <p class="mx-auto max-w-[600px] text-gray-400 md:text-xl">
+            Link your in-game player profile with Discord to access advanced features and seamlessly import blueprints.
+        </p>
+    </div>
+
+    <div class="max-w-3xl mx-auto space-y-2">
+        <div class="bg-darkBlue text-gray-300 rounded-lg shadow-lg p-6">
+            <h2 class="text-xl font-bold mb-4">Link Ingame Player to Discord</h2>
+            <form asp-action="LinkUser" class="space-x-3 text-gray-800">
+                <input asp-for="PlayerName" type="text" placeholder="Enter player name"
+                    class="max-w-md w-full px-4 py-2 border rounded-md">
+                <button
+                    class="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-md"
+                    type="submit">
+                    <img src="/svg/link.svg" class="mr-2 h-4 w-4 inline-block" />
+                    Find Player
+                </button>
+            </form>
+            <div class="py-3">
+                @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+                {
+                    <p class="text-red-500">@Model.ErrorMessage</p>
+                }
             </div>
         </div>
     </div>
-    <partial name="_BlueprintInstructions" />
 </div>

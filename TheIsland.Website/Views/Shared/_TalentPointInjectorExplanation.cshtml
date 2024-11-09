@@ -1,13 +1,50 @@
-﻿<div class="text-left">
-    <h5>Explanation of how injectors work</h5>
-    <ul>
-        <li>0 to 50 million talent points at time of purchase = 100% of talent points injected</li>
-        <li>50 to 100 million talent points at time of purchase = 80% of talent points injected</li>
-        <li>100 to 150 million talent points at time of purchase = 60% of talent points injected</li>
-        <li>150 to 250 million talent points at time of purchase = 40% of talent points injected</li>
-        <li>250 million or more talent points at time of purchase = 20% of talent points injected</li>
-    </ul>
-    <p>
-        Overall talent points are the sum of allocated and unallocated talent points. So, if a character has 49,501,000 talent points before injection and two talent injectors (500,000) are used, the amount of talent points he will receive are 900,000. The first talent injector will add 500,000 TP, but as it brings the total amount of talent points to 50,001,000, the character is over the limit and only receives 400,000 TP from the second injector accordingly.
-    </p>
+﻿<!-- Card Content -->
+<div class="space-y-6 p-6">
+    <!-- How Injectors Work -->
+    <div class="space-y-4">
+        <h3 class="text-lg font-semibold text-slate-50">How Injectors Work</h3>
+        <table class="w-full">
+            <thead>
+                <tr>
+                    <th class="text-slate-400 text-left p-2">Current Points Range</th>
+                    <th class="text-slate-400 text-left p-2">Injection Rate</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr class="border-t border-slate-800">
+                    <td class="p-2">0 to 50 million</td>
+                    <td class="p-2 text-primary">100% of purchased talent points</td>
+                </tr>
+                <tr class="border-t border-slate-800">
+                    <td class="p-2">50 to 100 million</td>
+                    <td class="p-2 text-primary">80% of purchased talent points</td>
+                </tr>
+                <tr class="border-t border-slate-800">
+                    <td class="p-2">100 to 150 million</td>
+                    <td class="p-2 text-primary">60% of purchased talent points</td>
+                </tr>
+                <tr class="border-t border-slate-800">
+                    <td class="p-2">150 to 250 million</td>
+                    <td class="p-2 text-primary">40% of purchased talent points</td>
+                </tr>
+                <tr class="border-t border-slate-800">
+                    <td class="p-2">250 million or more</td>
+                    <td class="p-2 text-primary">20% of purchased talent points</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Important Note -->
+    <div class="space-y-2 rounded-md bg-slate-900 p-4">
+        <h4 class="font-medium text-slate-400">Important Note:</h4>
+        <p class="text-sm text-slate-400 leading-relaxed">
+            Overall talent points are the sum of allocated and unallocated talent points. For example, if a character
+            has
+            49,501,000 talent points before injection and two talent injectors (500,000) are used, they will receive
+            900,000
+            points. The first injector adds 500,000 TP, but as this brings the total to 50,001,000, the character only
+            receives 400,000 TP from the second injector.
+        </p>
+    </div>
 </div>
