@@ -30,6 +30,10 @@
     <link href="~/css/style.css" rel="stylesheet">
     <!-- JS Files -->
     <script src="~/js/site.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Select2 CSS and JS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
     <!-- Chartjs -->
     <script src="https://cdn.jsdelivr.net/npm/luxon@3.4.4"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
@@ -155,20 +159,31 @@
     </div>
     <script>
         function toggleDropdown() {
-            document.getElementById("userDropdownMenu").classList.toggle("hidden");
+            const dropdownMenu = document.getElementById("userDropdownMenu");
+            if (dropdownMenu) {
+                dropdownMenu.classList.toggle("hidden");
+            }
         }
 
         // Close dropdown when clicking outside
         window.addEventListener("click", function (e) {
-            const dropdownButton = document.getElementById("userDropdownButton");
-            const dropdownMenu = document.getElementById("userDropdownMenu");
+            try {
+                const dropdownButton = document.getElementById("userDropdownButton");
+                const dropdownMenu = document.getElementById("userDropdownMenu");
 
-            // Check if the click is outside the dropdownButton and dropdownMenu
-            if (!dropdownButton.contains(e.target) && !dropdownMenu.contains(e.target)) {
-                dropdownMenu.classList.add("hidden");
+                // Only proceed if both elements are available
+                if (dropdownButton && dropdownMenu) {
+                    // Check if the click is outside the dropdownButton and dropdownMenu
+                    if (!dropdownButton.contains(e.target) && !dropdownMenu.contains(e.target)) {
+                        dropdownMenu.classList.add("hidden");
+                    }
+                }
+            } catch (error) {
+                console.error("Error in toggleDropdown click handler:", error);
             }
         });
     </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 

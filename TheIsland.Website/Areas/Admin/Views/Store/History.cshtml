@@ -60,8 +60,13 @@
 
 @section Scripts {
     <script>
-        $(function () {
-            var sellTable = $('#sellTable').DataTable();
+        document.addEventListener('DOMContentLoaded', function () {
+            const logsTable = document.getElementById('logs');
+            if (logsTable) {
+                // Apply any necessary JavaScript functionality here if needed
+                // This placeholder is used if you want to add any JavaScript interactions
+                console.log("Logs table loaded successfully.");
+            }
         });
     </script>
 }
