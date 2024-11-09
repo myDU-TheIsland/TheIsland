@@ -78,14 +78,14 @@ namespace TheIsland.Website.Areas.Admin.Controllers.API
             {
                 foreach (var market in markets)
                 {
-                    this._marketBot.SetItemMultiplierRecursive(
+                    await this._marketBot.SetItemMultiplierRecursive(
                         (ulong)market.id,
                         entry.ItemType,
-                        entry.BuyFactor);
-                    this._marketBot.SetItemSellMultiplierRecursive(
+                        entry.BuyFactor).ConfigureAwait(false);
+                    await this._marketBot.SetItemSellMultiplierRecursive(
                         (ulong)market.id,
                         entry.ItemType,
-                        entry.SellFactor);
+                        entry.SellFactor).ConfigureAwait(false);
                 }
             }
 
@@ -94,30 +94,28 @@ namespace TheIsland.Website.Areas.Admin.Controllers.API
 
         [HttpPost]
         [ApiKey]
-        public IActionResult SetPricesToSingleMarket(ulong marketId, [FromBody] IEnumerable<PriceEntry> entries)
+        public async Task<IActionResult> SetPricesToSingleMarket(ulong marketId, [FromBody] IEnumerable<PriceEntry> entries)
         {
             foreach (var entry in entries)
             {
-                this._marketBot.SetItemMultiplierRecursive(
+                await this._marketBot.SetItemMultiplierRecursive(
                     marketId,
                     entry.ItemType,
-                    entry.BuyFactor);
-                this._marketBot.SetItemSellMultiplierRecursive(
+                    entry.BuyFactor).ConfigureAwait(false);
+                await this._marketBot.SetItemSellMultiplierRecursive(
                     marketId,
                     entry.ItemType,
-                    entry.SellFactor);
+                    entry.SellFactor).ConfigureAwait(false);
             }
+
+            return this.Ok();
+        }
 
         [HttpGet]
         [ApiKey]
         public IActionResult GetConfigs()
         {
             return this.Json(this._marketBot.GetConfigs());
-        }
-    }
-}
-
-            return this.Ok();
         }
 
         public class PriceEntry
