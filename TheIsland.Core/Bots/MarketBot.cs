@@ -335,59 +335,6 @@ namespace TheIsland.Core.Bots
             return this.SaveDictionaries();
         }
 
-        private void SetDictionaryMultiplier(ulong marketId, string itemType, double value, ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, double>> inputDictionary)
-        {
-            IGameplayBank bank = this.Bot.GameplayBank;
-            IGameplayDefinition? entry = bank.GetDefinition(itemType);
-
-            if (entry == null)
-            {
-                return;
-            }
-
-            if (entry.GetChildren().Any())
-            {
-                // most likely a category, just continue
-                return;
-            }
-
-            inputDictionary
-                .GetOrAdd(marketId, (key) => new ConcurrentDictionary<ulong, double>())
-                .AddOrUpdate(entry.Id, value, (key, oldValue) => value);
-        }
-
-        private void SetDictionaryMultiplierRecursive(ulong marketId, string itemType, double value, ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, double>> inputDictionary)
-        {
-            IGameplayBank bank = this.Bot.GameplayBank;
-            IGameplayDefinition? baseEntry = bank.GetDefinition(itemType);
-
-            if (baseEntry == null)
-            {
-                return;
-            }
-
-            IEnumerable<ulong> childrenIds = baseEntry.GetChildrenIdsRecursive();
-            foreach (ulong childId in childrenIds)
-            {
-                IGameplayDefinition? entry = bank.GetDefinition(childId);
-
-                if (entry == null)
-                {
-                    continue;
-                }
-
-                if (entry.GetChildren().Any())
-                {
-                    // most likely a category, just continue
-                    continue;
-                }
-
-                inputDictionary
-                    .GetOrAdd(marketId, (key) => new ConcurrentDictionary<ulong, double>())
-                    .AddOrUpdate(childId, value, (key, oldValue) => value);
-            }
-        }
-
         public object GetConfigs()
         {
             void ToDictionary(ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, double>> input, Dictionary<ulong, Dictionary<ulong, double>> output)
@@ -491,6 +438,59 @@ namespace TheIsland.Core.Bots
             catch
             {
                 return;
+            }
+        }
+
+        private void SetDictionaryMultiplier(ulong marketId, string itemType, double value, ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, double>> inputDictionary)
+        {
+            IGameplayBank bank = this.Bot.GameplayBank;
+            IGameplayDefinition? entry = bank.GetDefinition(itemType);
+
+            if (entry == null)
+            {
+                return;
+            }
+
+            if (entry.GetChildren().Any())
+            {
+                // most likely a category, just continue
+                return;
+            }
+
+            inputDictionary
+                .GetOrAdd(marketId, (key) => new ConcurrentDictionary<ulong, double>())
+                .AddOrUpdate(entry.Id, value, (key, oldValue) => value);
+        }
+
+        private void SetDictionaryMultiplierRecursive(ulong marketId, string itemType, double value, ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, double>> inputDictionary)
+        {
+            IGameplayBank bank = this.Bot.GameplayBank;
+            IGameplayDefinition? baseEntry = bank.GetDefinition(itemType);
+
+            if (baseEntry == null)
+            {
+                return;
+            }
+
+            IEnumerable<ulong> childrenIds = baseEntry.GetChildrenIdsRecursive();
+            foreach (ulong childId in childrenIds)
+            {
+                IGameplayDefinition? entry = bank.GetDefinition(childId);
+
+                if (entry == null)
+                {
+                    continue;
+                }
+
+                if (entry.GetChildren().Any())
+                {
+                    // most likely a category, just continue
+                    continue;
+                }
+
+                inputDictionary
+                    .GetOrAdd(marketId, (key) => new ConcurrentDictionary<ulong, double>())
+                    .AddOrUpdate(childId, value, (key, oldValue) => value);
             }
         }
 
