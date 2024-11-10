@@ -11,7 +11,7 @@
     => item.store_item.id == Model.StoreItem.id)?.Sum(item => item.quantity) ?? 0;
 }
 <partial name="_UserData" />
-<div class="max-w-5xl mx-auto">
+<div class="max-w-5xl mx-auto xs:px-3 xs:pb-5">
     <div>
         <div class="col-md-6 ml-auto mr-auto">
             @if (Model.StoreItem.images.Any())
@@ -51,7 +51,7 @@
 
     <div class="w-full bg-darkBlue rounded-md text-gray-100 border border-slate-800">
         <!-- Card Header -->
-        <div class="space-y-1 p-6">
+        <div class="space-y-1 md:p-6 xs:p-3">
             <h2 class="flex items-center gap-2 text-2xl">
                 <!-- Zap Icon -->
                 <img src="/svg/zap.svg" class="w-6 h-6 text-primary" />
@@ -63,7 +63,7 @@
         {
             <partial name="_TalentPointInjectorExplanation" />
         }
-        <div class="flex items-center gap-4 border-t border-slate-800 pt-6 p-6">
+        <div class="flex items-center md:gap-4 xs:gap-1 border-t border-slate-800 pt-6 md:p-6 xs:p-2">
             <div class="flex items-center gap-2">
                 <div class="text-sm font-medium text-slate-400">Price:</div>
                 <div class="text-lg font-semibold text-primary">@Model.StoreItem.price.ToString("n0") &#8463;</div>
@@ -125,7 +125,7 @@
                         <div>
                             <label>Qty</label>
                             <input asp-for="@purchaseModel.Quantity" type="number" min="1" max="@limit" placeholder="Qty"
-                                class="@quantityClass w-24 bg-slate-900 border border-slate-800 text-slate-50 p-2 rounded-md" />
+                                class="@quantityClass md:w-24 xs:w-16 bg-slate-900 border border-slate-800 text-slate-50 p-2 rounded-md" />
                         </div>
                     }
                     <input asp-for="@purchaseModel.ItemId" class="hidden" type="hidden" />

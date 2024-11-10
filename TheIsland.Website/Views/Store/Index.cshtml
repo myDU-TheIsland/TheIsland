@@ -3,7 +3,7 @@
     ViewData["Title"] = "Home Page";
 }
 <partial name="_UserData" />
-<div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+<div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 xs:px-3 xs:pb-5">
     @foreach (var item in Model.StoreItems)
     {
         <div class="bg-darkBlue rounded-lg p-6 flex flex-col items-center text-center ">
