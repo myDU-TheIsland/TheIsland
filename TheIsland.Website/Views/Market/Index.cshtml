@@ -84,20 +84,18 @@
                     @if (botPurchasePrice > 0)
                     {
                         <p class="text-purple-400 mb-4 pb-4">
-                            ⭐ <i>Honjos Minion is buying at
-                                @botPurchasePrice quanta per unit</i> 
-                            
-                            @if (botLimit > 0)
-                            {
-                                    <i>
-                                        @Html.Raw(@$", they will only buy {botLimit.ToString("n0")} units")
-                                        @if (userLimit > 0 && Model.MarketId != 0)
-                                        {
-                                            @Html.Raw(@$"(you can still sell {@userLimit.ToString("n0")} units)")
-                                        }
-                                    </i>
-                            }
-                            ⭐
+                            ⭐ <i>
+                                Honjos Minion is buying at
+                                @botPurchasePrice quanta per unit
+                                @if (botLimit > 0)
+                                {
+                                    @Html.Raw(@$", they will only buy {botLimit.ToString("n0")} units")
+                                    @if (userLimit > 0 && Model.MarketId != 0)
+                                    {
+                                        @Html.Raw(@$" (you can still sell {@userLimit.ToString("n0")} units)")
+                                    }
+                                }
+                            </i> ⭐
                             </p>
                     }
                     <div class="border border-purple-500 w-full"></div>
