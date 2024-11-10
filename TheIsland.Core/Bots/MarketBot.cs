@@ -243,12 +243,18 @@ namespace TheIsland.Core.Bots
                 // loop over all my orders in this market
                 foreach (MarketOrder? order in orders.orders)
                 {
+                    if (order.ownerId.IsOrg())
+                    {
+                        // we don't buy from orgs.
+                        continue;
+                    }
+
                     var playerId = Convert.ToDouble(order.ownerId.playerId);
                     var itemId = Convert.ToDouble(order.itemType);
                     MarketEntry itemData = this.GetAllItemsMarketEntries().First(item => item.Id == itemId);
                     double marketLimit = await this.GetItemLimitAsync(itemId).ConfigureAwait(false);
 
-                    logMessage(@$"This item ({itemData.Name})limit is {marketLimit}!");
+                    logMessage(@$"This item ({itemData.Name}) limit is {marketLimit}!");
                     if (await this._dualPlayerRepository.IsBotByPlayerId(playerId).ConfigureAwait(false))
                     {
                         // we don't purchase from bots
