@@ -15,6 +15,14 @@ namespace TheIsland.Core.Services.SQL
         {
         }
 
+        public async Task<bool> IsBotByPlayerId(double playerId, CancellationToken cancellationToken = default)
+        {
+            using (DbConnection databaseConnection = this.GetConnection())
+            {
+                return await databaseConnection.ExecuteScalarAsync<bool>("SELECT COALESCE(player.is_bot, false) as is_bot FROM public.ownership LEFT JOIN public.player ON ownership.player_id = player.id WHERE  ownership.player_id = @playerId;", new { playerId }).ConfigureAwait(false);
+            }
+        }
+
         public async Task<DualPlayer?> FindByDisplayName(string displayName, CancellationToken cancellationToken = default)
         {
             using (DbConnection databaseConnection = this.GetConnection())

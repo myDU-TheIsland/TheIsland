@@ -9,7 +9,7 @@ namespace TheIsland.Core.Entities
     [Table("public.market_buy_limit")]
     public class MarketBuyLimit : DatabaseEntity
     {
-        public double item_id { get; set; } = 0;
+        public string filter { get; set; } = string.Empty;
 
         public double quantity { get; set; } = 0;
     }

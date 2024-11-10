@@ -4,7 +4,7 @@
         <name>TheIsland.Core</name>
     </assembly>
     <members>
-        <member name="M:TheIsland.Core.Bots.GeneralBot.GetListOfSellableItems">
+        <member name="M:TheIsland.Core.Bots.MarketBot.GetListOfSellableItems">
             <summary>
             Gets a list of all sellible items on the market.
             </summary>
@@ -162,6 +162,11 @@
             </summary>
         </member>
         <member name="P:TheIsland.Core.Settings.MarketBotConfig.HotTimeMarkets">
+            <summary>
+            Gets or sets list of markets hot time events can happen at.
+            </summary>
+        </member>
+        <member name="P:TheIsland.Core.Settings.MarketBotConfig.LimitBracket">
             <summary>
             Gets or sets list of markets hot time events can happen at.
             </summary>

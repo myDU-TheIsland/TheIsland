@@ -6,6 +6,7 @@ namespace TheIsland.Website.Areas.Admin.Controllers
 {
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
+    using StackExchange.Exceptional;
     using TheIsland.Core.Services;
     using TheIsland.Website.Classes;
 
@@ -23,5 +24,7 @@ namespace TheIsland.Website.Areas.Admin.Controllers
         {
             return this.View();
         }
+
+        public Task Exceptions() => ExceptionalMiddleware.HandleRequestAsync(this.HttpContext);
     }
 }

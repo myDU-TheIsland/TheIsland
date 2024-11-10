@@ -19,18 +19,10 @@ namespace TheIsland.Core.Bots
 
     public interface IGeneralBot : IBotClient
     {
-        #region General Functions
-        List<MarketEntry> GetMarketHierarchy(bool forceRefresh = false);
-
-        Dictionary<double, string> GetListOfSellableItems();
-        #endregion
-
         #region Admin Functions
         Task<List<string>> GiveTalentPoints(double amount);
 
         Task<List<string>> GiveAllQuanta(double amount, string note);
-
-        List<KeyValuePair<string, double>> GetAllItems();
 
         Task<List<string>> RespecEntireCategoryForAllPlayers(string category);
         #endregion
@@ -42,85 +34,11 @@ namespace TheIsland.Core.Bots
 
         private readonly DualUniverseSettings _dualUniverseSettings;
 
-        private List<MarketEntry> _marketEntries { get; set; } = new List<MarketEntry>();
-
-        private ConcurrentDictionary<double, string> ItemsForSale { get; set; } = new ConcurrentDictionary<double, string>();
-
         public GeneralBot(DualPlayerRepository dualPlayerRepository, DualUniverseSettings settings, ILogger<IGeneralBot> logger) : base(settings.WebsiteBot, logger)
         {
             this._dualUniverseSettings = settings;
             this._dualPlayerRepository = dualPlayerRepository;
         }
-
-        #region General Functions
-        public List<MarketEntry> GetMarketHierarchy(bool forceRefresh = false)
-        {
-            if (this._marketEntries.Count != 0 && !forceRefresh)
-            {
-                return this._marketEntries;
-            }
-
-            List<MarketEntry> output = new List<MarketEntry>();
-
-            IGameplayBank bank = this.Bot.GameplayBank;
-
-            foreach (ulong headerId in this._dualUniverseSettings.MarketHeaderIds)
-            {
-                IGameplayDefinition? baseEntry = bank.GetDefinition(headerId);
-
-                if (baseEntry == null)
-                {
-                    continue;
-                }
-
-                MarketEntry marketEntry = new MarketEntry()
-                {
-                    Id = headerId,
-                    Name = baseEntry.Name,
-                    DisplayName = baseEntry.LocalizedProperties.FirstOrDefault(item => item.Name == "displayName").Translation.ToString() ?? string.Empty,
-                };
-
-                IEnumerable<IGameplayDefinition> childrenObjects = baseEntry.GetChildren();
-
-                if (childrenObjects != null && childrenObjects.Any())
-                {
-                    ulong[] childrenIds = childrenObjects.Select(item => item.Id).ToArray();
-
-                    marketEntry.Children = this.GetChildren(childrenIds, bank);
-                }
-
-                if (marketEntry.Children.Count() == 0)
-                {
-                    this.ItemsForSale.TryAdd(marketEntry.Id, marketEntry.DisplayName);
-                }
-
-                output.Add(marketEntry);
-            }
-
-            this._marketEntries = new List<MarketEntry>(output);
-            return output;
-        }
-
-        public List<KeyValuePair<string, double>> GetAllItems()
-        {
-            var allItems = this.Bot.GameplayBank.GetDefinitions();
-            return allItems.Select(item => new KeyValuePair<string, double>(item.Name, item.Id)).ToList();
-        }
-
-        /// <summary>
-        /// Gets a list of all sellible items on the market.
-        /// </summary>
-        /// <returns></returns>
-        public Dictionary<double, string> GetListOfSellableItems()
-        {
-            if (this.ItemsForSale.Count == 0)
-            {
-                this.GetMarketHierarchy();
-            }
-
-            return this.ItemsForSale.ToDictionary();
-        }
-        #endregion
 
         #region Admin Functions
         public async Task<List<string>> GiveTalentPoints(double amount)
@@ -136,7 +54,7 @@ namespace TheIsland.Core.Bots
             {
                 IEnumerable<Entities.DualPlayer> players = await this._dualPlayerRepository.GetAsync().ConfigureAwait(false);
 
-                await this.BotConnectionTest().ConfigureAwait(false);
+                await this.BotConnectionTestAsync().ConfigureAwait(false);
 
                 foreach (Entities.DualPlayer player in players)
                 {
@@ -181,7 +99,7 @@ namespace TheIsland.Core.Bots
 
                 IEnumerable<Entities.DualPlayer> players = await this._dualPlayerRepository.GetAsync().ConfigureAwait(false);
 
-                await this.BotConnectionTest().ConfigureAwait(false);
+                await this.BotConnectionTestAsync().ConfigureAwait(false);
 
                 Currency wallet = await this.Bot.Req.GetWallet().ConfigureAwait(false);
 
@@ -274,62 +192,6 @@ namespace TheIsland.Core.Bots
             }
 
             return log;
-        }
-        #endregion
-
-        #region Private Functions
-
-        private List<MarketEntry> GetChildren(ulong[] children, IGameplayBank bank)
-        {
-            List<MarketEntry> output = new List<MarketEntry>();
-
-            foreach (ulong childId in children)
-            {
-                IGameplayDefinition? baseEntry = bank.GetDefinition(childId);
-
-                if (baseEntry == null)
-                {
-                    continue;
-                }
-
-                string displayName = baseEntry.LocalizedProperties?.FirstOrDefault(item => item.Name == "displayName").Translation?.ToString() ?? string.Empty;
-                bool hidden = baseEntry.GetStaticPropertyOpt("hidden")?.boolValue ?? false;
-                string size = baseEntry.GetStaticPropertyOpt("scale")?.stringValue ?? string.Empty;
-                if (string.IsNullOrEmpty(displayName) || hidden)
-                {
-                    continue;
-                }
-
-                if (!string.IsNullOrEmpty(size))
-                {
-                    size = $@" {size.ToUpper()}";
-                }
-
-                MarketEntry marketEntry = new MarketEntry()
-                {
-                    Id = childId,
-                    Name = baseEntry.Name,
-                    DisplayName = $@"{displayName}{size}",
-                };
-
-                IEnumerable<IGameplayDefinition> childrenObjects = baseEntry.GetChildren();
-
-                if (childrenObjects != null && childrenObjects.Any())
-                {
-                    ulong[] childrenIds = childrenObjects.Select(item => item.Id).ToArray();
-
-                    marketEntry.Children = this.GetChildren(childrenIds, bank);
-                }
-
-                if (marketEntry.Children.Count() == 0)
-                {
-                    this.ItemsForSale.TryAdd(marketEntry.Id, marketEntry.DisplayName);
-                }
-
-                output.Add(marketEntry);
-            }
-
-            return output;
         }
         #endregion
     }

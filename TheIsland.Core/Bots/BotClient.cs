@@ -35,13 +35,13 @@ namespace TheIsland.Core.Bots
 
         Client Bot { get; }
 
-        Task BotConnectionTest();
+        Task BotConnectionTestAsync();
 
-        Task SendMessage(ulong who, string message);
+        Task SendMessageAsync(ulong who, string message);
 
-        Task<string> GetConstructName(ulong constructId);
+        Task<string> GetConstructNameAsync(ulong constructId);
 
-        Task<string> SetConstructName(ulong constructId, string name);
+        Task<string> SetConstructNameAsync(ulong constructId, string name);
     }
 
     public class BotClient : IBotClient
@@ -100,7 +100,7 @@ namespace TheIsland.Core.Bots
             return Client.FromFactory(this.RestDuClientFactory, pi, allowExising: true);
         }
 
-        public async Task BotConnectionTest()
+        public async Task BotConnectionTestAsync()
         {
             try
             {
@@ -119,9 +119,9 @@ namespace TheIsland.Core.Bots
             }
         }
 
-        public async Task SendMessage(ulong who, string message)
+        public async Task SendMessageAsync(ulong who, string message)
         {
-            await this.BotConnectionTest().ConfigureAwait(false);
+            await this.BotConnectionTestAsync().ConfigureAwait(false);
             await this.Bot.Req.ChatMessageSend(new MessageContent
             {
                 channel = new MessageChannel
@@ -133,9 +133,9 @@ namespace TheIsland.Core.Bots
             }).ConfigureAwait(false);
         }
 
-        public async Task<string> GetConstructName(ulong constructId)
+        public async Task<string> GetConstructNameAsync(ulong constructId)
         {
-            await this.BotConnectionTest().ConfigureAwait(false);
+            await this.BotConnectionTestAsync().ConfigureAwait(false);
             try
             {
                 ConstructTree results = await this.Bot.Req.ConstructTreeGet(constructId).ConfigureAwait(false);
@@ -148,9 +148,9 @@ namespace TheIsland.Core.Bots
             }
         }
 
-        public async Task<string> SetConstructName(ulong constructId, string name)
+        public async Task<string> SetConstructNameAsync(ulong constructId, string name)
         {
-            await this.BotConnectionTest().ConfigureAwait(false);
+            await this.BotConnectionTestAsync().ConfigureAwait(false);
             try
             {
                 await this.Bot.Req.ConstructRename(new ConstructNameSet()

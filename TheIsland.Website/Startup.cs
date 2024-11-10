@@ -19,6 +19,7 @@ namespace TheIsland.Website
     using Microsoft.Extensions.Options;
     using Microsoft.IdentityModel.Logging;
     using Microsoft.OpenApi.Models;
+    using StackExchange.Exceptional.Stores;
     using TheIsland.Core;
     using TheIsland.Core.Bots;
     using TheIsland.Core.Services;
@@ -90,8 +91,17 @@ namespace TheIsland.Website
         /// </summary>
         public IWebHostEnvironment HostingEnvironment { get; }
 
+        public string AppName => this.HostingEnvironment.IsDevelopment() ? "TheIsland.Website.Local" : "TheIsland.Website";
+
         public void ConfigureServices(IServiceCollection services)
         {
+            string appName = this.HostingEnvironment.IsDevelopment() ? ".dev" : string.Empty;
+
+            services.AddExceptional(settings =>
+            {
+                settings.DefaultStore = new PostgreSqlErrorStore($@"{SiteSettings.Postgres.GetConnectionString()}Database={SiteSettings.Postgres.Database};", this.AppName);
+            });
+
             services.Configure<KestrelServerOptions>(options =>
             {
                 options.Limits.MaxRequestBodySize = int.MaxValue;
@@ -218,6 +228,8 @@ namespace TheIsland.Website
             GlobalConfiguration.Configuration
                 .UseActivator(new HangfireActivator(serviceProvider));
 
+            app.UseExceptional();
+
             // Configure the HTTP request pipeline.
             if (!this.HostingEnvironment.IsDevelopment())
             {
@@ -283,7 +295,7 @@ namespace TheIsland.Website
 
             if (!this.HostingEnvironment.IsDevelopment())
             {
-                RecurringJob.AddOrUpdate("buyStuff", (IMarketBot client) => client.BuyStuff(0), Cron.Minutely, options: recurringJobOptions);
+                RecurringJob.AddOrUpdate("buyStuff", (IMarketBot client) => client.BuyStuffAsync(0), Cron.Minutely, options: recurringJobOptions);
                 RecurringJob.AddOrUpdate("hotTime", (MarketService service) => service.HotTimeEvent(), "0 */3 * * *", options: recurringJobOptions);
             }
         }

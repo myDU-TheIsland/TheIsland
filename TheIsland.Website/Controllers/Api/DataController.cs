@@ -30,7 +30,7 @@ namespace TheIsland.Website.Controllers.Api
         [HttpGet]
         public IActionResult GetItems(string type = "JSON")
         {
-            var items = this._generalBot.GetAllItems();
+            var items = this._marketBot.GetAllItems();
             switch (type)
             {
                 case "csv":

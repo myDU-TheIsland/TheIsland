@@ -56,7 +56,7 @@ namespace TheIsland.Core.Services
         private readonly StoreItemRepository _storeItemRepository;
         private readonly StorePurchaseHistoryRepository _storePurchaseHistoryRepository;
 
-        private Task ConnectionTest() => this._bot.BotConnectionTest();
+        private Task ConnectionTest() => this._bot.BotConnectionTestAsync();
 
         public StoreService(DualPlayerRepository dualPlayerRepository, StorePurchaseHistoryRepository storePurchaseHistoryRepository, StoreItemRepository storeItemRepository, DualUniverseSettings settings, IGeneralBot bot)
         {
