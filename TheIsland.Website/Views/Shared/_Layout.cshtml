@@ -184,6 +184,11 @@
         });
     </script>
 
+    <script type="text/javascript">
+        $("#playerSelection").on("change", function () {
+            $("#playerChange").trigger("submit");
+        });
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 
