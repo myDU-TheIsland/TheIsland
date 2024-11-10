@@ -29,53 +29,32 @@
             <nav class="bg-darkBlue p-2 rounded-lg shadow-lg border border-purple-500/30">
                 <div class="flex items-center space-x-2">
 
-                    <div class="relative w-1/3">
-                        <!-- Item Dropdown with Search Input -->
-                        <input type="text" id="dropdownSearch" autocomplete="off" placeholder="Search Item..."
-                            class="block w-full px-4 py-2 text-white bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600"
-                            onfocus="showDropdown('dropdownMenu')" onkeyup="debouncedFilterOptions()">
-                        <input type="hidden" asp-for="ItemId" id="selectedItemId" name="ItemId">
-                        <div class="absolute z-10 mt-2 w-full bg-[#2a2a3e] rounded-md shadow-lg max-h-80 overflow-y-auto hidden"
-                            id="dropdownMenu">
-                            <ul id="dropdownOptions">
-                                @foreach (var item in items)
-                                {
-                                    <li class="px-4 py-2 text-white hover:bg-purple-600 cursor-pointer"
-                                        data-value="@item.Key"
-                                        onclick="selectOption('@item.Value.Replace("'", "\\'")', '@item.Key', 'dropdownSearch', 'dropdownMenu')">
-                                        @item.Value
-                                    </li>
-                                }
-                            </ul>
-                        </div>
+                    <div class="relative w-1/3 dropdown-container">
+                        <!-- Item Dropdown with Search (using Select2) -->
+                        <select asp-for="ItemId" id="dropdownSearch"
+                            class="block w-full px-4 py-2 text-white bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600">
+                            <option value="">Search Item...</option>
+                            @foreach (var item in items)
+                            {
+                                <option value="@item.Key">@item.Value</option>
+                            }
+                        </select>
                     </div>
 
-                    <div class="relative w-1/3">
-                        <!-- Market Dropdown with Search Input -->
-                        <input type="text" id="marketSearch" autocomplete="off" placeholder="Select Market..."
-                            value="All Markets" class="block w-full px-4 py-2 text-white bg-gray-700 rounded-md focus:outline-none focus:ring-2
-                        focus:ring-purple-600" onfocus="showDropdown('marketDropDown')"
-                            onkeyup="debouncedMarketFilter()">
-                        <!-- Hidden input to store selected market ID -->
-                        <input type="hidden" id="selectedMarketId" name="MarketId" value="0">
-                        <!-- Default value 0 (All Markets) -->
-                        <div class="absolute z-10 mt-2 w-full bg-[#2a2a3e] rounded-md shadow-lg max-h-80 overflow-y-auto hidden"
-                            id="marketDropDown">
-                            <ul id="marketOptions">
-                                @foreach (var market in markets.OrderBy(item => item.Value).ToArray())
-                                {
-                                    <li class="px-4 py-2 text-white hover:bg-purple-600 cursor-pointer"
-                                        data-value="@market.Key"
-                                        onclick="selectOption('@market.Value', '@market.Key', 'marketSearch', 'marketDropDown')">
-                                        @market.Value
-                                    </li>
-                                }
-                            </ul>
-                        </div>
+                    <div class="relative w-1/3 dropdown-container-2">
+                        <!-- Market Dropdown using Select2 -->
+                        <select asp-for="MarketId" id="marketSearch" name="MarketId"
+                            class="block w-full px-4 py-2 text-white bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600">
+                            <option value="0">All Markets</option> <!-- Default option for All Markets -->
+                            @foreach (var market in markets.OrderBy(item => item.Value).ToArray())
+                            {
+                                <option value="@market.Key">@market.Value</option>
+                            }
+                        </select>
                     </div>
 
                     <!-- Search Button -->
-                    <button onclick="updateMarketPage()"
+                    <button id="btnSearch"
                         class="px-4 py-2 bg-purple-600 rounded-md text-white hover:bg-purple-500 ml-2">Search</button>
 
                     <!-- Hidden inputs to store selected IDs -->
@@ -121,17 +100,21 @@
                             <table class="w-full">
                                 <thead>
                                     <tr class="border-b border-purple-500 text-left text-purple-400">
-                                        <th class="pb-2 w-1/3">Unit Price <span class="inline-block ml-1">▲▼</span></th>
-                                        <th class="pb-2 w-1/3">Quantity <span class="inline-block ml-1">▲▼</span></th>
-                                        <th class="pb-2 w-1/3">Market <span class="inline-block ml-1">▲▼</span></th>
+                                        <th class="pb-2 w-1/3 sortable cursor-pointer" data-column="price"
+                                            data-target="buyOrdersTable">Unit Price <span
+                                                class="inline-block ml-1">▲▼</span></th>
+                                        <th class="pb-2 w-1/3 sortable cursor-pointer" data-column="quantity"
+                                            data-target="buyOrdersTable">Quantity <span class="inline-block ml-1">▲▼</span>
+                                        </th>
+                                        <th class="pb-2 w-1/3 sortable cursor-pointer" data-column="market"
+                                            data-target="buyOrdersTable">Market <span class="inline-block ml-1">▲▼</span>
+                                        </th>
                                     </tr>
                                 </thead>
                             </table>
-
                             <div class="overflow-y-auto max-h-80">
                                 <table class="w-full">
-                                    <tbody class="text-white">
-                                        @* Buy order rows *@
+                                    <tbody id="buyOrdersTable" class="text-white">
                                         @foreach (var buyOrder in buyOrders)
                                         {
                                             <tr class="border-b border-purple-500/40">
@@ -155,13 +138,18 @@
                             <table class="w-full">
                                 <thead class="bg-darkBlue">
                                     <tr class="border-b border-purple-500 text-left text-purple-400">
-                                        <th class="pb-2 w-1/3">Unit Price <span class="inline-block ml-1">▲▼</span></th>
-                                        <th class="pb-2 w-1/3">Quantity <span class="inline-block ml-1">▲▼</span></th>
-                                        <th class="pb-2 w-1/3">Market <span class="inline-block ml-1">▲▼</span></th>
+                                        <th class="pb-2 w-1/3 sortable cursor-pointer" data-column="price"
+                                            data-target="sellOrdersTable">Unit Price <span
+                                                class="inline-block ml-1">▲▼</span></th>
+                                        <th class="pb-2 w-1/3 sortable cursor-pointer" data-column="quantity"
+                                            data-target="sellOrdersTable">Quantity <span class="inline-block ml-1">▲▼</span>
+                                        </th>
+                                        <th class="pb-2 w-1/3 sortable cursor-pointer" data-column="market"
+                                            data-target="sellOrdersTable">Market <span class="inline-block ml-1">▲▼</span>
+                                        </th>
                                     </tr>
                                 </thead>
                             </table>
-
                             <div class="overflow-y-auto max-h-80">
                                 <table class="w-full">
                                     <tbody id="sellOrdersTable" class="text-white">
@@ -177,6 +165,7 @@
                                 </table>
                             </div>
                         </div>
+
                     </div>
 
                 </div>
@@ -186,110 +175,115 @@
 
 </div>
 <script>
-    function showDropdown(dropdownId) {
-        const dropdown = document.getElementById(dropdownId);
-        if (dropdown) dropdown.classList.remove('hidden');
-    }
+    $(window).on('load', function () {
+        // Initialize Select2 for Item dropdown
+        $('#dropdownSearch').select2({
+            placeholder: "Search Item...",
+            allowClear: true,
+            dropdownParent: $('.dropdown-container')
+        }).on('select2:open', function () {
+            focusSelect2SearchField('#dropdownSearch');
+        });
 
-    function selectOption(text, value, inputId, dropdownId) {
-        const inputElement = document.getElementById(inputId);
-        const dropdown = document.getElementById(dropdownId);
-
-        if (inputElement) {
-            inputElement.value = text; // Show selected name in the input field
-            if (inputId === 'dropdownSearch') {
-                document.getElementById('selectedItemId').value = value; // Store item ID in hidden input to bind to model
-            } else if (inputId === 'marketSearch') {
-                document.getElementById('selectedMarketId').value = value; // Store market ID in hidden input to bind to model
-            }
-        }
-        if (dropdown) dropdown.classList.add('hidden');
-    }
-
-    function updateMarketPage() {
-        const itemId = document.getElementById('selectedItemId').value || ""; // Get item ID from hidden input
-        const marketId = document.getElementById('selectedMarketId').value || "0"; // Get market ID from hidden input
-
-        if (!itemId) {
-            console.log("No item selected");
-            return; // Exit if no item is selected
-        }
-
-        // Redirect based on selected item and market ID without changing the display value
-        if (marketId === "0") {
-            window.location.replace(`/Market/${itemId}`);
-        } else {
-            window.location.replace(`/Market/${itemId}/${marketId}`);
-        }
-    }
-
-    document.addEventListener("DOMContentLoaded", function () {
-        // Set default selection for the market dropdown
-        const marketSearchInput = document.getElementById('marketSearch');
-        const selectedMarketIdInput = document.getElementById('selectedMarketId');
-
-        // Set the displayed text to "All Markets" and hidden value to 0
-        marketSearchInput.value = "All Markets";
-        selectedMarketIdInput.value = "0";
+        // Initialize Select2 for Market dropdown
+        $('#marketSearch').select2({
+            placeholder: "Search Markets...",
+            allowClear: true,
+            dropdownParent: $('.dropdown-container-2')
+        }).on('select2:open', function () {
+            focusSelect2SearchField('#marketSearch');
+        });
     });
 
-    document.addEventListener("DOMContentLoaded", function () {
-        const dropdownSearch = document.getElementById('dropdownSearch');
-        const dropdownMenu = document.getElementById('dropdownMenu');
-        const marketSearch = document.getElementById('marketSearch');
-        const marketDropDown = document.getElementById('marketDropDown');
+    $(document).ready(function () {
+        // On Search button click, determine URL based on selected values
+        $("#btnSearch").on("click", function () {
+            // Get selected item and market values
+            var itemId = $("#dropdownSearch").val();
+            var marketId = $("#marketSearch").val();
 
-        // Filter function for items
-        function filterOptions() {
-            if (!dropdownMenu) return;
-            const filter = dropdownSearch.value.toLowerCase();
-            const dropdownOptions = dropdownMenu.getElementsByTagName('li');
-
-            for (let i = 0; i < dropdownOptions.length; i++) {
-                const txtValue = dropdownOptions[i].textContent || dropdownOptions[i].innerText;
-                dropdownOptions[i].style.display = txtValue.toLowerCase().includes(filter) ? '' : 'none';
-            }
-        }
-
-        // Filter function for markets
-        function filterMarketOptions() {
-            if (!marketDropDown) return;
-            const filter = marketSearch.value.toLowerCase();
-            const marketOptions = marketDropDown.getElementsByTagName('li');
-
-            for (let i = 0; i < marketOptions.length; i++) {
-                const txtValue = marketOptions[i].textContent || marketOptions[i].innerText;
-                marketOptions[i].style.display = txtValue.toLowerCase().includes(filter) ? '' : 'none';
-            }
-        }
-
-        // Debounce function to optimize search
-        function debounce(func, delay) {
-            let debounceTimeout;
-            return function (...args) {
-                clearTimeout(debounceTimeout);
-                debounceTimeout = setTimeout(() => func.apply(this, args), delay);
-            };
-        }
-
-        const debouncedFilterOptions = debounce(filterOptions, 300);
-        const debouncedMarketFilter = debounce(filterMarketOptions, 300);
-
-        if (dropdownSearch) dropdownSearch.addEventListener('keyup', debouncedFilterOptions);
-        if (marketSearch) marketSearch.addEventListener('keyup', debouncedMarketFilter);
-
-        // Close dropdown if clicking outside
-        document.addEventListener('click', (event) => {
-            if (dropdownMenu && !event.target.closest('#dropdownSearch') && !event.target.closest('#dropdownMenu')) {
-                dropdownMenu.classList.add('hidden');
-            }
-            if (marketDropDown && !event.target.closest('#marketSearch') && !event.target.closest('#marketDropDown')) {
-                marketDropDown.classList.add('hidden');
+            // Check if item is selected (non-zero) and perform the redirect
+            if (itemId == 0) return; // Exit if no item is selected
+            if (marketId == 0) {
+                // Redirect to /Market/{itemId} if no market selected
+                window.location.replace("/Market/" + itemId);
+            } else if (marketId > 0) {
+                // Redirect to /Market/{itemId}/{marketId} if market selected
+                window.location.replace("/Market/" + itemId + "/" + marketId);
             }
         });
     });
 
+    // Function to focus the Select2 search field using MutationObserver
+    function focusSelect2SearchField(select2Id) {
+        // Set up MutationObserver to detect when the dropdown is open
+        const observer = new MutationObserver(() => {
+            const searchField = document.querySelector('.select2-container--open .select2-search__field');
+            if (searchField) {
+                searchField.focus();
+                observer.disconnect(); // Stop observing once focused
+            }
+        });
+
+        // Observe changes to the body to detect dropdown open state
+        observer.observe(document.body, { childList: true, subtree: true });
+    }
+
+    $(document).ready(function () {
+        // Track current sort order for each table and column
+        let sortOrder = {};
+
+        // Function to sort table rows based on a column and order
+        function sortTable(tableId, column, order) {
+            const rows = $('#' + tableId + ' tr').get();
+
+            rows.sort(function (a, b) {
+                const cellA = $(a).children('td').eq(column).text();
+                const cellB = $(b).children('td').eq(column).text();
+
+                let valA = column === 0 || column === 1 ? parseFloat(cellA) : cellA;
+                let valB = column === 0 || column === 1 ? parseFloat(cellB) : cellB;
+
+                if (order === 'asc') {
+                    return valA > valB ? 1 : valA < valB ? -1 : 0;
+                } else {
+                    return valA < valB ? 1 : valA > valB ? -1 : 0;
+                }
+            });
+
+            // Append sorted rows back to the table
+            $.each(rows, function (index, row) {
+                $('#' + tableId).append(row);
+            });
+        }
+
+        // Event listeners for sorting when header is clicked
+        $('.sortable').on('click', function () {
+            const column = $(this).index(); // Column index
+            const targetTable = $(this).data('target'); // Target table ID
+            const columnName = $(this).data('column'); // Column name
+
+            // Initialize sort order if not set
+            if (!sortOrder[targetTable]) {
+                sortOrder[targetTable] = {};
+            }
+            if (!sortOrder[targetTable][columnName]) {
+                sortOrder[targetTable][columnName] = 'asc';
+            } else {
+                // Toggle sort order
+                sortOrder[targetTable][columnName] = sortOrder[targetTable][columnName] === 'asc' ? 'desc' : 'asc';
+            }
+
+            // Update sort indicator
+            $(`[data-target="${targetTable}"] span`).text('▲▼'); // Reset other columns
+            $(this).find('span').text(sortOrder[targetTable][columnName] === 'asc' ? '▲' : '▼');
+
+            // Sort the table based on selected column and order
+            sortTable(targetTable, column, sortOrder[targetTable][columnName]);
+        });
+    });
 </script>
+
 @if (itemExists)
 {
     string uri = "";
@@ -303,109 +297,114 @@
     }
     <text>
         <script>
-            const uri = "@uri";
+            $(document).ready(function () {
+                const uri = "@uri";
 
-            // Chart.js for displaying price trends
-            const ctx = document.getElementById('priceChart').getContext('2d');
+                // Chart.js for displaying price trends
+                const ctx = document.getElementById('priceChart').getContext('2d');
 
-            // Initialize an empty Chart.js chart
-            const priceChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: [], // Labels will be populated dynamically
-                    datasets: [
-                        {
-                            label: 'Total Sold',
-                            data: [], // Data will be populated dynamically
-                            borderColor: '#8884d8',
-                            backgroundColor: 'rgba(136, 132, 216, 0.2)',
-                            yAxisID: 'y1',
-                            tension: 0.4,
-                            pointRadius: 5,
-                            pointBackgroundColor: '#8884d8',
-                        },
-                        {
-                            label: 'Average Price',
-                            data: [], // Data will be populated dynamically
-                            borderColor: '#82ca9d',
-                            backgroundColor: 'rgba(130, 202, 157, 0.2)',
-                            yAxisID: 'y2',
-                            tension: 0.4,
-                            pointRadius: 5,
-                            pointBackgroundColor: '#82ca9d',
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Day'
-                            }
-                        },
-                        y1: {
-                            type: 'linear',
-                            position: 'left',
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Total Sold'
-                            }
-                        },
-                        y2: {
-                            type: 'linear',
-                            position: 'right',
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Average Price'
+                // Initialize an empty Chart.js chart
+                const priceChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: [], // Labels will be populated dynamically
+                        datasets: [
+                            {
+                                label: 'Total Sold',
+                                data: [], // Data will be populated dynamically
+                                borderColor: '#8884d8',
+                                backgroundColor: 'rgba(136, 132, 216, 0.2)',
+                                yAxisID: 'y1',
+                                tension: 0.4,
+                                pointRadius: 5,
+                                pointBackgroundColor: '#8884d8',
                             },
-                            grid: {
-                                drawOnChartArea: false // Prevent grid lines from overlapping
+                            {
+                                label: 'Average Price',
+                                data: [], // Data will be populated dynamically
+                                borderColor: '#82ca9d',
+                                backgroundColor: 'rgba(130, 202, 157, 0.2)',
+                                yAxisID: 'y2',
+                                tension: 0.4,
+                                pointRadius: 5,
+                                pointBackgroundColor: '#82ca9d',
                             }
-                        }
+                        ]
                     },
-                    plugins: {
-                        legend: {
-                            display: true,
-                            position: 'top'
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Day'
+                                }
+                            },
+                            y1: {
+                                type: 'linear',
+                                position: 'left',
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Total Sold'
+                                }
+                            },
+                            y2: {
+                                type: 'linear',
+                                position: 'right',
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Average Price'
+                                },
+                                grid: {
+                                    drawOnChartArea: false // Prevent grid lines from overlapping
+                                }
+                            }
                         },
-                        tooltip: {
-                            mode: 'index',
-                            intersect: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                            }
                         }
                     }
+                });
+
+                // Fetch data and update the chart using jQuery's AJAX
+                function fetchDataAndRenderChart() {
+                    $.ajax({
+                        url: uri,
+                        method: 'GET',
+                        dataType: 'json',
+                        success: function (realData) {
+                            // Transform the data
+                            const labels = realData.labels;
+                            const totalSoldData = realData.datasets[0].data;
+                            const averagePriceData = realData.datasets[1].data;
+
+                            // Update chart data
+                            priceChart.data.labels = labels;
+                            priceChart.data.datasets[0].data = totalSoldData;
+                            priceChart.data.datasets[1].data = averagePriceData;
+
+                            // Refresh chart
+                            priceChart.update();
+                        },
+                        error: function (xhr, status, error) {
+                            console.error('Error fetching chart data:', error);
+                        }
+                    });
                 }
+
+                // Fetch data and render chart on page load
+                fetchDataAndRenderChart();
             });
-
-            // Fetch data and update the chart
-            async function fetchDataAndRenderChart() {
-                try {
-                    const response = await fetch(uri);
-                    const realData = await response.json();
-
-                    // Transform the data
-                    const labels = realData.labels;
-                    const totalSoldData = realData.datasets[0].data;
-                    const averagePriceData = realData.datasets[1].data;
-
-                    // Update chart data
-                    priceChart.data.labels = labels;
-                    priceChart.data.datasets[0].data = totalSoldData;
-                    priceChart.data.datasets[1].data = averagePriceData;
-
-                    // Refresh chart
-                    priceChart.update();
-                } catch (error) {
-                    console.error('Error fetching chart data:', error);
-                }
-            }
-
-            // Fetch data and render chart on page load
-            window.onload = fetchDataAndRenderChart;
         </script>
     </text>
 }

@@ -284,7 +284,6 @@ namespace TheIsland.Website
             if (!this.HostingEnvironment.IsDevelopment())
             {
                 RecurringJob.AddOrUpdate("buyStuff", (IMarketBot client) => client.BuyStuff(0), Cron.Minutely, options: recurringJobOptions);
-                RecurringJob.AddOrUpdate("sellStuff", (MarketService service) => service.SellAllMarketsContainerContents(), Cron.Hourly, options: recurringJobOptions);
                 RecurringJob.AddOrUpdate("hotTime", (MarketService service) => service.HotTimeEvent(), "0 */3 * * *", options: recurringJobOptions);
             }
         }

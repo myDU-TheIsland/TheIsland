@@ -265,6 +265,8 @@ SoftripNext.STServerWeb.WebApi/[Ii]ssue[Mm]anager.json
 !wwwroot/css/tailwind.css
 
 *.lock.json
+.vscode
+global.json
 
 #Don't commit any templates other than DEFAULT
 .idea/

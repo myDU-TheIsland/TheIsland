@@ -226,18 +226,18 @@
             row.classList.add("bg-gray-700", "text-gray-100");
 
             row.innerHTML = `
-                                                                                            <td class="p-2">
-                                                                                                <select class="selectpicker w-full bg-gray-600 border border-gray-500 rounded-md p-2 text-gray-100" id="StoreItem_content_Skins_${lastRow}__Key" name="StoreItem.content.Skins[${lastRow}].Key">
-                                                                                                    <option value="">Loading...</option>
-                                                                                                </select>
-                                                                                            </td>
-                                                                                            <td class="p-2">
-                                                                                                <input class="w-full bg-gray-600 border border-gray-500 rounded-md p-2 text-gray-100" type="text" id="StoreItem_content_Skins_${lastRow}__Value" name="StoreItem.content.Skins[${lastRow}].Value" value="">
-                                                                                            </td>
-                                                                                            <td class="p-2 text-center">
-                                                                                                <a class="delete text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></a>
-                                                                                            </td>
-                                                                                        `;
+                    <td class="p-2">
+                        <select class="selectpicker w-full bg-gray-600 border border-gray-500 rounded-md p-2 text-gray-100" id="StoreItem_content_Skins_${lastRow}__Key" name="StoreItem.content.Skins[${lastRow}].Key">
+                            <option value="">Loading...</option>
+                        </select>
+                    </td>
+                    <td class="p-2">
+                        <input class="w-full bg-gray-600 border border-gray-500 rounded-md p-2 text-gray-100" type="text" id="StoreItem_content_Skins_${lastRow}__Value" name="StoreItem.content.Skins[${lastRow}].Value" value="">
+                    </td>
+                    <td class="p-2 text-center">
+                        <a class="delete text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></a>
+                    </td>
+                `;
 
             document.querySelector("#skins").appendChild(row);
             rebindDeletes();
@@ -253,18 +253,18 @@
             row.classList.add("bg-gray-700", "text-gray-100");
 
             row.innerHTML = `
-                                                                                            <td class="p-2">
-                                                                                                <select class="selectpicker w-full bg-gray-600 border border-gray-500 rounded-md p-2 text-gray-100" id="StoreItem_content_Items_${lastRow}__Key" name="StoreItem.content.Items[${lastRow}].Key">
-                                                                                                    <option value="">Loading...</option>
-                                                                                                </select>
-                                                                                            </td>
-                                                                                            <td class="p-2">
-                                                                                                <input class="w-full bg-gray-600 border border-gray-500 rounded-md p-2 text-gray-100" type="text" data-val="true" data-val-number="The field Value must be a number." data-val-required="The Value field is required." id="StoreItem_content_Items_${lastRow}__Value" name="StoreItem.content.Items[${lastRow}].Value" value="0">
-                                                                                            </td>
-                                                                                            <td class="p-2 text-center">
-                                                                                                <a class="delete text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></a>
-                                                                                            </td>
-                                                                                        `;
+                    <td class="p-2">
+                        <select class="selectpicker w-full bg-gray-600 border border-gray-500 rounded-md p-2 text-gray-100" id="StoreItem_content_Items_${lastRow}__Key" name="StoreItem.content.Items[${lastRow}].Key">
+                            <option value="">Loading...</option>
+                        </select>
+                    </td>
+                    <td class="p-2">
+                        <input class="w-full bg-gray-600 border border-gray-500 rounded-md p-2 text-gray-100" type="text" data-val="true" data-val-number="The field Value must be a number." data-val-required="The Value field is required." id="StoreItem_content_Items_${lastRow}__Value" name="StoreItem.content.Items[${lastRow}].Value" value="0">
+                    </td>
+                    <td class="p-2 text-center">
+                        <a class="delete text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></a>
+                    </td>
+                `;
 
             document.querySelector("#items").appendChild(row);
             rebindDeletes();
