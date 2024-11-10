@@ -88,7 +88,7 @@
                             class="absolute right-0 mt-2 w-60 bg-gray-900 text-white font-sans rounded-md shadow-lg py-2 z-10 hidden">
                             @if (currentPlayerName != "User")
                             {
-                                <form id="playerChange" asp-action="SetPlayerId" asp-controller="User" method="post"
+                                <form id="playerChange" asp-area="" asp-action="SetPlayerId" asp-controller="User" method="post"
                                     class="px-4 py-2">
                                     @{
                                         var selectedPlayer = this.SelectedPlayer;

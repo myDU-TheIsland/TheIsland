@@ -51,7 +51,7 @@ namespace TheIsland.Core.Services
             foreach (DualMarket market in markets)
             {
                 logMessage($@"Processing Market {market.name} ({market.id})");
-                await this._marketBot.CancelBotOrders(Convert.ToUInt64(market.id)).ConfigureAwait(false);
+                await this._marketBot.CancelBotOrdersAsync(Convert.ToUInt64(market.id)).ConfigureAwait(false);
                 logMessage($@"Market {market.name} ({market.id}) Complete!");
             }
 
@@ -104,7 +104,7 @@ namespace TheIsland.Core.Services
 
                 logMessage($@"Fetching Container Contents for market {marketId} with these items {System.Text.Json.JsonSerializer.Serialize(this._marketBot.ResellItems)}!");
 
-                NQ.MarketStorageInfoEx containerContents = await this._marketBot.GetMarketContainerContents(Convert.ToUInt64(marketId)).ConfigureAwait(false);
+                NQ.MarketStorageInfoEx containerContents = await this._marketBot.GetMarketContainerContentsAsync(Convert.ToUInt64(marketId)).ConfigureAwait(false);
 
                 logMessage($@"Container has {containerContents.slots.Count()}!");
                 logMessage($@"Container contents {System.Text.Json.JsonSerializer.Serialize(containerContents.slots)}!");
@@ -152,7 +152,7 @@ namespace TheIsland.Core.Services
                     }
 
                     logMessage($@"Selling item  {itemId} @ {avgPer}, quantity {marketQty}!");
-                    log.AddRange(await this._marketBot.SellStuff(Convert.ToUInt64(marketId), itemId, Convert.ToInt64(avgPer), marketQty).ConfigureAwait(false));
+                    log.AddRange(await this._marketBot.SellStuffAsync(Convert.ToUInt64(marketId), itemId, Convert.ToInt64(avgPer), marketQty).ConfigureAwait(false));
                 }
             }
             catch (Exception exception)
@@ -240,14 +240,14 @@ namespace TheIsland.Core.Services
                 this._marketBot.MarketBudgetMultiplier.TryAdd(chosenMarket, rate);
 
                 logMessage($@"Saving Config");
-                await this._marketBot.SaveDictionaries().ConfigureAwait(false);
+                await this._marketBot.SaveDictionariesAsync().ConfigureAwait(false);
 
-                string name = await this._marketBot.GetConstructName(constuctId).ConfigureAwait(false);
+                string name = await this._marketBot.GetConstructNameAsync(constuctId).ConfigureAwait(false);
                 logMessage($@"Found '{name}'");
 
                 string newName = $@"[!][{rate}] {name}";
                 logMessage($@"Renaming '{name}' to '{newName}'");
-                await this._marketBot.SetConstructName(constuctId, newName).ConfigureAwait(false);
+                await this._marketBot.SetConstructNameAsync(constuctId, newName).ConfigureAwait(false);
                 logMessage($@"New Name '{name}'");
                 return log;
             }
@@ -273,7 +273,7 @@ namespace TheIsland.Core.Services
             foreach (ulong market in configuredMarkets)
             {
                 ulong constuctId = Convert.ToUInt64(actualMarkets[market].construct_id);
-                string oldMarketName = await this._marketBot.GetConstructName(constuctId).ConfigureAwait(false) ?? string.Empty;
+                string oldMarketName = await this._marketBot.GetConstructNameAsync(constuctId).ConfigureAwait(false) ?? string.Empty;
 
                 if (oldMarketName.StartsWith("[!]"))
                 {
@@ -285,7 +285,7 @@ namespace TheIsland.Core.Services
                     constructName = constructName.Substring(index + 1).Trim();
 
                     logMessage($@"Renaming '{oldMarketName}' to '{constructName}'");
-                    await this._marketBot.SetConstructName(constuctId, constructName).ConfigureAwait(false);
+                    await this._marketBot.SetConstructNameAsync(constuctId, constructName).ConfigureAwait(false);
 
                     //re-seed market
                     await this._dualMarketTransactionRepository.EnableBotSeedOrders(market).ConfigureAwait(false);

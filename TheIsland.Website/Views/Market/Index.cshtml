@@ -6,7 +6,7 @@
 @{
     ViewData["Title"] = "Market Data";
 
-    var items = _generalBot.GetListOfSellableItems().OrderBy(items => items.Value).ToDictionary();
+    var items = _marketBot.GetListOfSellableItems().OrderBy(items => items.Value).ToDictionary();
 
     var markets = (await _marketRepo.GetAsync().ConfigureAwait(false)).ToDictionary(key => key.id, value =>
     value.name.Replace("Market", string.Empty).Replace("District", string.Empty).Trim());
@@ -16,8 +16,9 @@
     var selectedMarket = markets[Model.MarketId];
     var selectedItem = itemExists ? items[Model.ItemId] : string.Empty;
 
-    double botPurchasePrice = _marketBot.GetItemPrice(Convert.ToUInt64(Model.MarketId), Convert.ToUInt64(Model.ItemId)) /
-    100;
+    double botPurchasePrice = _marketBot.GetItemPrice(Convert.ToUInt64(Model.MarketId), Convert.ToUInt64(Model.ItemId)) / 100;
+    double botLimit = await _marketBot.GetItemLimitAsync(Model.ItemId);
+    double userLimit = botLimit - ((await _marketBot.GetPlayerItemLimitAsync(this.SelectedPlayer, Model.MarketId, Model.ItemId))?.quantity ?? 0); 
 
     string graphHeader = markets.ContainsKey(Model.MarketId) ? " @ " + markets[Model.MarketId] : string.Empty;
 }
@@ -82,8 +83,22 @@
                     </h2>
                     @if (botPurchasePrice > 0)
                     {
-                        <p class="text-purple-400 mb-4 pb-4">⭐ <i>Honjos Minion is buying at
-                                @botPurchasePrice quanta per unit</i> ⭐</p>
+                        <p class="text-purple-400 mb-4 pb-4">
+                            ⭐ <i>Honjos Minion is buying at
+                                @botPurchasePrice quanta per unit</i> 
+                            
+                            @if (botLimit > 0)
+                            {
+                                    <i>
+                                        @Html.Raw(@$", they will only buy {botLimit.ToString("n0")} units")
+                                        @if (userLimit > 0 && Model.MarketId != 0)
+                                        {
+                                            @Html.Raw(@$"(you can still sell {@userLimit.ToString("n0")} units)")
+                                        }
+                                    </i>
+                            }
+                            ⭐
+                            </p>
                     }
                     <div class="border border-purple-500 w-full"></div>
                     <canvas id="priceChart" class="pt-5" style="max-height: 300px;"></canvas>

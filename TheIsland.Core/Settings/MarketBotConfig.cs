@@ -47,16 +47,21 @@ namespace TheIsland.Core.Settings
         /// </summary>
         public List<double> HotTimeMarkets { get; set; } = new List<double>() { 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137 };
 
+        /// <summary>
+        /// Gets or sets list of markets hot time events can happen at.
+        /// </summary>
+        public List<double> LimitBracket { get; set; } = new List<double>() { 0, 3, 6, 9, 12, 15, 18, 21 };
+
         public Dictionary<double, double> HotTimeMargins { get; set; } = new Dictionary<double, double>
         {
-            { 1.5, 1 },
-            { 1.45, 2 },
-            { 1.40, 4 },
-            { 1.35, 8 },
-            { 1.30, 16 },
-            { 1.25, 32 },
-            { 1.20, 64 },
-            { 1.15, 128 },
+            { 1.5, 8 },
+            { 1.45, 16 },
+            { 1.40, 32 },
+            { 1.35, 64 },
+            { 1.30, 128 },
+            { 1.25, 128 },
+            { 1.20, 256 },
+            { 1.15, 256 },
             { 1.1, 256 },
         };
     }

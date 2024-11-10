@@ -41,7 +41,7 @@ namespace TheIsland.Website.Areas.Admin.Controllers
         [ApiKey]
         public async Task<IActionResult> BuyStuff()
         {
-            return this.Json(await this._marketBot.BuyStuff(0).ConfigureAwait(false));
+            return this.Json(await this._marketBot.BuyStuffAsync(0).ConfigureAwait(false));
         }
 
         [HttpGet]
@@ -76,14 +76,14 @@ namespace TheIsland.Website.Areas.Admin.Controllers
         [ApiKey]
         public async Task<IActionResult> GetMarketName()
         {
-            return this.Json(await this._marketBot.GetConstructName(170000).ConfigureAwait(false));
+            return this.Json(await this._marketBot.GetConstructNameAsync(170000).ConfigureAwait(false));
         }
 
         [HttpGet]
         [ApiKey]
         public async Task<IActionResult> SetMarketName()
         {
-            return this.Json(await this._marketBot.SetConstructName(170000, "Aegis 123").ConfigureAwait(false));
+            return this.Json(await this._marketBot.SetConstructNameAsync(170000, "Aegis 123").ConfigureAwait(false));
         }
     }
 }
