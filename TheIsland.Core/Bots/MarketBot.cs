@@ -4,6 +4,7 @@
 
 namespace TheIsland.Core.Bots
 {
+    using System;
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using Backend;
@@ -11,6 +12,11 @@ namespace TheIsland.Core.Bots
     using BotLib.Utils;
     using Microsoft.Extensions.Logging;
     using NQ;
+    using NQ.Visibility;
+    using StackExchange.Redis;
+    using TheIsland.Core.Classes;
+    using TheIsland.Core.Entities;
+    using TheIsland.Core.Services.SQL;
     using TheIsland.Core.Settings;
 
     public interface IMarketBot : IBotClient
@@ -25,31 +31,45 @@ namespace TheIsland.Core.Bots
 
         ConcurrentBag<ulong> ResellItems { get; }
 
+        #region General Functions
+        List<MarketEntry> GetMarketHierarchy(bool forceRefresh = false);
+
+        Dictionary<double, string> GetListOfSellableItems();
+
+        List<KeyValuePair<string, double>> GetAllItems();
+
+        List<MarketEntry> GetAllItemsMarketEntries();
+
         object GetConfigs();
 
-        Task SaveDictionaries();
+        Task SaveDictionariesAsync();
 
-        Task LoadDictionaries();
+        Task LoadDictionariesAsync();
+        #endregion
 
-        Task<MarketStorageInfoEx> GetMarketContainerContents(ulong marketId);
+        Task<MarketStorageInfoEx> GetMarketContainerContentsAsync(ulong marketId);
 
-        Task<List<string>> BuyStuff(ulong planetId);
+        Task<List<string>> BuyStuffAsync(ulong planetId);
 
-        Task<List<string>> SellStuff(ulong marketId, ulong itemType, long unitPrice, long quantity);
+        Task<List<string>> SellStuffAsync(ulong marketId, ulong itemType, long unitPrice, long quantity);
 
-        Task CancelBotOrders(ulong marketId);
+        Task CancelBotOrdersAsync(ulong marketId);
+
+        Task<double> GetItemLimitAsync(double itemId);
+
+        Task<PlayerMarketBuyLimit?> GetPlayerItemLimitAsync(double playerId, double marketId, double itemId);
 
         long GetItemPrice(ulong marketId, ulong itemType);
 
         long GetSellPrice(ulong marketId, ulong itemType, decimal inputPrice = 0);
 
-        Task SetItemMultiplier(ulong marketId, string itemType, double value);
+        Task SetItemMultipliersAsync(ulong marketId, string itemType, double value);
 
-        Task SetItemMultiplierRecursive(ulong marketId, string itemType, double value);
+        Task SetItemMultiplierRecursiveAsync(ulong marketId, string itemType, double value);
 
-        Task SetItemSellMultiplier(ulong marketId, string itemType, double value);
+        Task SetItemSellMultiplierAsync(ulong marketId, string itemType, double value);
 
-        Task SetItemSellMultiplierRecursive(ulong marketId, string itemType, double value);
+        Task SetItemSellMultiplierRecursiveAsync(ulong marketId, string itemType, double value);
     }
 
     public class MarketBot : BotClient, IMarketBot
@@ -64,19 +84,113 @@ namespace TheIsland.Core.Bots
 
         public ConcurrentBag<ulong> ResellItems { get; private set; } = new ConcurrentBag<ulong>();
 
+        private List<MarketEntry> _marketEntries { get; set; } = new List<MarketEntry>();
+
+        private ConcurrentDictionary<double, string> ItemsForSale { get; set; } = new ConcurrentDictionary<double, string>();
+
+        private ConcurrentBag<MarketEntry> ItemsForSaleME { get; set; } = new ConcurrentBag<MarketEntry>();
+
         private readonly MarketBotConfig _marketBotConfig;
-
         private readonly DualUniverseSettings _settings;
+        private readonly DualPlayerRepository _dualPlayerRepository;
+        private readonly MarketBuyLimitRepository _marketBuyLimitRepository;
+        private readonly PlayerMarketBuyLimitRepository _playerMarketBuyLimitRepository;
 
-        public MarketBot(MarketBotConfig marketBotConfig, DualUniverseSettings settings, ILogger<IMarketBot> logger) : base(settings.MarketBot, logger)
+        public MarketBot(
+            DualPlayerRepository dualPlayerRepository,
+            MarketBuyLimitRepository marketBuyLimitRepository,
+            PlayerMarketBuyLimitRepository playerMarketBuyLimitRepository,
+            MarketBotConfig marketBotConfig,
+            DualUniverseSettings settings,
+            ILogger<IMarketBot> logger) : base(settings.MarketBot, logger)
         {
+            this._dualPlayerRepository = dualPlayerRepository;
+            this._marketBuyLimitRepository = marketBuyLimitRepository;
+            this._playerMarketBuyLimitRepository = playerMarketBuyLimitRepository;
             this._marketBotConfig = marketBotConfig;
             this._settings = settings;
             this.InitializeItemPurchasing();
-            this.LoadDictionaries().GetAwaiter().GetResult();
+            this.LoadDictionariesAsync().GetAwaiter().GetResult();
         }
 
-        public async Task<List<string>> BuyStuff(ulong parent)
+        #region General Functions
+        public List<MarketEntry> GetAllItemsMarketEntries()
+        {
+            if (this.ItemsForSaleME.Count == 0)
+            {
+                this.GetMarketHierarchy(true);
+            }
+
+            return this.ItemsForSaleME.ToList();
+        }
+
+        public List<MarketEntry> GetMarketHierarchy(bool forceRefresh = false)
+        {
+            if (this._marketEntries.Count != 0 && !forceRefresh)
+            {
+                return this._marketEntries;
+            }
+
+            List<MarketEntry> output = new List<MarketEntry>();
+
+            IGameplayBank bank = this.Bot.GameplayBank;
+
+            foreach (ulong headerId in this._settings.MarketHeaderIds)
+            {
+                IGameplayDefinition? baseEntry = bank.GetDefinition(headerId);
+
+                if (baseEntry == null)
+                {
+                    continue;
+                }
+
+                MarketEntry marketEntry = new MarketEntry()
+                {
+                    ParentId = 0,
+                    ParentName = string.Empty,
+                    Id = headerId,
+                    Name = baseEntry.Name,
+                    DisplayName = baseEntry.LocalizedProperties.FirstOrDefault(item => item.Name == "displayName").Translation.ToString() ?? string.Empty,
+                };
+
+                IEnumerable<IGameplayDefinition> childrenObjects = baseEntry.GetChildren();
+
+                if (childrenObjects != null && childrenObjects.Any())
+                {
+                    ulong[] childrenIds = childrenObjects.Select(item => item.Id).ToArray();
+
+                    marketEntry.Children = this.GetChildren(childrenIds, bank);
+                }
+
+                output.Add(marketEntry);
+            }
+
+            this._marketEntries = new List<MarketEntry>(output);
+            return output;
+        }
+
+        public List<KeyValuePair<string, double>> GetAllItems()
+        {
+            var allItems = this.Bot.GameplayBank.GetDefinitions();
+            return allItems.Select(item => new KeyValuePair<string, double>(item.Name, item.Id)).ToList();
+        }
+
+        /// <summary>
+        /// Gets a list of all sellible items on the market.
+        /// </summary>
+        /// <returns></returns>
+        public Dictionary<double, string> GetListOfSellableItems()
+        {
+            if (this.ItemsForSale.Count == 0)
+            {
+                this.GetMarketHierarchy();
+            }
+
+            return this.ItemsForSale.ToDictionary();
+        }
+        #endregion
+
+        public async Task<List<string>> BuyStuffAsync(ulong parent)
         {
             List<string> log = new List<string>();
 
@@ -85,12 +199,12 @@ namespace TheIsland.Core.Bots
                 log.Add($@"{DateTime.Now} :: {input}");
             }
 
-            logMessage("Pinging Server (confirming connection)");
-            await this.BotConnectionTest().ConfigureAwait(false);
+            var timeframe = PlayerMarketBuyLimitRepository.GetTimeframe();
 
+            logMessage("Pinging Server (confirming connection)");
+            await this.BotConnectionTestAsync().ConfigureAwait(false);
             logMessage("Good to start");
             List<ulong> itemTypes = this.BuyPrices.Keys.ToList();
-
             logMessage(@$"Items to Buy ({itemTypes.Count()})");
 
             if (itemTypes.Count() == 0)
@@ -102,14 +216,16 @@ namespace TheIsland.Core.Bots
             }
 
             // get all markets on alioth (ALioths ID (Construct) is 2)
-            MarketList ml = await this.Bot.Req.MarketGetList(parent).ConfigureAwait(false);
+            MarketList marketList = await this.Bot.Req.MarketGetList(parent).ConfigureAwait(false);
 
-            logMessage(@$"Found Markets ({ml.markets.Count()})");
+            logMessage(@$"Found Markets ({marketList.markets.Count()})");
 
             // loop over each market
-            foreach (MarketInfo? mkt in ml.markets)
+            foreach (MarketInfo? market in marketList.markets)
             {
-                logMessage(@$"Starting Market '{mkt.name}'");
+                logMessage(@$"Starting Market '{market.name}'");
+
+                var marketId = Convert.ToDouble(market.marketId);
 
                 List<ulong> doneIds = new List<ulong>();
                 int itemsPurchase = 0;
@@ -118,7 +234,7 @@ namespace TheIsland.Core.Bots
                 MarketOrders orders = await this.Bot.Req.MarketSelectItem(
                     new MarketSelectRequest
                     {
-                        marketIds = new List<ulong> { mkt.marketId },
+                        marketIds = new List<ulong> { market.marketId },
                         itemTypes = itemTypes,
                     }).ConfigureAwait(false);
 
@@ -127,9 +243,21 @@ namespace TheIsland.Core.Bots
                 // loop over all my orders in this market
                 foreach (MarketOrder? order in orders.orders)
                 {
-                    if (order.ownerName == "Bot" || order.ownerName == this.Settings.PlayerName)
+                    if (order.ownerId.IsOrg())
                     {
-                        // most likely a seeded order. skip
+                        // we don't buy from orgs.
+                        continue;
+                    }
+
+                    var playerId = Convert.ToDouble(order.ownerId.playerId);
+                    var itemId = Convert.ToDouble(order.itemType);
+                    MarketEntry itemData = this.GetAllItemsMarketEntries().First(item => item.Id == itemId);
+                    double marketLimit = await this.GetItemLimitAsync(itemId).ConfigureAwait(false);
+
+                    logMessage(@$"This item ({itemData.Name}) limit is {marketLimit}!");
+                    if (await this._dualPlayerRepository.IsBotByPlayerId(playerId).ConfigureAwait(false))
+                    {
+                        // we don't purchase from bots
                         continue;
                     }
 
@@ -143,7 +271,21 @@ namespace TheIsland.Core.Bots
                         continue;
                     }
 
-                    double budget = this.GetItemPrice(mkt.marketId, order.itemType);
+                    PlayerMarketBuyLimit? getPlayersLimit = await this.GetPlayerItemLimitAsync(playerId, marketId, itemId).ConfigureAwait(false);
+
+                    if (getPlayersLimit == null)
+                    {
+                        throw new Exception("Somehow market or player is a negative number. you broke something bad.");
+                    }
+
+                    if (getPlayersLimit.quantity >= marketLimit)
+                    {
+                        //skipping this, player over purchase limit.
+                        logMessage(@$"Skipping order ({order.orderId}) because {getPlayersLimit.quantity} greater then limit({marketLimit})!");
+                        continue;
+                    }
+
+                    double budget = this.GetItemPrice(market.marketId, order.itemType);
 
                     logMessage(@$"Using Budget {budget} on {order.itemType} ({order.orderId}@{order.unitPrice})");
 
@@ -157,31 +299,56 @@ namespace TheIsland.Core.Bots
 
                     Currency wallet = await this.Bot.Req.GetWallet().ConfigureAwait(false);
 
-                    if (wallet != null)
+                    long buyQuantity = Math.Abs(order.buyQuantity);
+                    long allowedQuantity = Convert.ToInt64(marketLimit - getPlayersLimit.quantity);
+
+                    if (buyQuantity > allowedQuantity)
                     {
-                        logMessage(@$"Wallet has {wallet.amount} and need {Math.Abs(order.buyQuantity) * order.unitPrice}!");
+                        logMessage(@$"More items then limit {buyQuantity} > {allowedQuantity}!");
+
+                        //more avail then limit.
+                        buyQuantity = allowedQuantity;
+                    }
+
+                    long totalCost = buyQuantity * order.unitPrice;
+
+                    if (wallet != null && wallet.amount > totalCost)
+                    {
+                        logMessage(@$"Wallet has {wallet.amount} and need {totalCost}!");
                     }
 
                     MarketOrders boughtItems = await this.Bot.Req.MarketInstantOrder(
                         new MarketRequest
                         {
+                            itemOwner = order.ownerId,
                             marketId = order.marketId,
                             itemType = order.itemType,
-                            buyQuantity = Math.Abs(order.buyQuantity),
+                            buyQuantity = buyQuantity,
                             unitPrice = order.unitPrice,
                         }).ConfigureAwait(false);
                     itemsPurchase++;
+
+                    getPlayersLimit.quantity += buyQuantity;
+
+                    if (getPlayersLimit.id == 0)
+                    {
+                        await this._playerMarketBuyLimitRepository.AddAsync(getPlayersLimit).ConfigureAwait(false);
+                    }
+                    else
+                    {
+                        await this._playerMarketBuyLimitRepository.UpdateAsync(getPlayersLimit).ConfigureAwait(false);
+                    }
                 }
 
-                logMessage(@$"Purchased {itemsPurchase} orders @ '{mkt.name}'!");
+                logMessage(@$"Purchased {itemsPurchase} orders @ '{market.name}'!");
             }
 
             return log;
         }
 
-        public async Task<MarketStorageInfoEx> GetMarketContainerContents(ulong marketId)
+        public async Task<MarketStorageInfoEx> GetMarketContainerContentsAsync(ulong marketId)
         {
-            await this.BotConnectionTest().ConfigureAwait(false);
+            await this.BotConnectionTestAsync().ConfigureAwait(false);
 
             return await this.Bot.Req.MarketContainerGetMyContent(new MarketSelectRequest
             {
@@ -190,9 +357,9 @@ namespace TheIsland.Core.Bots
             }).ConfigureAwait(false);
         }
 
-        public async Task CancelBotOrders(ulong marketId)
+        public async Task CancelBotOrdersAsync(ulong marketId)
         {
-            await this.BotConnectionTest().ConfigureAwait(false);
+            await this.BotConnectionTestAsync().ConfigureAwait(false);
 
             MarketOrders orders = await this.Bot.Req.MarketGetMyOrders(
                 new MarketSelectRequest
@@ -207,7 +374,7 @@ namespace TheIsland.Core.Bots
             }
         }
 
-        public async Task<List<string>> SellStuff(ulong marketId, ulong itemType, long unitPrice, long quantity)
+        public async Task<List<string>> SellStuffAsync(ulong marketId, ulong itemType, long unitPrice, long quantity)
         {
             List<string> log = new List<string>();
 
@@ -217,7 +384,7 @@ namespace TheIsland.Core.Bots
             }
 
             logMessage("Pinging Server (confirming connection)");
-            await this.BotConnectionTest().ConfigureAwait(false);
+            await this.BotConnectionTestAsync().ConfigureAwait(false);
 
             logMessage(@$"Selling {itemType} @ {marketId} for this {unitPrice / 100}");
 
@@ -233,6 +400,36 @@ namespace TheIsland.Core.Bots
 
             logMessage(@$"Listed {order.itemType} @ {order.marketId} for this {order.unitPrice / 100} ({order.buyQuantity})");
             return log;
+        }
+
+        public async Task<double> GetItemLimitAsync(double itemId)
+        {
+            List<MarketBuyLimit> marketLimits = (await this._marketBuyLimitRepository.GetAsync().ConfigureAwait(false)).OrderBy(item => item.id).ToList();
+            MarketEntry? itemData = this.GetAllItemsMarketEntries().FirstOrDefault(item => item.Id == itemId);
+
+            if (itemData == null)
+            {
+                return 0;
+            }
+
+            return marketLimits.FirstOrDefault(item => item.filter == itemData.Name || item.filter == itemData.ParentName || item.filter == itemData.GrandParentName)?.quantity ?? 10000;
+        }
+
+        public async Task<PlayerMarketBuyLimit?> GetPlayerItemLimitAsync(double playerId, double marketId, double itemId)
+        {
+            if (playerId == -1 || marketId == -1)
+            {
+                return null;
+            }
+
+            return
+                await this._playerMarketBuyLimitRepository.GetByPlayerIdAsync(playerId, marketId, itemId).ConfigureAwait(false)
+                ?? new PlayerMarketBuyLimit
+                {
+                    item_id = itemId,
+                    market_id = marketId,
+                    player_id = playerId,
+                };
         }
 
         public long GetItemPrice(ulong marketId, ulong itemType)
@@ -307,85 +504,32 @@ namespace TheIsland.Core.Bots
             return (long)Math.Ceiling((inputPrice * (decimal)finalMarketItemMultiplier) * (decimal)this._marketBotConfig.MarketMarkUp) * 100;
         }
 
-        public Task SetItemMultiplier(ulong marketId, string itemType, double value)
+        public Task SetItemMultipliersAsync(ulong marketId, string itemType, double value)
         {
             value = Math.Clamp(value, .1, 10);
             this.SetDictionaryMultiplier(marketId, itemType, value, this.MarketItemMultiplier);
-            return this.SaveDictionaries();
+            return this.SaveDictionariesAsync();
         }
 
-        public Task SetItemSellMultiplier(ulong marketId, string itemType, double value)
+        public Task SetItemSellMultiplierAsync(ulong marketId, string itemType, double value)
         {
             value = Math.Clamp(value, 1, 10);
             this.SetDictionaryMultiplier(marketId, itemType, value, this.MarketItemSellMultiplier);
-            return this.SaveDictionaries();
+            return this.SaveDictionariesAsync();
         }
 
-        public Task SetItemMultiplierRecursive(ulong marketId, string itemType, double value)
+        public Task SetItemMultiplierRecursiveAsync(ulong marketId, string itemType, double value)
         {
             value = Math.Clamp(value, .1, 10);
             this.SetDictionaryMultiplierRecursive(marketId, itemType, value, this.MarketItemMultiplier);
-            return this.SaveDictionaries();
+            return this.SaveDictionariesAsync();
         }
 
-        public Task SetItemSellMultiplierRecursive(ulong marketId, string itemType, double value)
+        public Task SetItemSellMultiplierRecursiveAsync(ulong marketId, string itemType, double value)
         {
             value = Math.Clamp(value, 1, 10);
             this.SetDictionaryMultiplierRecursive(marketId, itemType, value, this.MarketItemSellMultiplier);
-            return this.SaveDictionaries();
-        }
-
-        private void SetDictionaryMultiplier(ulong marketId, string itemType, double value, ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, double>> inputDictionary)
-        {
-            IGameplayBank bank = this.Bot.GameplayBank;
-            IGameplayDefinition? entry = bank.GetDefinition(itemType);
-
-            if (entry == null)
-            {
-                return;
-            }
-
-            if (entry.GetChildren().Any())
-            {
-                // most likely a category, just continue
-                return;
-            }
-
-            inputDictionary
-                .GetOrAdd(marketId, (key) => new ConcurrentDictionary<ulong, double>())
-                .AddOrUpdate(entry.Id, value, (key, oldValue) => value);
-        }
-
-        private void SetDictionaryMultiplierRecursive(ulong marketId, string itemType, double value, ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, double>> inputDictionary)
-        {
-            IGameplayBank bank = this.Bot.GameplayBank;
-            IGameplayDefinition? baseEntry = bank.GetDefinition(itemType);
-
-            if (baseEntry == null)
-            {
-                return;
-            }
-
-            IEnumerable<ulong> childrenIds = baseEntry.GetChildrenIdsRecursive();
-            foreach (ulong childId in childrenIds)
-            {
-                IGameplayDefinition? entry = bank.GetDefinition(childId);
-
-                if (entry == null)
-                {
-                    continue;
-                }
-
-                if (entry.GetChildren().Any())
-                {
-                    // most likely a category, just continue
-                    continue;
-                }
-
-                inputDictionary
-                    .GetOrAdd(marketId, (key) => new ConcurrentDictionary<ulong, double>())
-                    .AddOrUpdate(childId, value, (key, oldValue) => value);
-            }
+            return this.SaveDictionariesAsync();
         }
 
         public object GetConfigs()
@@ -408,7 +552,7 @@ namespace TheIsland.Core.Bots
             return new { MarketBudgetMultiplier = market, MarketItemMultiplier = item, MarketItemSellMultiplier = itemSell };
         }
 
-        public async Task SaveDictionaries()
+        public async Task SaveDictionariesAsync()
         {
             void ToDictionary(ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, double>> input, Dictionary<ulong, Dictionary<ulong, double>> output)
             {
@@ -438,7 +582,7 @@ namespace TheIsland.Core.Bots
             }
         }
 
-        public async Task LoadDictionaries()
+        public async Task LoadDictionariesAsync()
         {
             void ToDictionary(Dictionary<ulong, Dictionary<ulong, double>> input, ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, double>> output)
             {
@@ -491,6 +635,60 @@ namespace TheIsland.Core.Bots
             catch
             {
                 return;
+            }
+        }
+
+        #region Private Functions
+        private void SetDictionaryMultiplier(ulong marketId, string itemType, double value, ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, double>> inputDictionary)
+        {
+            IGameplayBank bank = this.Bot.GameplayBank;
+            IGameplayDefinition? entry = bank.GetDefinition(itemType);
+
+            if (entry == null)
+            {
+                return;
+            }
+
+            if (entry.GetChildren().Any())
+            {
+                // most likely a category, just continue
+                return;
+            }
+
+            inputDictionary
+                .GetOrAdd(marketId, (key) => new ConcurrentDictionary<ulong, double>())
+                .AddOrUpdate(entry.Id, value, (key, oldValue) => value);
+        }
+
+        private void SetDictionaryMultiplierRecursive(ulong marketId, string itemType, double value, ConcurrentDictionary<ulong, ConcurrentDictionary<ulong, double>> inputDictionary)
+        {
+            IGameplayBank bank = this.Bot.GameplayBank;
+            IGameplayDefinition? baseEntry = bank.GetDefinition(itemType);
+
+            if (baseEntry == null)
+            {
+                return;
+            }
+
+            IEnumerable<ulong> childrenIds = baseEntry.GetChildrenIdsRecursive();
+            foreach (ulong childId in childrenIds)
+            {
+                IGameplayDefinition? entry = bank.GetDefinition(childId);
+
+                if (entry == null)
+                {
+                    continue;
+                }
+
+                if (entry.GetChildren().Any())
+                {
+                    // most likely a category, just continue
+                    continue;
+                }
+
+                inputDictionary
+                    .GetOrAdd(marketId, (key) => new ConcurrentDictionary<ulong, double>())
+                    .AddOrUpdate(childId, value, (key, oldValue) => value);
             }
         }
 
@@ -576,5 +774,64 @@ namespace TheIsland.Core.Bots
                 }
             }
         }
+
+        private List<MarketEntry> GetChildren(ulong[] children, IGameplayBank bank)
+        {
+            List<MarketEntry> output = new List<MarketEntry>();
+
+            foreach (ulong childId in children)
+            {
+                IGameplayDefinition? baseEntry = bank.GetDefinition(childId);
+
+                if (baseEntry == null)
+                {
+                    continue;
+                }
+
+                string displayName = baseEntry.LocalizedProperties?.FirstOrDefault(item => item.Name == "displayName").Translation?.ToString() ?? string.Empty;
+                bool hidden = baseEntry.GetStaticPropertyOpt("hidden")?.boolValue ?? false;
+                string size = baseEntry.GetStaticPropertyOpt("scale")?.stringValue ?? string.Empty;
+                if (string.IsNullOrEmpty(displayName) || hidden)
+                {
+                    continue;
+                }
+
+                if (!string.IsNullOrEmpty(size))
+                {
+                    size = $@" {size.ToUpper()}";
+                }
+
+                MarketEntry marketEntry = new MarketEntry()
+                {
+                    GrandParentId = baseEntry.Parent.Parent.Id,
+                    GrandParentName = baseEntry.Parent.Parent.Name,
+                    ParentId = baseEntry.Parent.Id,
+                    ParentName = baseEntry.Parent.Name,
+                    Id = childId,
+                    Name = baseEntry.Name,
+                    DisplayName = $@"{displayName}{size}",
+                };
+
+                IEnumerable<IGameplayDefinition> childrenObjects = baseEntry.GetChildren();
+
+                if (childrenObjects != null && childrenObjects.Any())
+                {
+                    ulong[] childrenIds = childrenObjects.Select(item => item.Id).ToArray();
+
+                    marketEntry.Children = this.GetChildren(childrenIds, bank);
+                }
+
+                if (marketEntry.Children.Count() == 0)
+                {
+                    this.ItemsForSale.TryAdd(marketEntry.Id, marketEntry.DisplayName);
+                    this.ItemsForSaleME.Add(marketEntry);
+                }
+
+                output.Add(marketEntry);
+            }
+
+            return output;
+        }
+        #endregion
     }
 }

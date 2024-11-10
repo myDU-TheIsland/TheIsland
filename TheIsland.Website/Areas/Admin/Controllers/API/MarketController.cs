@@ -34,7 +34,7 @@ namespace TheIsland.Website.Areas.Admin.Controllers.API
         [ApiKey]
         public async Task<IActionResult> AddItemMultiplier(ulong marketId, string itemType, double value)
         {
-            await this._marketBot.SetItemMultiplier(marketId, itemType, value).ConfigureAwait(false);
+            await this._marketBot.SetItemMultipliersAsync(marketId, itemType, value).ConfigureAwait(false);
             return this.Json(true);
         }
 
@@ -42,7 +42,7 @@ namespace TheIsland.Website.Areas.Admin.Controllers.API
         [ApiKey]
         public async Task<IActionResult> AddItemSellMultiplier(ulong marketId, string itemType, double value)
         {
-            await this._marketBot.SetItemSellMultiplier(marketId, itemType, value).ConfigureAwait(false);
+            await this._marketBot.SetItemSellMultiplierAsync(marketId, itemType, value).ConfigureAwait(false);
             return this.Json(true);
         }
 
@@ -50,7 +50,7 @@ namespace TheIsland.Website.Areas.Admin.Controllers.API
         [ApiKey]
         public async Task<IActionResult> AddItemMultiplierRecursive(ulong marketId, string itemType, double value)
         {
-            await this._marketBot.SetItemMultiplierRecursive(marketId, itemType, value).ConfigureAwait(false);
+            await this._marketBot.SetItemMultiplierRecursiveAsync(marketId, itemType, value).ConfigureAwait(false);
             return this.Json(true);
         }
 
@@ -58,7 +58,7 @@ namespace TheIsland.Website.Areas.Admin.Controllers.API
         [ApiKey]
         public async Task<IActionResult> AddItemSellMultiplierRecursive(ulong marketId, string itemType, double value)
         {
-            await this._marketBot.SetItemSellMultiplierRecursive(marketId, itemType, value).ConfigureAwait(false);
+            await this._marketBot.SetItemSellMultiplierRecursiveAsync(marketId, itemType, value).ConfigureAwait(false);
             return this.Json(true);
         }
 
@@ -78,11 +78,11 @@ namespace TheIsland.Website.Areas.Admin.Controllers.API
             {
                 foreach (var market in markets)
                 {
-                    await this._marketBot.SetItemMultiplierRecursive(
+                    await this._marketBot.SetItemMultiplierRecursiveAsync(
                         (ulong)market.id,
                         entry.ItemType,
                         entry.BuyFactor).ConfigureAwait(false);
-                    await this._marketBot.SetItemSellMultiplierRecursive(
+                    await this._marketBot.SetItemSellMultiplierRecursiveAsync(
                         (ulong)market.id,
                         entry.ItemType,
                         entry.SellFactor).ConfigureAwait(false);
@@ -98,11 +98,11 @@ namespace TheIsland.Website.Areas.Admin.Controllers.API
         {
             foreach (var entry in entries)
             {
-                await this._marketBot.SetItemMultiplierRecursive(
+                await this._marketBot.SetItemMultiplierRecursiveAsync(
                     marketId,
                     entry.ItemType,
                     entry.BuyFactor).ConfigureAwait(false);
-                await this._marketBot.SetItemSellMultiplierRecursive(
+                await this._marketBot.SetItemSellMultiplierRecursiveAsync(
                     marketId,
                     entry.ItemType,
                     entry.SellFactor).ConfigureAwait(false);

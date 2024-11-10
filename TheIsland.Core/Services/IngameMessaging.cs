@@ -23,7 +23,7 @@ namespace TheIsland.Core.Services
 
         public Task SendMessage(ulong who, string message)
         {
-            return this._client.SendMessage(who, message);
+            return this._client.SendMessageAsync(who, message);
         }
     }
 }

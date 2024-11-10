@@ -46,7 +46,7 @@ namespace TheIsland.Core.Services
         private readonly BlueprintExportRepository _blueprintExportRepository;
         private readonly DualUniverseSettings _settings;
 
-        private Task ConnectionTest() => this._bot.BotConnectionTest();
+        private Task ConnectionTest() => this._bot.BotConnectionTestAsync();
 
         public BlueprintService(BlueprintExportRepository blueprintExportRepository, DualUniverseSettings settings, IGeneralBot bot)
         {

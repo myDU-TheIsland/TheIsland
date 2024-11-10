@@ -17,10 +17,12 @@ namespace TheIsland.Website.Areas.Admin.Controllers.API
     public class AdminController : IslandController
     {
         private readonly IGeneralBot _generalBot;
+        private readonly IMarketBot _marketBot;
 
-        public AdminController(IGeneralBot generalBot, PlayerLinkingService playerLinkingService, IAuthorizationService authorizationService) : base(playerLinkingService, authorizationService)
+        public AdminController(IMarketBot marketBot, IGeneralBot generalBot, PlayerLinkingService playerLinkingService, IAuthorizationService authorizationService) : base(playerLinkingService, authorizationService)
         {
             this._generalBot = generalBot;
+            this._marketBot = marketBot;
         }
 
         [HttpGet]
@@ -28,7 +30,7 @@ namespace TheIsland.Website.Areas.Admin.Controllers.API
         [ApiExplorerSettings(IgnoreApi = true)]
         public IActionResult GetAllItems()
         {
-            return this.Json(this._generalBot.GetAllItems());
+            return this.Json(this._marketBot.GetAllItems());
         }
 
         [HttpPost]

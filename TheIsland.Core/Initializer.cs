@@ -4,6 +4,7 @@
 
 namespace TheIsland.Core
 {
+    using System.Reflection;
     using Dapper;
     using Microsoft.Extensions.DependencyInjection;
     using TheIsland.Core.Bots;
@@ -27,8 +28,7 @@ namespace TheIsland.Core
 
         public static IServiceCollection AddCoreDependencies(this IServiceCollection services)
         {
-            Type[] types = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(assemblies => assemblies.GetTypes())
+            Type[] types = Assembly.Load("TheIsland.Core").GetTypes()
                 .Where(type => (type.BaseType?.IsGenericType ?? false) && type.BaseType.GetGenericTypeDefinition() == typeof(EntityRepository<>))
                 .ToArray();
 
@@ -38,8 +38,7 @@ namespace TheIsland.Core
                 services.AddSingleton(typeDefinition);
             }
 
-            types = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(assemblies => assemblies.GetTypes())
+            types = Assembly.Load("TheIsland.Core").GetTypes()
                 .Where(type => typeof(IAppService).IsAssignableFrom(type) && !type.IsInterface)
                 .ToArray();
 

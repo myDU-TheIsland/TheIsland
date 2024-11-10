@@ -7,6 +7,16 @@ namespace TheIsland.Core.Classes
 
     public class MarketEntry
     {
+        public double? GrandParentId { get; set; } = null;
+
+        [JsonIgnore]
+        public string? GrandParentName { get; set; } = null;
+
+        public double ParentId { get; set; } = 0;
+
+        [JsonIgnore]
+        public string ParentName { get; set; } = string.Empty;
+
         public double Id { get; set; } = 0;
 
         [JsonIgnore]
