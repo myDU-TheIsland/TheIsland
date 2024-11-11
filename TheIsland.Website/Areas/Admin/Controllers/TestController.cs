@@ -15,6 +15,7 @@ namespace TheIsland.Website.Areas.Admin.Controllers
     [Area("Admin")]
     public class TestController : IslandController
     {
+        private readonly BuildService _buildService;
         private readonly MarketService _marketService;
         private readonly DualMarketRepository _dualMarketRepository;
         private readonly IGeneralBot _generalBot;
@@ -22,6 +23,7 @@ namespace TheIsland.Website.Areas.Admin.Controllers
         private readonly DualMarketRepository _marketRepo;
 
         public TestController(
+            BuildService buildService,
             MarketService marketService,
             DualMarketRepository dualMarketRepository,
             IGeneralBot generalBot,
@@ -30,11 +32,20 @@ namespace TheIsland.Website.Areas.Admin.Controllers
             PlayerLinkingService playerLinkingService,
             IAuthorizationService authorizationService) : base(playerLinkingService, authorizationService)
         {
+            this._buildService = buildService;
             this._marketService = marketService;
             this._dualMarketRepository = dualMarketRepository;
             this._generalBot = generalBot;
             this._marketBot = marketBot;
             this._marketRepo = marketRepo;
+        }
+
+        [HttpGet]
+        [ApiKey]
+        public async Task<IActionResult> PriceItems()
+        {
+            await this._buildService.PriceItems().ConfigureAwait(false);
+            return this.Json(true);
         }
 
         [HttpGet]
