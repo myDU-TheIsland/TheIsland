@@ -14,6 +14,9 @@ module.exports = {
       transformOrigin: {
         'top-left': 'top left',
       },
+      screens: {
+        xs: '425px',
+      },
     },
   },
   plugins: [],
