@@ -1,11 +1,12 @@
 ﻿@inject IStoreService StoreService
 
-<div class="max-w-7xl mx-auto pt-35">
-    <div class="flex justify-between items-center mb-8">
-        <h1 class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
+<div class="max-w-7xl mx-auto pt-35 xs:px-3">
+    <div class="md:flex md:flex-row xs:flex-col md:justify-between items-center mb-8">
+        <h1
+            class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600 xs:pb-5 xs:text-center">
             The Isle Store
         </h1>
-        <div class="flex items-center space-x-4">
+        <div class="md:flex md:flex-row xs:flex-col items-center xs:space-x-0 md:space-x-4 xs:space-y-4 md:space-y-0">
             @{
                 var amount = (await StoreService.GetWalletBalance(this.SelectedPlayer)).ToString("n0");
                 var talentPoints = (await StoreService.GetTalentPoints(this.SelectedPlayer)).ToString("n0");

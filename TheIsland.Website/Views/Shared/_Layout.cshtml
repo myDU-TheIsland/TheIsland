@@ -43,23 +43,112 @@
     @await RenderSectionAsync("Head", required: false)
 </head>
 
-<body className="min-h-screen bg-gray-900 text-white font-sans">
+<body class="min-h-screen bg-gray-900 text-white font-sans">
     <header class="bg-black/50 backdrop-blur-md fixed top-0 left-0 right-0 z-50">
         <nav class="container mx-auto px-4 py-4 flex items-center justify-between">
             <div class="flex items-center">
                 <img src="/img/honjo-logo.png" style="height: 70px; padding-right: 8px;" />
                 <a href="~/"
-                    class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
-                    The Isle
-                </a>
+                    class="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">The
+                    Isle</a>
             </div>
+            <!-- Mobile Menu Links -->
+            <div class="relative">
+                <!-- Mobile Menu Toggle Button -->
+                <button class="text-gray-300 md:hidden" id="menuToggle" onclick="toggleMobileMenu()">
+                    <!-- Hamburger Icon -->
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 6h16M4 12h16M4 18h16">
+                        </path>
+                    </svg>
+                </button>
+
+                @* <!-- Mobile Menu Links (Hidden by Default) --> *@
+                <div id="mobileMenu"
+                    class="md:hidden text-center absolute right-0 mt-7 w-96 bg-gray-900 text-white font-sans rounded-md py-4 z-10 hidden max-h-[80vh] overflow-y-auto">
+                    @if (currentPlayerName != "User")
+                    {
+                        <form id="playerChange" asp-action="SetPlayerId" asp-controller="User" method="post"
+                            class="flex items-center justify-center px-4 py-2">
+                            @{
+                                var selectedPlayer = this.SelectedPlayer;
+                            }
+                            <select name="playerId" id="playerSelection"
+                                class="w-72 bg-gray-700 p-2 py-4 rounded border-gray-600">
+                                @foreach (var player in players)
+                                {
+                                    if (player.dual_id == @selectedPlayer)
+                                    {
+                                        <option value="@player.dual_id" selected>@player.player_name</option>
+                                    }
+                                    else
+                                    {
+                                        <option value="@player.dual_id">@player.player_name</option>
+                                    }
+                                }
+                            </select>
+                        </form>
+                        <div class="border-t border-gray-600 my-2"></div>
+                    }
+                    @if (this.IsAdmin)
+                    {
+                        <a asp-area="Admin" asp-controller="Admin" asp-action="Index"
+                            class="block px-4 py-4 text-gray-100 hover:bg-purple-500">
+                            Admin Center
+                        </a>
+                        <div class="border-t border-gray-600 my-2"></div>
+                    }
+                    <div class="flex flex-col text-center space-y-10 py-5">
+                        <a href="https://discord.gg/6zsBcDX5Rz" target="_blank"
+                            class="text-gray-300 hover:text-purple-400 transition-colors">OUR DISCORD</a>
+                        <a href="~/Market/Index"
+                            class="text-gray-300 hover:text-purple-400 transition-colors">MARKET</a>
+                        @if (hasPlayerInfo)
+                        {
+                            <a asp-controller="Store" asp-action="Index"
+                                class="text-gray-300 hover:text-purple-400 transition-colors">STORE</a>
+                        }
+                        <a href="https://wiki.theisle.online" target="_blank"
+                            class="text-gray-300 hover:text-purple-400 transition-colors">WIKI</a>
+                        <a href="https://www.paypal.com/donate/?hosted_button_id=SGK46VC2GYFM2" target="_blank"
+                            class="text-gray-300 hover:text-purple-400 transition-colors">DONATE</a>
+                        @if (!this.IsLoggedIn)
+                        {
+                            <a asp-controller="Authentication" asp-action="Signin"
+                                class="text-gray-300 hover:text-purple-400 transition-colors">SIGN IN</a>
+                        }
+                        else
+                        {
+                            <a asp-area="" asp-controller="User" asp-action="Link"
+                                class="text-gray-300 hover:text-purple-400 transition-colors">Link Game Account(s)</a>
+                            @if (hasPlayerInfo)
+                            {
+
+                                <a asp-area="" asp-controller="User" asp-action="ImportBP"
+                                    class="block px-4 py-2 text-gray-100 hover:bg-purple-500">Import
+                                    Blueprints</a>
+                            }
+                            <a asp-area="" asp-controller="Store" asp-action="History"
+                                class="block px-4 py-2 text-gray-100 hover:bg-purple-500">
+                                Player Purchase History
+                            </a>
+                            <a asp-controller="Authentication" asp-action="SignOutCurrentUser"
+                                class="text-gray-300 hover:text-purple-400 transition-colors">Logout</a>
+                        }
+                    </div>
+                </div>
+            </div>
+
+            <!-- Desktop Menu Links -->
             <div class="hidden md:flex items-center space-x-5">
                 <a href="https://discord.gg/6zsBcDX5Rz" target="_blank"
                     class="text-gray-300 hover:text-purple-400 transition-colors">OUR DISCORD</a>
                 <a href="~/Market/Index" class="text-gray-300 hover:text-purple-400 transition-colors">MARKET</a>
                 @if (hasPlayerInfo)
                 {
-                    <a asp-controller="Store" asp-action="Index" asp-area=""
+                    <a asp-controller="Store" asp-action="Index"
                         class="text-gray-300 hover:text-purple-400 transition-colors">STORE</a>
                 }
                 <a href="https://wiki.theisle.online" target="_blank"
@@ -73,6 +162,7 @@
                 }
                 else
                 {
+                    @* <!-- User Dropdown (Desktop Only) --> *@
                     <div class="relative">
                         <button class="flex items-center text-gray-300 hover:text-purple-400 transition-colors"
                             id="userDropdownButton" onclick="toggleDropdown()">
@@ -143,10 +233,10 @@
                         </div>
                     </div>
                 }
-
             </div>
         </nav>
     </header>
+
     <div class="min-h-screen bg-dark relative text-white font-sans">
         <div class="absolute inset-0 overflow-hidden">
             <div class="stars"></div>
@@ -158,6 +248,21 @@
         </div>
     </div>
     <script>
+        function toggleMobileMenu() {
+            const mobileMenu = document.getElementById('mobileMenu');
+            const body = document.body;
+
+            // Toggle the hidden class on the mobile menu
+            mobileMenu.classList.toggle('hidden');
+
+            // Toggle the overflow-hidden class on the body
+            if (mobileMenu.classList.contains('hidden')) {
+                body.classList.remove('overflow-hidden');
+            } else {
+                body.classList.add('overflow-hidden');
+            }
+        }
+
         function toggleDropdown() {
             const dropdownMenu = document.getElementById("userDropdownMenu");
             if (dropdownMenu) {

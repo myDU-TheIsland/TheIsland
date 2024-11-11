@@ -15,14 +15,15 @@
         </p>
     </div>
 
-    <div class="max-w-3xl mx-auto space-y-2">
+    <div class="max-w-3xl mx-auto space-y-2 xs:px-3">
         <div class="bg-darkBlue text-gray-300 rounded-lg shadow-lg p-6">
             <h2 class="text-xl font-bold mb-4">Verify Ingame Code</h2>
-            <form asp-action="ConfirmLink" class="space-x-3 text-gray-800">
+            <form asp-action="ConfirmLink"
+                class="md:flex md:flex-row xs:flex-col xs:space-x-0 md:space-x-3 text-gray-800">
                 <input asp-for="Token" type="text" placeholder="Token"
                     class="max-w-md w-full px-4 py-2 border rounded-md">
                 <button
-                    class="w-full sm:w-auto bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-md"
+                    class="w-full xs:mt-2 md:mt-0 sm:w-auto bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 px-4 rounded-md"
                     type="submit">
                     <img src="/svg/link.svg" class="mr-2 h-4 w-4 inline-block" />
                     Verify Token

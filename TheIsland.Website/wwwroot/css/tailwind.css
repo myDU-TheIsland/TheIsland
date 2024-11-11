@@ -62,6 +62,8 @@
   border: none;
   border-radius: 0.375rem !important; /* Rounded corners */
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); /* Optional: add shadow */
+  max-height: 300px;
+  overflow-y: auto;
 }
 
 /* Style the search input within the dropdown */
@@ -129,20 +131,20 @@
 }
 
 .stars {
-  background: url('http://www.script-tutorials.com/demos/360/images/stars.png')
+  background: url('https://www.script-tutorials.com/demos/360/images/stars.png')
     repeat top center;
   z-index: 0;
 }
 
 .stars2 {
-  background: url('http://www.script-tutorials.com/demos/360/images/stars.png')
+  background: url('https://www.script-tutorials.com/demos/360/images/stars.png')
     repeat top center;
   animation: movetwink 200s linear infinite;
   z-index: 1;
 }
 
 .stars3 {
-  background: url('http://www.script-tutorials.com/demos/360/images/stars.png')
+  background: url('https://www.script-tutorials.com/demos/360/images/stars.png')
     repeat top center;
   animation: movetwink 100s linear infinite;
   z-index: 2;
