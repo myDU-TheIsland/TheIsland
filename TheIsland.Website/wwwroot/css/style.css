@@ -1885,6 +1885,10 @@ video {
     width: 100%;
   }
 
+  .xs\:max-w-full {
+    max-width: 100%;
+  }
+
   .xs\:flex-col {
     flex-direction: column;
   }
