@@ -16,11 +16,11 @@
     var allItemsJson = System.Text.Json.JsonSerializer.Serialize(allItemsData);
 }
 
-<div class="pt-35">
+<div class="pt-35 xs:px-3 xs:pb-16">
     <div class="w-full max-w-6xl mx-auto bg-darkBlue rounded-md p-5">
         <form asp-action="SaveItem" asp-controller="Store" asp-area="Admin" method="post" enctype="multipart/form-data"
-            class="flex space-x-4">
-            <div class="space-y-4 border-r border-gray-700 pr-4 w-2/5">
+            class="flex md:flex-row xs:flex-col space-x-4">
+            <div class="space-y-4 border-r border-gray-700 pr-4 md:w-2/5 xs:w-full">
                 <div class="py-3">
                     <h2 class="text-xl font-bold">Configure Item</h2>
                 </div>
@@ -83,7 +83,7 @@
                 <!-- Save Button -->
                 <button class="w-full bg-purple-600 rounded-md p-1">Save Changes</button>
             </div>
-            <div class="w-3/5">
+            <div class="md:w-3/5 xs:w-5/5">
                 <!-- Items & Skins -->
                 <div class="space-y-4">
                     <div class="py-3">
@@ -291,20 +291,20 @@
             const lastRow = parseInt(lastRowId.replace("skins_", "")) + 1;
 
             const row = $(`
-                                        <tr id="skins_${lastRow}" class="bg-gray-700 text-gray-100">
-                                            <td class="p-2">
-                                                <select class="selectpicker w-full bg-gray-600 border border-gray-500 rounded-md p-2 text-gray-100" id="StoreItem_content_Skins_${lastRow}__Key" name="StoreItem.content.Skins[${lastRow}].Key">
-                                                    <option value="">Select Item...</option>
-                                                </select>
-                                            </td>
-                                            <td class="p-2">
-                                                <input class="w-full bg-gray-600 border border-gray-500 rounded-md p-2 text-gray-100" type="text" id="StoreItem_content_Skins_${lastRow}__Value" name="StoreItem.content.Skins[${lastRow}].Value" value="">
-                                            </td>
-                                            <td class="p-2 text-center">
-                                                <a class="delete text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></a>
-                                            </td>
-                                        </tr>
-                                    `);
+                                                                            <tr id="skins_${lastRow}" class="bg-gray-700 text-gray-100">
+                                                                                <td class="p-2">
+                                                                                    <select class="selectpicker w-full bg-gray-600 border border-gray-500 rounded-md p-2 text-gray-100" id="StoreItem_content_Skins_${lastRow}__Key" name="StoreItem.content.Skins[${lastRow}].Key">
+                                                                                        <option value="">Select Item...</option>
+                                                                                    </select>
+                                                                                </td>
+                                                                                <td class="p-2">
+                                                                                    <input class="w-full bg-gray-600 border border-gray-500 rounded-md p-2 text-gray-100" type="text" id="StoreItem_content_Skins_${lastRow}__Value" name="StoreItem.content.Skins[${lastRow}].Value" value="">
+                                                                                </td>
+                                                                                <td class="p-2 text-center">
+                                                                                    <a class="delete text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></a>
+                                                                                </td>
+                                                                            </tr>
+                                                                        `);
 
             $("#skins").append(row);
             rebindDeletes();
@@ -320,20 +320,20 @@
             const lastRow = parseInt(lastRowId.replace("items_", "")) + 1;
 
             const row = $(`
-                                        <tr id="items_${lastRow}" class="bg-gray-700 text-gray-100">
-                                            <td class="p-2">
-                                                <select class="selectpicker w-full bg-gray-600 border border-gray-500 rounded-md p-2 text-gray-100" id="StoreItem_content_Items_${lastRow}__Key" name="StoreItem.content.Items[${lastRow}].Key">
-                                                    <option value="">Select Item...</option>
-                                                </select>
-                                            </td>
-                                            <td class="p-2">
-                                                <input class="w-full bg-gray-600 border border-gray-500 rounded-md p-2 text-gray-100" type="text" data-val="true" data-val-number="The field Value must be a number." data-val-required="The Value field is required." id="StoreItem_content_Items_${lastRow}__Value" name="StoreItem.content.Items[${lastRow}].Value" value="0">
-                                            </td>
-                                            <td class="p-2 text-center">
-                                                <a class="delete text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></a>
-                                            </td>
-                                        </tr>
-                                    `);
+                                                                            <tr id="items_${lastRow}" class="bg-gray-700 text-gray-100">
+                                                                                <td class="p-2">
+                                                                                    <select class="selectpicker w-full bg-gray-600 border border-gray-500 rounded-md p-2 text-gray-100" id="StoreItem_content_Items_${lastRow}__Key" name="StoreItem.content.Items[${lastRow}].Key">
+                                                                                        <option value="">Select Item...</option>
+                                                                                    </select>
+                                                                                </td>
+                                                                                <td class="p-2">
+                                                                                    <input class="w-full bg-gray-600 border border-gray-500 rounded-md p-2 text-gray-100" type="text" data-val="true" data-val-number="The field Value must be a number." data-val-required="The Value field is required." id="StoreItem_content_Items_${lastRow}__Value" name="StoreItem.content.Items[${lastRow}].Value" value="0">
+                                                                                </td>
+                                                                                <td class="p-2 text-center">
+                                                                                    <a class="delete text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></a>
+                                                                                </td>
+                                                                            </tr>
+                                                                        `);
 
             $("#items").append(row);
             rebindDeletes();

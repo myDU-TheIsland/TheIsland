@@ -1935,6 +1935,16 @@ video {
     margin-bottom: calc(1.25rem * var(--tw-space-y-reverse));
   }
 
+  .xs\:space-y-3 > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-y-reverse: 0;
+    margin-top: calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));
+    margin-bottom: calc(0.75rem * var(--tw-space-y-reverse));
+  }
+
+  .xs\:overflow-auto {
+    overflow: auto;
+  }
+
   .xs\:p-2 {
     padding: 0.5rem;
   }
@@ -1954,6 +1964,10 @@ video {
 
   .xs\:pb-10 {
     padding-bottom: 2.5rem;
+  }
+
+  .xs\:pb-16 {
+    padding-bottom: 4rem;
   }
 
   .xs\:text-center {
@@ -2011,6 +2025,14 @@ video {
 
   .md\:w-24 {
     width: 6rem;
+  }
+
+  .md\:w-2\/5 {
+    width: 40%;
+  }
+
+  .md\:w-3\/5 {
+    width: 60%;
   }
 
   .md\:max-w-6xl {
