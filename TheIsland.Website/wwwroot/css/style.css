@@ -1873,12 +1873,12 @@ video {
 }
 
 @media (min-width: 425px) {
-  .xs\:w-full {
-    width: 100%;
-  }
-
   .xs\:w-16 {
     width: 4rem;
+  }
+
+  .xs\:w-full {
+    width: 100%;
   }
 
   .xs\:flex-col {
@@ -1918,16 +1918,6 @@ video {
   .xs\:px-3 {
     padding-left: 0.75rem;
     padding-right: 0.75rem;
-  }
-
-  .xs\:py-4 {
-    padding-top: 1rem;
-    padding-bottom: 1rem;
-  }
-
-  .xs\:px-2 {
-    padding-left: 0.5rem;
-    padding-right: 0.5rem;
   }
 
   .xs\:pb-5 {
@@ -2013,12 +2003,12 @@ video {
     margin-bottom: calc(0px * var(--tw-space-y-reverse));
   }
 
-  .md\:p-6 {
-    padding: 1.5rem;
-  }
-
   .md\:p-5 {
     padding: 1.25rem;
+  }
+
+  .md\:p-6 {
+    padding: 1.5rem;
   }
 
   .md\:text-5xl {

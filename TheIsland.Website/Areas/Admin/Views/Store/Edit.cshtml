@@ -1,4 +1,5 @@
-﻿@model StoreItemModel
+﻿@inject IMarketBot _marketBot
+@model StoreItemModel
 @{
     ViewData["Title"] = "Home Page";
     ViewBag.InsertGutter = true;
@@ -10,6 +11,9 @@
 
     int itemCount = Model.StoreItem.content?.Items.Count() ?? 0;
     int skinCount = Model.StoreItem.content?.Skins.Count() ?? 0;
+
+    var allItemsData = _marketBot.GetAllItems();
+    var allItemsJson = System.Text.Json.JsonSerializer.Serialize(allItemsData);
 }
 
 <div class="pt-35">
@@ -106,7 +110,7 @@
 
                     <div class="space-y-2">
                         <h3 class="font-semibold">Items</h3>
-                        <div class="overflow-x-auto">
+                        <div class="overflow-auto">
                             <table class="table-fixed w-full">
                                 <thead>
                                     <tr class="bg-gray-800 text-gray-100 text-left">
@@ -182,102 +186,177 @@
     </div>
 </div>
 
-
 @section Scripts {
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            rebindDeletes();
-            document.querySelector(".add-skin").addEventListener('click', appendSkin);
-            document.querySelector(".add-item").addEventListener('click', appendItem);
+        // Parse JSON directly from Razor with proper escaping
+        var optionsData = JSON.parse('@Html.Raw(allItemsJson)');
+        var dataLoaded = true;
 
-            setSelect(); // Populate existing select elements on load
+        $(document).ready(function () {
+            // Populate select elements with preloaded data
+            populateSelects($('select.selectpicker'));
+
+            rebindDeletes();
+            $(".add-skin").on('click', debounce(appendSkin, 200)); // Debounced click
+            $(".add-item").on('click', debounce(appendItem, 200)); // Debounced click
         });
 
-        async function setSelect() {
-            const selects = document.querySelectorAll('select.selectpicker');
-            try {
-                const response = await fetch('/Api/Data/GetItems');
-                const data = await response.json();
+        function populateSelects(selects) {
+            if (!optionsData.length) return;
 
-                selects.forEach(select => {
-                    select.innerHTML = ''; // Clear existing options
+            // Only render the first few items initially
+            const initialOptions = optionsData.slice(0, 50).map(item => `<option value="${item.Value}">${item.Key}</option>`).join('');
+            selects.each(function () {
+                const select = $(this);
+                select.empty().append('<option value="">Select Item...</option>' + initialOptions);
 
-                    // Populate the select with new options
-                    data.forEach(({ key, value }) => {
-                        const option = document.createElement('option');
-                        option.value = value;
-                        option.textContent = key;
-                        select.appendChild(option);
+                // Initialize Select2 with custom AJAX-like filtering for virtual scrolling
+                select.select2({
+                    placeholder: "Select Item...",
+                    allowClear: true,
+                    width: '100%',
+                    minimumInputLength: 1,  // Start search after one character input
+                    dropdownParent: $('body'),  // Ensures the dropdown is appended to body for absolute positioning
+                    ajax: {
+                        transport: function (params, success, failure) {
+                            const searchTerm = params.data.term || "";
+                            const filteredOptions = optionsData.filter(item =>
+                                item.Key.toLowerCase().includes(searchTerm.toLowerCase())
+                            );
+
+                            const results = filteredOptions.slice(0, 50).map(item => ({
+                                id: item.Value,
+                                text: item.Key
+                            }));
+
+                            success({ results });
+                        },
+                        delay: 250
+                    }
+                }).on('select2:open', function () {
+                    // Lock scroll on dropdown open
+                    const scrollTop = $(window).scrollTop();
+                    $('body').css({
+                        'position': 'fixed',
+                        'top': `-${scrollTop}px`,
+                        'width': '100%'
                     });
-
-                    select.classList.remove('selectpicker'); // Remove the class after population
+                }).on('select2:close', function () {
+                    // Unlock scroll on dropdown close
+                    const scrollTop = Math.abs(parseInt($('body').css('top')));
+                    $('body').css({
+                        'position': '',
+                        'top': '',
+                        'width': ''
+                    });
+                    $(window).scrollTop(scrollTop);
                 });
-            } catch (error) {
-                console.error('Error fetching data:', error);
+            });
+        }
+
+        $(document).ready(function () {
+            $('select.selectpicker').on('select2:open', function () {
+                // Get current scroll position
+                const scrollTop = $(window).scrollTop();
+
+                // Apply styles to lock body scroll
+                $('body').css({
+                    'position': 'fixed',
+                    'top': `-${scrollTop}px`,
+                    'width': '100%'
+                });
+            });
+
+            $('select.selectpicker').on('select2:close', function () {
+                // Get the scroll position before unlocking
+                const scrollTop = Math.abs(parseInt($('body').css('top')));
+
+                // Remove fixed positioning
+                $('body').css({
+                    'position': '',
+                    'top': '',
+                    'width': ''
+                });
+
+                // Restore scroll position
+                $(window).scrollTop(scrollTop);
+            });
+
+            populateSelects($('select.selectpicker'));
+        });
+
+        // Additional functions for adding rows and handling deletes
+        function appendSkin() {
+            const lastRowId = $("#skins").children("tr").last().attr("id") || "skins_-1";
+            const lastRow = parseInt(lastRowId.replace("skins_", "")) + 1;
+
+            const row = $(`
+                                        <tr id="skins_${lastRow}" class="bg-gray-700 text-gray-100">
+                                            <td class="p-2">
+                                                <select class="selectpicker w-full bg-gray-600 border border-gray-500 rounded-md p-2 text-gray-100" id="StoreItem_content_Skins_${lastRow}__Key" name="StoreItem.content.Skins[${lastRow}].Key">
+                                                    <option value="">Select Item...</option>
+                                                </select>
+                                            </td>
+                                            <td class="p-2">
+                                                <input class="w-full bg-gray-600 border border-gray-500 rounded-md p-2 text-gray-100" type="text" id="StoreItem_content_Skins_${lastRow}__Value" name="StoreItem.content.Skins[${lastRow}].Value" value="">
+                                            </td>
+                                            <td class="p-2 text-center">
+                                                <a class="delete text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></a>
+                                            </td>
+                                        </tr>
+                                    `);
+
+            $("#skins").append(row);
+            rebindDeletes();
+
+            // Populate select options for the new row
+            if (dataLoaded) {
+                populateSelects(row.find('select.selectpicker'));
             }
         }
 
-        function appendSkin() {
-            const lastRowId = document.querySelector("#skins").lastElementChild?.id || "skins_-1";
-            const lastRow = parseInt(lastRowId.replace("skins_", "")) + 1;
-
-            const row = document.createElement('tr');
-            row.id = `skins_${lastRow}`;
-            row.classList.add("bg-gray-700", "text-gray-100");
-
-            row.innerHTML = `
-                    <td class="p-2">
-                        <select class="selectpicker w-full bg-gray-600 border border-gray-500 rounded-md p-2 text-gray-100" id="StoreItem_content_Skins_${lastRow}__Key" name="StoreItem.content.Skins[${lastRow}].Key">
-                            <option value="">Loading...</option>
-                        </select>
-                    </td>
-                    <td class="p-2">
-                        <input class="w-full bg-gray-600 border border-gray-500 rounded-md p-2 text-gray-100" type="text" id="StoreItem_content_Skins_${lastRow}__Value" name="StoreItem.content.Skins[${lastRow}].Value" value="">
-                    </td>
-                    <td class="p-2 text-center">
-                        <a class="delete text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></a>
-                    </td>
-                `;
-
-            document.querySelector("#skins").appendChild(row);
-            rebindDeletes();
-            setSelect(); // Populate the new select element with options
-        }
-
         function appendItem() {
-            const lastRowId = document.querySelector("#items").lastElementChild?.id || "items_-1";
+            const lastRowId = $("#items").children("tr").last().attr("id") || "items_-1";
             const lastRow = parseInt(lastRowId.replace("items_", "")) + 1;
 
-            const row = document.createElement('tr');
-            row.id = `items_${lastRow}`;
-            row.classList.add("bg-gray-700", "text-gray-100");
+            const row = $(`
+                                        <tr id="items_${lastRow}" class="bg-gray-700 text-gray-100">
+                                            <td class="p-2">
+                                                <select class="selectpicker w-full bg-gray-600 border border-gray-500 rounded-md p-2 text-gray-100" id="StoreItem_content_Items_${lastRow}__Key" name="StoreItem.content.Items[${lastRow}].Key">
+                                                    <option value="">Select Item...</option>
+                                                </select>
+                                            </td>
+                                            <td class="p-2">
+                                                <input class="w-full bg-gray-600 border border-gray-500 rounded-md p-2 text-gray-100" type="text" data-val="true" data-val-number="The field Value must be a number." data-val-required="The Value field is required." id="StoreItem_content_Items_${lastRow}__Value" name="StoreItem.content.Items[${lastRow}].Value" value="0">
+                                            </td>
+                                            <td class="p-2 text-center">
+                                                <a class="delete text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></a>
+                                            </td>
+                                        </tr>
+                                    `);
 
-            row.innerHTML = `
-                    <td class="p-2">
-                        <select class="selectpicker w-full bg-gray-600 border border-gray-500 rounded-md p-2 text-gray-100" id="StoreItem_content_Items_${lastRow}__Key" name="StoreItem.content.Items[${lastRow}].Key">
-                            <option value="">Loading...</option>
-                        </select>
-                    </td>
-                    <td class="p-2">
-                        <input class="w-full bg-gray-600 border border-gray-500 rounded-md p-2 text-gray-100" type="text" data-val="true" data-val-number="The field Value must be a number." data-val-required="The Value field is required." id="StoreItem_content_Items_${lastRow}__Value" name="StoreItem.content.Items[${lastRow}].Value" value="0">
-                    </td>
-                    <td class="p-2 text-center">
-                        <a class="delete text-red-500 hover:text-red-700"><i class="fa-solid fa-trash"></i></a>
-                    </td>
-                `;
-
-            document.querySelector("#items").appendChild(row);
+            $("#items").append(row);
             rebindDeletes();
-            setSelect(); // Populate the new select element with options
+
+            // Populate select options for the new row
+            if (dataLoaded) {
+                populateSelects(row.find('select.selectpicker'));
+            }
         }
 
         function rebindDeletes() {
-            const deleteButtons = document.querySelectorAll("tr > td > .delete");
-            deleteButtons.forEach(button => {
-                button.onclick = function () {
-                    this.closest("tr").remove();
-                };
+            $(".delete").off("click").on("click", function () {
+                $(this).closest("tr").remove();
             });
+        }
+
+        // Debounce function to limit how often appendSkin and appendItem are called
+        function debounce(func, wait) {
+            let timeout;
+            return function (...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
         }
     </script>
 }
