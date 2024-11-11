@@ -34,7 +34,7 @@
                             }
                 
                             <tr class="border-b border-gray-700 hover:bg-slate-900">
-                                <td class="py-4 px-6 font-semibold">@bp.Key</td>
+                                <td class="py-4 px-6 font-semibold">@bp.Value</td>
                                 <td class="py-4 px-6">
                                     <div class="flex items-center gap-2">
                                         <img src="/svg/package-static.svg" class="w-4 h-4" alt="Type Icon" />
@@ -43,8 +43,8 @@
                                 </td>
                                 <td class="py-4 px-6 text-center">
                                     <form asp-action="GenerateBP" asp-controller="User" asp-area="" method="post" class="inline-block">
-                                        <input type="hidden" asp-for="@Model.SelectedBP" value="@bp.Value" />
-                                        <input type="hidden" asp-for="@Model.SelectedBPName" value="@bp.Key" />
+                                        <input type="hidden" asp-for="@Model.SelectedBPName" value="@bp.Value" />
+                                        <input type="hidden" asp-for="@Model.SelectedBP" value="@bp.Key" />
                                         <button
                                             class="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-gray-200 px-3 py-1 rounded-md text-sm">
                                             <img src="/svg/file-up.svg" class="w-4 h-4" alt="Export Icon" />

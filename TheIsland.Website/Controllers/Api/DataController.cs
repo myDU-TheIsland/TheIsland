@@ -4,7 +4,6 @@
 
 namespace TheIsland.Website.Controllers.Api
 {
-    using System.Diagnostics;
     using System.Linq;
     using System.Text;
     using Microsoft.AspNetCore.Authorization;

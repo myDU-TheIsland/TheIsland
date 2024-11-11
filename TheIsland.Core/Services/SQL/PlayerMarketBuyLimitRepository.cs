@@ -22,8 +22,8 @@ namespace TheIsland.Core.Services.SQL
         public static PlayerMarketBuyLimit GetTimeframe()
         {
             DateTime now = DateTime.Now;
-            DateTime startTime = new DateTime(now.Year, now.Month, now.Day, now.AddHours(-(now.Hour % 6)).Hour, 0, 0, DateTimeKind.Local).ToLocalTime();
-            DateTime endTime = startTime.AddHours(6).AddSeconds(-1).ToLocalTime();
+            DateTime startTime = new DateTime(now.Year, now.Month, now.Day, now.AddHours(-(now.Hour % 3)).Hour, 0, 0, DateTimeKind.Local).ToLocalTime();
+            DateTime endTime = startTime.AddHours(3).AddSeconds(-1).ToLocalTime();
 
             return new PlayerMarketBuyLimit { start_time = startTime, end_time = endTime };
         }
