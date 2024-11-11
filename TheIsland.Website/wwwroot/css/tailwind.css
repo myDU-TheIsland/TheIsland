@@ -131,20 +131,20 @@
 }
 
 .stars {
-  background: url('http://www.script-tutorials.com/demos/360/images/stars.png')
+  background: url('https://www.script-tutorials.com/demos/360/images/stars.png')
     repeat top center;
   z-index: 0;
 }
 
 .stars2 {
-  background: url('http://www.script-tutorials.com/demos/360/images/stars.png')
+  background: url('https://www.script-tutorials.com/demos/360/images/stars.png')
     repeat top center;
   animation: movetwink 200s linear infinite;
   z-index: 1;
 }
 
 .stars3 {
-  background: url('http://www.script-tutorials.com/demos/360/images/stars.png')
+  background: url('https://www.script-tutorials.com/demos/360/images/stars.png')
     repeat top center;
   animation: movetwink 100s linear infinite;
   z-index: 2;
