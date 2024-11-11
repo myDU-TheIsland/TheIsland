@@ -3,12 +3,13 @@
     ViewData["Title"] = "Import Blueprint";
 }
 
-<div class="min-h-screen text-white font-sans pt-35">
-    <div class="max-w-6xl mx-auto flex items-stretch space-x-5 h-full">
+<div class="min-h-screen text-white font-sans pt-35 xs:px-3 xs:pb-10">
+    <div
+        class="max-w-6xl mx-auto md:flex md:flex-row xs:flex-col items-stretch md:space-x-5 md:space-y-0 xs:space-y-5 xs:space-x-0 h-full">
         <!-- Left Side (Upload & Preview) -->
-        <div class="flex flex-col w-1/2 space-y-5 h-full">
+        <div class="flex flex-col md:w-1/2 xs:w-full space-y-5 h-full">
             <!-- Blueprint Preview Section -->
-            <div class="bg-darkBlue p-6 rounded-lg shadow-lg flex flex-col items-center flex-grow">
+            <div class="bg-darkBlue p-6 rounded-lg shadow-lg flex flex-col items-center flex-grow xs:hidden md:block">
                 <div class="aspect-video flex items-center justify-center w-full">
                     <img src="/img/blueprint.jpg?height=300&width=400" class="rounded-md" alt="Blueprint"
                         class="max-w-full max-h-full object-contain" />
@@ -26,17 +27,17 @@
                         </label>
                         <div class="flex items-center space-x-4">
                             <label for="blueprint"
-                                   class="cursor-pointer bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md transition-colors flex items-center">
+                                class="cursor-pointer bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-md transition-colors flex items-center">
                                 Choose Files
                             </label>
                             <span class="text-gray-400" id="file-chosen">No file chosen</span>
                         </div>
                         <input type="file" id="blueprint" accept=".json" class="hidden" name="blueprint" multiple
-                               onchange="handleFileChange(event)" />
+                            onchange="handleFileChange(event)" />
                     </div>
                     <button type="button"
-                            class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors flex items-center justify-center"
-                            onclick="submitFiles()">
+                        class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-md transition-colors flex items-center justify-center"
+                        onclick="submitFiles()">
                         Import Blueprint
                     </button>
                 </div>
@@ -44,7 +45,7 @@
         </div>
 
         <!-- Right Side (Instructions) -->
-        <div class="bg-darkBlue p-6 rounded-lg shadow-lg w-1/2 flex flex-col flex-grow">
+        <div class="bg-darkBlue p-6 rounded-lg shadow-lg md:w-1/2 xs:w-full flex flex-col flex-grow">
             <h2 class="text-2xl font-semibold flex items-center mb-4">Blueprint Import Process</h2>
             <ol class="list-decimal list-inside space-y-2 text-gray-300 text-sm">
                 <li>

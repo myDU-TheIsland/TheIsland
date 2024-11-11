@@ -1070,6 +1070,10 @@ video {
   border-color: rgb(55 65 81 / var(--tw-divide-opacity));
 }
 
+.overflow-auto {
+  overflow: auto;
+}
+
 .overflow-hidden {
   overflow: hidden;
 }
@@ -1550,6 +1554,10 @@ video {
   box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow);
 }
 
+.filter {
+  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+}
+
 .backdrop-blur-md {
   --tw-backdrop-blur: blur(12px);
   -webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
@@ -1645,6 +1653,8 @@ video {
   /* Rounded corners */
   box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   /* Optional: add shadow */
+  max-height: 300px;
+  overflow-y: auto;
 }
 
 /* Style the search input within the dropdown */
@@ -1733,20 +1743,20 @@ video {
 }
 
 .stars {
-  background: url('http://www.script-tutorials.com/demos/360/images/stars.png')
+  background: url('https://www.script-tutorials.com/demos/360/images/stars.png')
     repeat top center;
   z-index: 0;
 }
 
 .stars2 {
-  background: url('http://www.script-tutorials.com/demos/360/images/stars.png')
+  background: url('https://www.script-tutorials.com/demos/360/images/stars.png')
     repeat top center;
   animation: movetwink 200s linear infinite;
   z-index: 1;
 }
 
 .stars3 {
-  background: url('http://www.script-tutorials.com/demos/360/images/stars.png')
+  background: url('https://www.script-tutorials.com/demos/360/images/stars.png')
     repeat top center;
   animation: movetwink 100s linear infinite;
   z-index: 2;
@@ -1873,12 +1883,24 @@ video {
 }
 
 @media (min-width: 425px) {
+  .xs\:mt-2 {
+    margin-top: 0.5rem;
+  }
+
+  .xs\:hidden {
+    display: none;
+  }
+
   .xs\:w-16 {
     width: 4rem;
   }
 
   .xs\:w-full {
     width: 100%;
+  }
+
+  .xs\:max-w-full {
+    max-width: 100%;
   }
 
   .xs\:flex-col {
@@ -1907,6 +1929,12 @@ video {
     margin-bottom: calc(1rem * var(--tw-space-y-reverse));
   }
 
+  .xs\:space-y-5 > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-y-reverse: 0;
+    margin-top: calc(1.25rem * calc(1 - var(--tw-space-y-reverse)));
+    margin-bottom: calc(1.25rem * var(--tw-space-y-reverse));
+  }
+
   .xs\:p-2 {
     padding: 0.5rem;
   }
@@ -1922,6 +1950,10 @@ video {
 
   .xs\:pb-5 {
     padding-bottom: 1.25rem;
+  }
+
+  .xs\:pb-10 {
+    padding-bottom: 2.5rem;
   }
 
   .xs\:text-center {
@@ -1949,6 +1981,18 @@ video {
     margin-left: 0.5rem;
   }
 
+  .md\:mt-10 {
+    margin-top: 2.5rem;
+  }
+
+  .md\:mt-0 {
+    margin-top: 0px;
+  }
+
+  .md\:block {
+    display: block;
+  }
+
   .md\:flex {
     display: flex;
   }
@@ -1967,6 +2011,10 @@ video {
 
   .md\:w-24 {
     width: 6rem;
+  }
+
+  .md\:max-w-6xl {
+    max-width: 72rem;
   }
 
   .md\:grid-cols-2 {
@@ -1991,6 +2039,12 @@ video {
     margin-left: calc(0.5rem * calc(1 - var(--tw-space-x-reverse)));
   }
 
+  .md\:space-x-3 > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-x-reverse: 0;
+    margin-right: calc(0.75rem * var(--tw-space-x-reverse));
+    margin-left: calc(0.75rem * calc(1 - var(--tw-space-x-reverse)));
+  }
+
   .md\:space-x-4 > :not([hidden]) ~ :not([hidden]) {
     --tw-space-x-reverse: 0;
     margin-right: calc(1rem * var(--tw-space-x-reverse));
@@ -2001,6 +2055,12 @@ video {
     --tw-space-y-reverse: 0;
     margin-top: calc(0px * calc(1 - var(--tw-space-y-reverse)));
     margin-bottom: calc(0px * var(--tw-space-y-reverse));
+  }
+
+  .md\:space-x-5 > :not([hidden]) ~ :not([hidden]) {
+    --tw-space-x-reverse: 0;
+    margin-right: calc(1.25rem * var(--tw-space-x-reverse));
+    margin-left: calc(1.25rem * calc(1 - var(--tw-space-x-reverse)));
   }
 
   .md\:p-5 {
