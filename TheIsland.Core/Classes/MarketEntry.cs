@@ -7,11 +7,13 @@ namespace TheIsland.Core.Classes
 
     public class MarketEntry
     {
+        [JsonIgnore]
         public double? GrandParentId { get; set; } = null;
 
         [JsonIgnore]
         public string? GrandParentName { get; set; } = null;
 
+        [JsonIgnore]
         public double ParentId { get; set; } = 0;
 
         [JsonIgnore]
@@ -19,7 +21,6 @@ namespace TheIsland.Core.Classes
 
         public double Id { get; set; } = 0;
 
-        [JsonIgnore]
         public string Name { get; set; } = string.Empty;
 
         [JsonIgnore]
@@ -27,6 +28,7 @@ namespace TheIsland.Core.Classes
 
         public string DisplayName { get; set; } = string.Empty;
 
+        [JsonIgnore]
         public List<MarketEntry> Children { get; set; } = new List<MarketEntry>();
     }
 }
