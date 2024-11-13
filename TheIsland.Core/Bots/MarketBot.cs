@@ -32,13 +32,13 @@ namespace TheIsland.Core.Bots
         ConcurrentBag<ulong> ResellItems { get; }
 
         #region General Functions
-        List<MarketEntry> GetMarketHierarchy(bool forceRefresh = false);
+        List<ItemEntry> GetMarketHierarchy(bool forceRefresh = false);
 
         Dictionary<double, string> GetListOfSellableItems();
 
         List<KeyValuePair<string, double>> GetAllItems();
 
-        List<MarketEntry> GetAllItemsMarketEntries();
+        List<ItemEntry> GetAllItemsMarketEntries();
 
         object GetConfigs();
 
@@ -84,11 +84,11 @@ namespace TheIsland.Core.Bots
 
         public ConcurrentBag<ulong> ResellItems { get; private set; } = new ConcurrentBag<ulong>();
 
-        private List<MarketEntry> _marketEntries { get; set; } = new List<MarketEntry>();
+        private List<ItemEntry> _marketEntries { get; set; } = new List<ItemEntry>();
 
         private ConcurrentDictionary<double, string> ItemsForSale { get; set; } = new ConcurrentDictionary<double, string>();
 
-        private ConcurrentBag<MarketEntry> ItemsForSaleME { get; set; } = new ConcurrentBag<MarketEntry>();
+        private ConcurrentBag<ItemEntry> ItemsForSaleME { get; set; } = new ConcurrentBag<ItemEntry>();
 
         private readonly MarketBotConfig _marketBotConfig;
         private readonly DualUniverseSettings _settings;
@@ -114,7 +114,7 @@ namespace TheIsland.Core.Bots
         }
 
         #region General Functions
-        public List<MarketEntry> GetAllItemsMarketEntries()
+        public List<ItemEntry> GetAllItemsMarketEntries()
         {
             if (this.ItemsForSaleME.Count == 0)
             {
@@ -124,14 +124,14 @@ namespace TheIsland.Core.Bots
             return this.ItemsForSaleME.ToList();
         }
 
-        public List<MarketEntry> GetMarketHierarchy(bool forceRefresh = false)
+        public List<ItemEntry> GetMarketHierarchy(bool forceRefresh = false)
         {
             if (this._marketEntries.Count != 0 && !forceRefresh)
             {
                 return this._marketEntries;
             }
 
-            List<MarketEntry> output = new List<MarketEntry>();
+            List<ItemEntry> output = new List<ItemEntry>();
 
             IGameplayBank bank = this.Bot.GameplayBank;
 
@@ -144,7 +144,7 @@ namespace TheIsland.Core.Bots
                     continue;
                 }
 
-                MarketEntry marketEntry = new MarketEntry()
+                ItemEntry marketEntry = new ItemEntry()
                 {
                     ParentId = 0,
                     ParentName = string.Empty,
@@ -165,7 +165,7 @@ namespace TheIsland.Core.Bots
                 output.Add(marketEntry);
             }
 
-            this._marketEntries = new List<MarketEntry>(output);
+            this._marketEntries = new List<ItemEntry>(output);
             return output;
         }
 
@@ -251,7 +251,7 @@ namespace TheIsland.Core.Bots
 
                     var playerId = Convert.ToDouble(order.ownerId.playerId);
                     var itemId = Convert.ToDouble(order.itemType);
-                    MarketEntry itemData = this.GetAllItemsMarketEntries().First(item => item.Id == itemId);
+                    ItemEntry itemData = this.GetAllItemsMarketEntries().First(item => item.Id == itemId);
                     double marketLimit = await this.GetItemLimitAsync(itemId).ConfigureAwait(false);
 
                     logMessage(@$"This item ({itemData.Name}) limit is {marketLimit}!");
@@ -405,7 +405,7 @@ namespace TheIsland.Core.Bots
         public async Task<double> GetItemLimitAsync(double itemId)
         {
             List<MarketBuyLimit> marketLimits = (await this._marketBuyLimitRepository.GetAsync().ConfigureAwait(false)).OrderBy(item => item.id).ToList();
-            MarketEntry? itemData = this.GetAllItemsMarketEntries().FirstOrDefault(item => item.Id == itemId);
+            ItemEntry? itemData = this.GetAllItemsMarketEntries().FirstOrDefault(item => item.Id == itemId);
 
             if (itemData == null)
             {
@@ -775,9 +775,9 @@ namespace TheIsland.Core.Bots
             }
         }
 
-        private List<MarketEntry> GetChildren(ulong[] children, IGameplayBank bank)
+        private List<ItemEntry> GetChildren(ulong[] children, IGameplayBank bank)
         {
-            List<MarketEntry> output = new List<MarketEntry>();
+            List<ItemEntry> output = new List<ItemEntry>();
 
             foreach (ulong childId in children)
             {
@@ -789,8 +789,13 @@ namespace TheIsland.Core.Bots
                 }
 
                 string displayName = baseEntry.LocalizedProperties?.FirstOrDefault(item => item.Name == "displayName").Translation?.ToString() ?? string.Empty;
+                string parentDisplayName = baseEntry.Parent.LocalizedProperties?.FirstOrDefault(item => item.Name == "displayName").Translation?.ToString() ?? string.Empty;
+                string grandparentDisplayName = baseEntry.Parent.Parent.LocalizedProperties?.FirstOrDefault(item => item.Name == "displayName").Translation?.ToString() ?? string.Empty;
+
                 bool hidden = baseEntry.GetStaticPropertyOpt("hidden")?.boolValue ?? false;
                 string size = baseEntry.GetStaticPropertyOpt("scale")?.stringValue ?? string.Empty;
+                long tier = baseEntry.GetStaticPropertyOpt("level")?.intValue ?? 0;
+
                 if (string.IsNullOrEmpty(displayName) || hidden)
                 {
                     continue;
@@ -801,14 +806,18 @@ namespace TheIsland.Core.Bots
                     size = $@" {size.ToUpper()}";
                 }
 
-                MarketEntry marketEntry = new MarketEntry()
+                ItemEntry marketEntry = new ItemEntry()
                 {
                     GrandParentId = baseEntry.Parent.Parent.Id,
                     GrandParentName = baseEntry.Parent.Parent.Name,
+                    Type = grandparentDisplayName,
                     ParentId = baseEntry.Parent.Id,
                     ParentName = baseEntry.Parent.Name,
+                    SubType = parentDisplayName,
                     Id = childId,
                     Name = baseEntry.Name,
+                    Size = size.Trim(),
+                    Tier = tier,
                     DisplayName = $@"{displayName}{size}",
                 };
 
