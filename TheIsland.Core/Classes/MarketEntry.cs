@@ -10,13 +10,11 @@ namespace TheIsland.Core.Classes
         [JsonIgnore]
         public double? GrandParentId { get; set; } = null;
 
-        [JsonIgnore]
         public string? GrandParentName { get; set; } = null;
 
         [JsonIgnore]
         public double ParentId { get; set; } = 0;
 
-        [JsonIgnore]
         public string ParentName { get; set; } = string.Empty;
 
         public double Id { get; set; } = 0;
