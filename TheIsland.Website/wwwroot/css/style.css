@@ -558,9 +558,9 @@ video {
   width: 100%;
 }
 
-@media (min-width: 425px) {
+@media (min-width: 340px) {
   .container {
-    max-width: 425px;
+    max-width: 340px;
   }
 }
 
@@ -1972,7 +1972,7 @@ video {
   --tw-ring-color: rgb(147 51 234 / var(--tw-ring-opacity));
 }
 
-@media (min-width: 425px) {
+@media (min-width: 340px) {
   .xs\:mt-2 {
     margin-top: 0.5rem;
   }

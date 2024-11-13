@@ -15,7 +15,7 @@ module.exports = {
         'top-left': 'top left',
       },
       screens: {
-        xs: '425px',
+        xs: '340px',
       },
     },
   },
