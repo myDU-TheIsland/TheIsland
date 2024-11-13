@@ -1,0 +1,94 @@
+{
+  "engines": {
+    "atmospheric": {
+      "xs": {
+        "710193240": {
+          "name": "Basic",
+          "type": "Basic"
+        },
+        "1933133404": {
+          "name": "Uncommon",
+          "type": "Maneuver"
+        },
+        "887167900": {
+          "name": "Uncommon",
+          "type": "Safe"
+        },
+        "676012472": {
+          "name": "Uncommon",
+          "type": "Military"
+        },
+        "3174850377": {
+          "name": "Uncommon",
+          "type": "Freight"
+        }
+      },
+      "s": {
+        "2043566501": {
+          "name": "Basic",
+          "type": "Basic"
+        },
+        "317861818": {
+          "name": "Uncommon",
+          "type": "Maneuver"
+        },
+        "1679964557": {
+          "name": "Uncommon",
+          "type": "Safe"
+        },
+        "2203746213": {
+          "name": "Uncommon",
+          "type": "Military"
+        },
+        "1503780712": {
+          "name": "Uncommon",
+          "type": "Freight"
+        }
+      },
+      "m": {
+        "4072611011": {
+          "name": "Basic",
+          "type": "Basic"
+        },
+        "3847351355": {
+          "name": "Uncommon",
+          "type": "Maneuver"
+        },
+        "260237137": {
+          "name": "Uncommon",
+          "type": "Safe"
+        },
+        "3295665550": {
+          "name": "Uncommon",
+          "type": "Military"
+        },
+        "230429858": {
+          "name": "Uncommon",
+          "type": "Freight"
+        }
+      },
+      "l": {
+        "2375915630": {
+          "name": "Basic",
+          "type": "Basic"
+        },
+        "3475626911": {
+          "name": "Uncommon",
+          "type": "Maneuver"
+        },
+        "2510112556": {
+          "name": "Uncommon",
+          "type": "Safe"
+        },
+        "2714399324": {
+          "name": "Uncommon",
+          "type": "Military"
+        },
+        "1053170502": {
+          "name": "Uncommon",
+          "type": "Freight"
+        }
+      }
+    }
+  }
+}

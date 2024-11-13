@@ -111,6 +111,7 @@ namespace TheIsland.Website.Controllers
                 model.ExportableBPs = await this._bluePrintService.GetExportableBPs(Convert.ToUInt64(this.SelectedPlayer)).ConfigureAwait(false);
             }
 
+            this.ViewData["ActiveAction"] = "ExportBP";
             return this.View(model);
         }
 
@@ -155,7 +156,16 @@ namespace TheIsland.Website.Controllers
                 model = new ImportBPModel();
             }
 
+            this.ViewData["ActiveAction"] = "ImportBP";
             return this.View(model);
+        }
+
+        [HttpGet]
+        [Authorize]
+        public IActionResult EditBP()
+        {
+            this.ViewData["ActiveAction"] = "EditBP";
+            return this.View();
         }
 
         [HttpPost]

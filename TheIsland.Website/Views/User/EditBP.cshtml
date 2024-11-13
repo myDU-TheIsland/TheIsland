@@ -1,0 +1,485 @@
+@{
+  ViewData["Title"] = "Edit Blueprint Page";
+}
+
+<partial name="_Blueprints" />
+<div class="max-w-7xl space-y-3 mx-auto text-white font-sans xs:px-3 md:px-0 xs:pb-10 md:pb-3">
+  <!-- Upload -->
+  <div class="bg-darkBlue w-full rounded-md px-4 pb-4">
+    <div class="flex flex-col justify-center">
+      <div class="flex items-center justify-between py-4">
+        <label class="text-lg text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
+          Upload Blueprint:
+        </label>
+        <div class="flex items-center gap-2">
+          <span class="flex text-green-500 px-2">Loaded:</span><span class="text-gray-400">test-bp.json</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-1">
+        <div class="w-5/6">
+          <div class="flex items-center rounded-md border border-purple-700">
+            <label for="blueprint" class="flex w-full cursor-pointer p-2">
+              <span class="mr-2">Choose Files</span>
+              <span class="text-gray-400" id="file-chosen">No file chosen</span>
+            </label>
+          </div>
+          <input type="file" id="blueprint" accept=".json" class="hidden" name="blueprint"
+            onchange="handleFileChange(event)" />
+        </div>
+        <button class="flex-grow bg-purple-600 hover:bg-purple-700/60 px-4 py-2 rounded-md transition-colors">Parse
+          File</button>
+        <button class="flex-grow bg-red-500 hover:bg-red-500/60 px-4 py-2 rounded-md transition-colors">Save</button>
+      </div>
+    </div>
+  </div>
+  <!-- Blueprint Data -->
+  <div class="flex w-full gap-3">
+    <!-- Basic Info -->
+    <div class="bg-darkBlue rounded-md w-1/5 px-4 max-h-fit">
+      <div class="border-b border-gray-700 py-4">
+        <h2 class="text-lg text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">Blueprint Info
+        </h2>
+      </div>
+      <div class="flex flex-col gap-3 py-4">
+        <div class="flex flex-col space-y-2">
+          <label class="text-purple-400">Construct Name:</label>
+          <input
+            class="bg-gray-700 py-1 px-2 rounded-md text-gray-100 border border-gray-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
+            placeholder="Test Bp Static" />
+        </div>
+        <div class="flex items-center gap-2 w-full">
+          <p class="text-purple-400">Core Type:</p>
+          <div
+            class="flex flex-grow gap-1 items-center justify-between text-center rounded-md border border-gray-500 p-1 w-1/2">
+            <p class="w-1/3 p-0.5">St</p>
+            <p class="w-1/3 p-0.5 bg-purple-500 rounded-md">Sp</p>
+            <p class="w-1/3 p-0.5">Dy</p>
+          </div>
+        </div>
+        <div class="flex flex-col gap-2">
+          <p class="text-purple-400">Core Size:</p>
+          <p>L</p>
+        </div>
+        <div class="flex flex-col gap-2">
+          <p class="text-purple-400">File Size:</p>
+          <p>32.6 MB</p>
+        </div>
+        <div class="flex flex-col gap-2">
+          <p class="text-purple-400">Number of Elements:</p>
+          <p>56</p>
+        </div>
+      </div>
+    </div>
+    <div class="flex flex-col gap-2 w-4/5">
+      <!-- Engines -->
+      <div class="flex gap-2 w-full max-h-fit">
+        <!-- Atmo Engines -->
+        <div class="bg-darkBlue rounded-md px-4 pb-4 w-1/2">
+          <div class="border-b border-gray-700 py-3">
+            <h2 class="text-lg text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">Atmophereic
+              Engines
+            </h2>
+          </div>
+          <div class="overflow-auto">
+            <table class="table-fixed w-full">
+              <thead>
+                <tr class="bg-gray-800 text-gray-100">
+                  <th class="w-2/6 p-2 text-left">Tier</th>
+                  <th class="w-2/6 p-2 text-center">Type</th>
+                  <th class="w-1/6 p-2 text-center">Size</th>
+                  <th class="w-1/6 p-2 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="items">
+                <tr class="bg-gray-700 text-gray-100">
+                  <td class="p-2 text-left">
+                    <select class="w-full py-1 bg-gray-600 border border-gray-500 rounded-md text-gray-100">
+
+                    </select>
+                  </td>
+                  <td class="p-2 text-center">
+                    <select class="w-full py-1 bg-gray-600 border border-gray-500 rounded-md text-gray-100">
+
+                    </select>
+                  </td>
+                  <td class="p-2 text-center">
+                    <a class="w-full py-2 text-gray-100">XS</a>
+                  </td>
+                  <td class="p-2 text-right">
+                    <div class="flex gap-2 justify-end">
+                      <a class="text-purple-500 hover:text-purple-500/60 cursor-pointer"><i
+                          class="fa-duotone fa-solid fa-circle-question"></i></a>
+                      <a class="text-red-500 hover:text-red-500/60 cursor-pointer"><i class="fa-solid fa-trash"></i></a>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <!-- Space Engines -->
+        <div class="bg-darkBlue rounded-md px-4 pb-4 w-1/2">
+          <div class="border-b border-gray-700 py-3">
+            <h2 class="text-lg text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">Space
+              Engines
+            </h2>
+          </div>
+          <div class="overflow-auto">
+            <table class="table-fixed w-full">
+              <thead>
+                <tr class="bg-gray-800 text-gray-100">
+                  <th class="w-2/6 p-2 text-left">Tier</th>
+                  <th class="w-2/6 p-2 text-center">Type</th>
+                  <th class="w-1/6 p-2 text-center">Size</th>
+                  <th class="w-1/6 p-2 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="items">
+                <tr class="bg-gray-700 text-gray-100">
+                  <td class="p-2 text-left">
+                    <select class="w-full py-1 bg-gray-600 border border-gray-500 rounded-md text-gray-100">
+
+                    </select>
+                  </td>
+                  <td class="p-2 text-center">
+                    <select class="w-full py-1 bg-gray-600 border border-gray-500 rounded-md text-gray-100">
+
+                    </select>
+                  </td>
+                  <td class="p-2 text-center">
+                    <a class="w-full py-2 text-gray-100">XS</a>
+                  </td>
+                  <td class="p-2 text-right">
+                    <div class="flex gap-2 justify-end">
+                      <a class="text-purple-500 hover:text-purple-500/60 cursor-pointer"><i
+                          class="fa-duotone fa-solid fa-circle-question"></i></a>
+                      <a class="text-red-500 hover:text-red-500/60 cursor-pointer"><i class="fa-solid fa-trash"></i></a>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- Hovers/Boosters -->
+      <div class="flex gap-2 w-full max-h-fit">
+        <!-- Hover Engines -->
+        <div class="bg-darkBlue rounded-md px-4 pb-4 w-1/2">
+          <div class="border-b border-gray-700 py-3">
+            <h2 class="text-lg text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">Hover Engines
+            </h2>
+          </div>
+          <div class="overflow-auto">
+            <table class="table-fixed w-full">
+              <thead>
+                <tr class="bg-gray-800 text-gray-100">
+                  <th class="w-2/6 p-2 text-left">Tier</th>
+                  <th class="w-2/6 p-2 text-center">Type</th>
+                  <th class="w-1/6 p-2 text-center">Size</th>
+                  <th class="w-1/6 p-2 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="items">
+                <tr class="bg-gray-700 text-gray-100">
+                  <td class="p-2 text-left">
+                    <select class="w-full py-1 bg-gray-600 border border-gray-500 rounded-md text-gray-100">
+
+                    </select>
+                  </td>
+                  <td class="p-2 text-center">
+                    <select class="w-full py-1 bg-gray-600 border border-gray-500 rounded-md text-gray-100">
+
+                    </select>
+                  </td>
+                  <td class="p-2 text-center">
+                    <a class="w-full py-2 text-gray-100">XS</a>
+                  </td>
+                  <td class="p-2 text-right">
+                    <div class="flex gap-2 justify-end">
+                      <a class="text-purple-500 hover:text-purple-500/60 cursor-pointer"><i
+                          class="fa-duotone fa-solid fa-circle-question"></i></a>
+                      <a class="text-red-500 hover:text-red-500/60 cursor-pointer"><i class="fa-solid fa-trash"></i></a>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <!-- Vertical Boosters -->
+        <div class="bg-darkBlue rounded-md px-4 pb-4 w-1/2">
+          <div class="border-b border-gray-700 py-3">
+            <h2 class="text-lg text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">Vertical
+              Boosters
+            </h2>
+          </div>
+          <div class="overflow-auto">
+            <table class="table-fixed w-full">
+              <thead>
+                <tr class="bg-gray-800 text-gray-100">
+                  <th class="w-2/6 p-2 text-left">Tier</th>
+                  <th class="w-2/6 p-2 text-center">Type</th>
+                  <th class="w-1/6 p-2 text-center">Size</th>
+                  <th class="w-1/6 p-2 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="items">
+                <tr class="bg-gray-700 text-gray-100">
+                  <td class="p-2 text-left">
+                    <select class="w-full py-1 bg-gray-600 border border-gray-500 rounded-md text-gray-100">
+
+                    </select>
+                  </td>
+                  <td class="p-2 text-center">
+                    <select class="w-full py-1 bg-gray-600 border border-gray-500 rounded-md text-gray-100">
+
+                    </select>
+                  </td>
+                  <td class="p-2 text-center">
+                    <a class="w-full py-2 text-gray-100">XS</a>
+                  </td>
+                  <td class="p-2 text-right">
+                    <div class="flex gap-2 justify-end">
+                      <a class="text-purple-500 hover:text-purple-500/60 cursor-pointer"><i
+                          class="fa-duotone fa-solid fa-circle-question"></i></a>
+                      <a class="text-red-500 hover:text-red-500/60 cursor-pointer"><i class="fa-solid fa-trash"></i></a>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- Radars -->
+      <div class="flex gap-2 w-full max-h-fit">
+        <!-- Atmo Radar -->
+        <div class="bg-darkBlue rounded-md px-4 pb-4 w-1/2">
+          <div class="border-b border-gray-700 py-3">
+            <h2 class="text-lg text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">Atmophereic
+              Radar
+            </h2>
+          </div>
+          <div class="overflow-auto">
+            <table class="table-fixed w-full">
+              <thead>
+                <tr class="bg-gray-800 text-gray-100">
+                  <th class="w-2/6 p-2 text-left">Tier</th>
+                  <th class="w-2/6 p-2 text-center">Type</th>
+                  <th class="w-1/6 p-2 text-center">Size</th>
+                  <th class="w-1/6 p-2 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="items">
+                <tr class="bg-gray-700 text-gray-100">
+                  <td class="p-2 text-left">
+                    <select class="w-full py-1 bg-gray-600 border border-gray-500 rounded-md text-gray-100">
+
+                    </select>
+                  </td>
+                  <td class="p-2 text-center">
+                    <select class="w-full py-1 bg-gray-600 border border-gray-500 rounded-md text-gray-100">
+
+                    </select>
+                  </td>
+                  <td class="p-2 text-center">
+                    <a class="w-full py-2 text-gray-100">XS</a>
+                  </td>
+                  <td class="p-2 text-right">
+                    <div class="flex gap-2 justify-end">
+                      <a class="text-purple-500 hover:text-purple-500/60 cursor-pointer"><i
+                          class="fa-duotone fa-solid fa-circle-question"></i></a>
+                      <a class="text-red-500 hover:text-red-500/60 cursor-pointer"><i class="fa-solid fa-trash"></i></a>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <!-- Space Radar -->
+        <div class="bg-darkBlue rounded-md px-4 pb-4 w-1/2">
+          <div class="border-b border-gray-700 py-3">
+            <h2 class="text-lg text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">Space Radar
+            </h2>
+          </div>
+          <div class="overflow-auto">
+            <table class="table-fixed w-full">
+              <thead>
+                <tr class="bg-gray-800 text-gray-100">
+                  <th class="w-2/6 p-2 text-left">Tier</th>
+                  <th class="w-2/6 p-2 text-center">Type</th>
+                  <th class="w-1/6 p-2 text-center">Size</th>
+                  <th class="w-1/6 p-2 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="items">
+                <tr class="bg-gray-700 text-gray-100">
+                  <td class="p-2 text-left">
+                    <select class="w-full py-1 bg-gray-600 border border-gray-500 rounded-md text-gray-100">
+
+                    </select>
+                  </td>
+                  <td class="p-2 text-center">
+                    <select class="w-full py-1 bg-gray-600 border border-gray-500 rounded-md text-gray-100">
+
+                    </select>
+                  </td>
+                  <td class="p-2 text-center">
+                    <a class="w-full py-2 text-gray-100">XS</a>
+                  </td>
+                  <td class="p-2 text-right">
+                    <div class="flex gap-2 justify-end">
+                      <a class="text-purple-500 hover:text-purple-500/60 cursor-pointer"><i
+                          class="fa-duotone fa-solid fa-circle-question"></i></a>
+                      <a class="text-red-500 hover:text-red-500/60 cursor-pointer"><i class="fa-solid fa-trash"></i></a>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- Gunner Seats/Weapons -->
+      <div class="flex gap-2 w-full max-h-fit">
+        <!-- Gunner Seats -->
+        <div class="bg-darkBlue rounded-md px-4 pb-4 w-1/2">
+          <div class="border-b border-gray-700 py-3">
+            <h2 class="text-lg text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">Gunner Seat
+            </h2>
+          </div>
+          <div class="overflow-auto">
+            <table class="table-fixed w-full">
+              <thead>
+                <tr class="bg-gray-800 text-gray-100">
+                  <th class="w-2/6 p-2 text-left">Tier</th>
+                  <th class="w-2/6 p-2 text-center">Type</th>
+                  <th class="w-1/6 p-2 text-center">Size</th>
+                  <th class="w-1/6 p-2 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="items">
+                <tr class="bg-gray-700 text-gray-100">
+                  <td class="p-2 text-left">
+                    <select class="w-full py-1 bg-gray-600 border border-gray-500 rounded-md text-gray-100">
+
+                    </select>
+                  </td>
+                  <td class="p-2 text-center">
+                    <select class="w-full py-1 bg-gray-600 border border-gray-500 rounded-md text-gray-100">
+
+                    </select>
+                  </td>
+                  <td class="p-2 text-center">
+                    <select class="w-full py-1 bg-gray-600 border border-gray-500 rounded-md text-gray-100">
+
+                    </select>
+                  </td>
+                  <td class="p-2 text-right">
+                    <div class="flex gap-2 justify-end">
+                      <a class="text-purple-500 hover:text-purple-500/60 cursor-pointer"><i
+                          class="fa-duotone fa-solid fa-circle-question"></i></a>
+                      <a class="text-red-500 hover:text-red-500/60 cursor-pointer"><i class="fa-solid fa-trash"></i></a>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <!-- Weapons -->
+        <div class="bg-darkBlue rounded-md px-4 pb-4 w-1/2">
+          <div class="border-b border-gray-700 py-3">
+            <h2 class="text-lg text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">Weapons
+            </h2>
+          </div>
+          <div class="overflow-auto">
+            <table class="table-fixed w-full">
+              <thead>
+                <tr class="bg-gray-800 text-gray-100">
+                  <th class="w-2/6 p-2 text-left">Tier</th>
+                  <th class="w-2/6 p-2 text-center">Type</th>
+                  <th class="w-1/6 p-2 text-center">Size</th>
+                  <th class="w-1/6 p-2 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="items">
+                <tr class="bg-gray-700 text-gray-100">
+                  <td class="p-2 text-left">
+                    <select class="w-full py-1 bg-gray-600 border border-gray-500 rounded-md text-gray-100">
+
+                    </select>
+                  </td>
+                  <td class="p-2 text-center">
+                    <select class="w-full py-1 bg-gray-600 border border-gray-500 rounded-md text-gray-100">
+
+                    </select>
+                  </td>
+                  <td class="p-2 text-center">
+                    <select class="w-full py-1 bg-gray-600 border border-gray-500 rounded-md text-gray-100">
+
+                    </select>
+                  </td>
+                  <td class="p-2 text-right">
+                    <div class="flex gap-2 justify-end">
+                      <a class="text-purple-500 hover:text-purple-500/60 cursor-pointer"><i
+                          class="fa-duotone fa-solid fa-circle-question"></i></a>
+                      <a class="text-red-500 hover:text-red-500/60 cursor-pointer"><i class="fa-solid fa-trash"></i></a>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  function handleFileChange(event) {
+    const fileInput = event.target;
+    const files = fileInput.files;
+    const maxFiles = 1;
+    const maxSize = 75 * 1024 * 1024; // 75MB in bytes
+
+    let totalSize = 0;
+    let fileNames = [];
+
+    if (files.length > maxFiles) {
+      alert(`You can only upload up to ${maxFiles} files.`);
+      fileInput.value = ""; // Clear the file input
+      document.getElementById('file-chosen').textContent = 'No file chosen';
+      return;
+    }
+
+    for (const file of files) {
+      totalSize += file.size;
+      fileNames.push(file.name);
+    }
+
+    if (totalSize > maxSize) {
+      alert(`Total file size must not exceed ${maxSize / (1024 * 1024)} MB.`);
+      fileInput.value = ""; // Clear the file input
+      document.getElementById('file-chosen').textContent = 'No file chosen';
+      return;
+    }
+
+    document.getElementById('file-chosen').textContent = fileNames.join(', ');
+  }
+
+  function submitFiles() {
+    const fileInput = document.getElementById('blueprint');
+    if (!fileInput.files.length) {
+      alert("Please select files to upload.");
+      return;
+    }
+
+    // Here you could perform further validations or submit the form.
+    ///alert("Files ready to be uploaded.");
+    document.getElementById('import-bp-form').submit();
+  }
+</script>
