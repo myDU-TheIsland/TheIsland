@@ -77,6 +77,7 @@ namespace TheIsland.Core.Bots
                 .AddInitializableSingleton<IGameplayBank, GameplayBank>()
                 .AddSingleton<ILocalizationManager, LocalizationManager>()
                 .AddTransient<IDataAccessor, DataAccessor>()
+                .AddTransient<IRecipes, Backend.Recipes>()
                 .AddOrleansClient("IntegrationTests")
                 .AddHttpClient()
                 .AddTransient<NQutils.Stats.IStats, NQutils.Stats.FakeIStats>()

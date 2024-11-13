@@ -33,6 +33,15 @@
             </returns>
             <remarks>Referenced from https://blogs.msdn.microsoft.com/pfxteam/2012/03/05/implementing-a-simple-foreachasync-part-2/.</remarks>
         </member>
+        <member name="M:TheIsland.Core.Services.BuildService.CraftItem(System.Double,System.Double)">
+            <summary>
+            Gets the recipe results with talents applied for recipe provided.
+            </summary>
+            <param name="recipeId"></param>
+            <param name="playerId"></param>
+            <returns></returns>
+            <remarks>Duplicated from Orleans IndustryUnitGrain.cs.</remarks>
+        </member>
         <member name="T:TheIsland.Core.Services.IAppService">
             <summary>
             Placeholder class to allow us to use reflection to include things.

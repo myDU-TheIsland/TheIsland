@@ -13,6 +13,8 @@ namespace TheIsland.Website.Areas.Admin.Controllers
     using TheIsland.Website.Framework.Attributes;
 
     [Area("Admin")]
+    [ApiExplorerSettings(IgnoreApi = false)]
+    [Route("~/[area]/[controller]/[action]")]
     public class TestController : IslandController
     {
         private readonly BuildService _buildService;
