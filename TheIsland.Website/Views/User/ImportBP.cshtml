@@ -43,6 +43,10 @@
                     </button>
                 </div>
             </form>
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <p class="p-1 text-center text-red-500">@Html.Raw(Model.ErrorMessage)</p>
+            }
         </div>
 
         <!-- Right Side (Instructions) -->

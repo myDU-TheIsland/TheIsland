@@ -268,7 +268,7 @@ namespace TheIsland.Core.Services
                 }
 
                 await System.IO.File.WriteAllBytesAsync(this.GetBPPath(uuid), bin).ConfigureAwait(false);
-                BluePrintExport blueprintEntry = new BluePrintExport() { uuid = uuid, blueprint_id = blueprintId, player_id = playerId, blueprint_name = blueprintName,  };
+                BluePrintExport blueprintEntry = new BluePrintExport() { uuid = uuid, blueprint_id = blueprintId, player_id = playerId, blueprint_name = blueprintName, };
                 await this._blueprintExportRepository.AddAsync(blueprintEntry).ConfigureAwait(false);
                 return blueprintEntry;
             }

@@ -42,6 +42,51 @@ namespace TheIsland.Website.Controllers.Api
         }
 
         [HttpGet]
+        public IActionResult GetPlaceableItems()
+        {
+            var nonPlaceableGrandParentNames = new List<string>
+            {
+                "StructuralPart",
+                "IntermediaryPart",
+                "FunctionalPart",
+                "ExceptionalPart",
+                "ComplexPart",
+                "RefinedMaterial",
+                "ProductMaterial",
+                "PureMaterial",
+                "Part",
+                "MineableMaterial",
+                "OreMaterial",
+                "PureHoneycomb",
+                "ProductHoneycomb",
+                "Fuel",
+                "PlanetElement",
+                "Ammo",
+                "AmmoRailgunSmall",
+                "AmmoRailgunMedium",
+                "AmmoRailgunLarge",
+                "AmmoRailgunExtraSmall",
+                "AmmoMissileSmall",
+                "AmmoMissileMedium",
+                "AmmoMissileLarge",
+                "AmmoMissileExtraSmall",
+                "AmmoLaserSmall",
+                "AmmoLaserMedium",
+                "AmmoLaserLarge",
+                "AmmoLaserExtraSmall",
+                "AmmoCannonSmall",
+                "AmmoCannonMedium",
+                "AmmoCannonLarge",
+                "AmmoCannonExtraSmall",
+                "BaseItem",
+            };
+            var placeableItems = this._marketBot.GetAllItemsMarketEntries()
+                .Where(item => !nonPlaceableGrandParentNames.Contains(item.GrandParentName ?? string.Empty))
+                .ToList();
+            return this.Json(placeableItems);
+        }
+
+        [HttpGet]
         public IActionResult GetBotPricesById(string type = "JSON", double market = 0)
         {
             type = type.ToLower();
