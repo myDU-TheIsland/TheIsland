@@ -79,6 +79,11 @@
 	  <ProjectReference Include="..\TheIsland.Core\TheIsland.Core.csproj" />
 	</ItemGroup>
 	<ItemGroup>
+	  <Reference Include="NQutils">
+	    <HintPath>..\TheIsland.Core\NQLibs\NQutils.dll</HintPath>
+	  </Reference>
+	</ItemGroup>
+	<ItemGroup>
 	  <Content Update="Views\Store\FailedPurchase.cshtml">
 	    <ExcludeFromSingleFile>true</ExcludeFromSingleFile>
 	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>

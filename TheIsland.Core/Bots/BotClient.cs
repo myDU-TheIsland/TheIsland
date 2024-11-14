@@ -77,6 +77,7 @@ namespace TheIsland.Core.Bots
                 .AddInitializableSingleton<IGameplayBank, GameplayBank>()
                 .AddSingleton<ILocalizationManager, LocalizationManager>()
                 .AddTransient<IDataAccessor, DataAccessor>()
+                .AddTransient<IRecipes, Backend.Recipes>()
                 .AddOrleansClient("IntegrationTests")
                 .AddHttpClient()
                 .AddTransient<NQutils.Stats.IStats, NQutils.Stats.FakeIStats>()
@@ -100,7 +101,12 @@ namespace TheIsland.Core.Bots
             return Client.FromFactory(this.RestDuClientFactory, pi, allowExising: true);
         }
 
-        public async Task BotConnectionTestAsync()
+        public virtual Task BotConnectionTestAsync()
+        {
+            return ThreadSafeExecution.ThreadExecution("bot", this.InternalBotConnectionTestAsync);
+        }
+
+        protected async Task InternalBotConnectionTestAsync()
         {
             try
             {

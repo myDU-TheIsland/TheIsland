@@ -9,8 +9,11 @@ namespace TheIsland.Website.Controllers.Api
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using TheIsland.Core.Bots;
+    using TheIsland.Core.Helpers;
+    using TheIsland.Core.Helpers.Caching;
     using TheIsland.Core.Services;
     using TheIsland.Website.Classes;
+    using static TheIsland.Core.Helpers.ItemEntryExtensions;
 
     [Area("Api")]
     [Route("~/[area]/[controller]/[action]")]
@@ -29,11 +32,11 @@ namespace TheIsland.Website.Controllers.Api
         [HttpGet]
         public IActionResult GetItems(string type = "JSON")
         {
-            var items = this._marketBot.GetAllItemsMarketEntries();
+            List<Core.Classes.ItemEntry> items = this._marketBot.GetAllItemsMarketEntries();
             switch (type)
             {
                 case "csv":
-                    byte[] bytes = Encoding.UTF8.GetBytes("itemId,itemName,display_name\r\n" + string.Join("\r\n", items.Select(item => $@"{item.Id},{item.Name},{item.DisplayName}")));
+                    byte[] bytes = Encoding.UTF8.GetBytes(@$"{ItemEntryCSVHeader()}" + "\r\n" + string.Join("\r\n", items.Select(item => item.ToCSVLine())));
                     return this.File(bytes, "text/csv", "items.csv");
                 case "json":
                 default:
