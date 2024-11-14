@@ -101,7 +101,12 @@ namespace TheIsland.Core.Bots
             return Client.FromFactory(this.RestDuClientFactory, pi, allowExising: true);
         }
 
-        public async Task BotConnectionTestAsync()
+        public virtual Task BotConnectionTestAsync()
+        {
+            return ThreadSafeExecution.ThreadExecution("bot", this.InternalBotConnectionTestAsync);
+        }
+
+        protected async Task InternalBotConnectionTestAsync()
         {
             try
             {

@@ -5,6 +5,7 @@
 namespace TheIsland.Core.Services
 {
     using Backend;
+    using Backend.Database;
     using Microsoft.Extensions.DependencyInjection;
     using NQ;
     using NQ.Interfaces;
@@ -25,10 +26,22 @@ namespace TheIsland.Core.Services
         }
 
         #region ItemCosts
-        public async Task PriceItems()
+
+        public Task ConvertOreIntoPure()
         {
-            var details = await this.CraftItem(1833008839).ConfigureAwait(false);
-            return;
+            var pures = this._marketBot.GetAllItemsMarketEntries().Where(item => item.Type == "Pure").ToList();
+            foreach (var pure in pures)
+            {
+            }
+
+            return Task.CompletedTask;
+        }
+
+        public async Task<ulong> GetRecipeId(double itemId)
+        {
+            var recipes = await this._recipes.GetAllRecipes().ConfigureAwait(false);
+            var recipe = recipes.FirstOrDefault(item => item.products[0].itemId == Convert.ToUInt64(itemId));
+            return recipe?.id ?? 0;
         }
 
         /// <summary>
@@ -38,9 +51,9 @@ namespace TheIsland.Core.Services
         /// <param name="playerId"></param>
         /// <returns></returns>
         /// <remarks>Duplicated from Orleans IndustryUnitGrain.cs.</remarks>
-        public async Task<(NQ.Recipe? recipe, ulong batchSize)> CraftItem(double recipeId, double playerId = 10000)
+        public async Task<(NQ.Recipe? recipe, ulong batchSize)> CraftItem(ulong recipeId, double playerId = 10000)
         {
-            NQ.Recipe? recipe = this._marketBot.Bot.Recipes.FirstOrDefault(item => item.id == Convert.ToUInt64(recipeId));
+            NQ.Recipe? recipe = this._marketBot.Bot.Recipes.FirstOrDefault(item => item.id == recipeId);
 
             if (recipe == null)
             {
@@ -132,19 +145,6 @@ namespace TheIsland.Core.Services
             }
 
             return (res, (ulong)num);
-        }
-
-        public async Task<List<TalentAndLevel>> GetIndustryTalents(double playerId = 10000)
-        {
-            var talentState = await this._marketBot.DataAccessor.PlayerTalentAsync(Convert.ToUInt64(playerId)).ConfigureAwait(false);
-            var talentsWeWant = this.GetIndustryTalentDefinitions().Select(item => item.Id).ToList();
-            return talentState.talents.Where(item => talentsWeWant.Contains(item.talent)).ToList();
-        }
-
-        public List<IGameplayDefinition> GetIndustryTalentDefinitions()
-        {
-            var talentSubgroups = this._gameplayBank.GetDefinition("TalentGroup")?.GetChildren().Where(item => item.GetStaticProperty("group").stringValue == "CraftingMega").Select(item => item.Name).ToList() ?? new List<string>();
-            return this._gameplayBank.GetDefinition("Talent")?.GetChildren().Where(item => talentSubgroups.Contains(item.GetStaticProperty("group").stringValue)).ToList() ?? new List<IGameplayDefinition>();
         }
         #endregion
     }

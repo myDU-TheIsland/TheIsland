@@ -10,6 +10,7 @@ namespace TheIsland.Website.Controllers.Api
     using Microsoft.AspNetCore.Mvc;
     using TheIsland.Core.Bots;
     using TheIsland.Core.Helpers;
+    using TheIsland.Core.Helpers.Caching;
     using TheIsland.Core.Services;
     using TheIsland.Website.Classes;
     using static TheIsland.Core.Helpers.ItemEntryExtensions;
@@ -31,7 +32,7 @@ namespace TheIsland.Website.Controllers.Api
         [HttpGet]
         public IActionResult GetItems(string type = "JSON")
         {
-            var items = this._marketBot.GetAllItemsMarketEntries();
+            List<Core.Classes.ItemEntry> items = this._marketBot.GetAllItemsMarketEntries();
             switch (type)
             {
                 case "csv":

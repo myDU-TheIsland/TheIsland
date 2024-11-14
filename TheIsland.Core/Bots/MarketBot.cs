@@ -12,10 +12,11 @@ namespace TheIsland.Core.Bots
     using BotLib.Utils;
     using Microsoft.Extensions.Logging;
     using NQ;
-    using NQ.Visibility;
+    using NQ.Interfaces;
     using StackExchange.Redis;
     using TheIsland.Core.Classes;
     using TheIsland.Core.Entities;
+    using TheIsland.Core.Helpers;
     using TheIsland.Core.Services.SQL;
     using TheIsland.Core.Settings;
 
@@ -95,11 +96,15 @@ namespace TheIsland.Core.Bots
         private readonly DualPlayerRepository _dualPlayerRepository;
         private readonly MarketBuyLimitRepository _marketBuyLimitRepository;
         private readonly PlayerMarketBuyLimitRepository _playerMarketBuyLimitRepository;
+        private readonly FactoryLedgerRepository _factoryLedgerRepository;
+        private readonly DualMarketItemEntryRepository _dualMarketItemEntryRepository;
 
         public MarketBot(
             DualPlayerRepository dualPlayerRepository,
             MarketBuyLimitRepository marketBuyLimitRepository,
             PlayerMarketBuyLimitRepository playerMarketBuyLimitRepository,
+            FactoryLedgerRepository factoryLedgerRepository,
+            DualMarketItemEntryRepository dualMarketItemEntryRepository,
             MarketBotConfig marketBotConfig,
             DualUniverseSettings settings,
             ILogger<IMarketBot> logger) : base(settings.MarketBot, logger)
@@ -107,10 +112,18 @@ namespace TheIsland.Core.Bots
             this._dualPlayerRepository = dualPlayerRepository;
             this._marketBuyLimitRepository = marketBuyLimitRepository;
             this._playerMarketBuyLimitRepository = playerMarketBuyLimitRepository;
+            this._factoryLedgerRepository = factoryLedgerRepository;
+            this._dualMarketItemEntryRepository = dualMarketItemEntryRepository;
+
             this._marketBotConfig = marketBotConfig;
             this._settings = settings;
             this.InitializeItemPurchasing();
             this.LoadDictionariesAsync().GetAwaiter().GetResult();
+        }
+
+        public override Task BotConnectionTestAsync()
+        {
+            return ThreadSafeExecution.ThreadExecution(nameof(MarketBot), this.InternalBotConnectionTestAsync);
         }
 
         #region General Functions
@@ -128,7 +141,7 @@ namespace TheIsland.Core.Bots
         {
             if (this._marketEntries.Count != 0 && !forceRefresh)
             {
-                return this._marketEntries;
+                return new List<ItemEntry>();
             }
 
             List<ItemEntry> output = new List<ItemEntry>();
@@ -327,7 +340,6 @@ namespace TheIsland.Core.Bots
                             unitPrice = order.unitPrice,
                         }).ConfigureAwait(false);
                     itemsPurchase++;
-
                     getPlayersLimit.quantity += buyQuantity;
 
                     if (getPlayersLimit.id == 0)
@@ -338,6 +350,19 @@ namespace TheIsland.Core.Bots
                     {
                         await this._playerMarketBuyLimitRepository.UpdateAsync(getPlayersLimit).ConfigureAwait(false);
                     }
+
+                    await this._factoryLedgerRepository.AddAsync(new FactoryLedgerEntry
+                    {
+                        item_id = Convert.ToDouble(order.itemType),
+                        quantity = buyQuantity,
+                        price = totalCost,
+                    }).ConfigureAwait(false);
+
+                    var marketBox = await this._dualMarketItemEntryRepository.GetByPlayerIdByMarketIdAsync(this.Bot.PlayerId.id, order.marketId).ConfigureAwait(false);
+                    var marketBoxID = marketBox.FirstOrDefault(item => item.item_type_id == order.itemType)?.id ?? 0;
+
+                    //delete the ore
+                    await this._dualMarketItemEntryRepository.RemoveAsync(marketBoxID).ConfigureAwait(false);
                 }
 
                 logMessage(@$"Purchased {itemsPurchase} orders @ '{market.name}'!");

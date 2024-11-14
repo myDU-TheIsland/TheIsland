@@ -10,6 +10,36 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="T:TheIsland.Core.Helpers.Caching.IThreadSafeCacheLookup`1">
+            <summary>
+            Interface IThreadSafeCacheLookup.
+            </summary>
+            <typeparam name="TValue">The type of the t value.</typeparam>
+        </member>
+        <member name="M:TheIsland.Core.Helpers.Caching.IThreadSafeCacheLookup`1.ThreadSafeLookup(System.String,System.Func{System.Threading.Tasks.Task{`0}})">
+            <summary>
+            Threads the safe lookup.
+            </summary>
+            <param name="key">The key.</param>
+            <param name="lookup">The lookup.</param>
+            <returns>Task&lt;TValue&gt;.</returns>
+        </member>
+        <member name="T:TheIsland.Core.Helpers.Caching.ThreadSafeCacheLookup`1">
+            <summary>
+            Class ThreadSafeCacheLookup.
+            Implements the <see cref="T:TheIsland.Core.Helpers.Caching.IThreadSafeCacheLookup`1" />.
+            </summary>
+            <typeparam name="TValue">The type of the t value.</typeparam>
+            <seealso cref="T:TheIsland.Core.Helpers.Caching.IThreadSafeCacheLookup`1" />
+        </member>
+        <member name="M:TheIsland.Core.Helpers.Caching.ThreadSafeCacheLookup`1.ThreadSafeLookup(System.String,System.Func{System.Threading.Tasks.Task{`0}})">
+            <summary>
+            Threads the safe lookup.
+            </summary>
+            <param name="key">The key.</param>
+            <param name="lookup">The lookup.</param>
+            <returns>Task&lt;TValue&gt;.</returns>
+        </member>
         <member name="M:TheIsland.Core.Helpers.ParallelizationHelpers.ForEachAsync``1(System.Collections.Generic.IEnumerable{``0},System.Int32,System.Func{``0,System.Threading.Tasks.Task},System.Threading.CancellationToken)">
             <summary>
             The for each async.
@@ -33,7 +63,15 @@
             </returns>
             <remarks>Referenced from https://blogs.msdn.microsoft.com/pfxteam/2012/03/05/implementing-a-simple-foreachasync-part-2/.</remarks>
         </member>
-        <member name="M:TheIsland.Core.Services.BuildService.CraftItem(System.Double,System.Double)">
+        <member name="M:TheIsland.Core.Helpers.ThreadSafeExecution.ThreadExecution(System.String,System.Func{System.Threading.Tasks.Task})">
+            <summary>
+            Threads the safe execution.
+            </summary>
+            <param name="key">The key.</param>
+            <param name="lookup">The lookup.</param>
+            <returns>Task&lt;TValue&gt;.</returns>
+        </member>
+        <member name="M:TheIsland.Core.Services.BuildService.CraftItem(System.UInt64,System.Double)">
             <summary>
             Gets the recipe results with talents applied for recipe provided.
             </summary>

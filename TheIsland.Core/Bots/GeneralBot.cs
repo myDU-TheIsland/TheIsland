@@ -13,6 +13,7 @@ namespace TheIsland.Core.Bots
     using NQ;
     using StackExchange.Redis;
     using TheIsland.Core.Classes;
+    using TheIsland.Core.Helpers;
     using TheIsland.Core.Services.SQL;
     using TheIsland.Core.Settings;
     using static Backend.Fixture.Construct.Schema.ConstructFixtureV1;
@@ -38,6 +39,11 @@ namespace TheIsland.Core.Bots
         {
             this._dualUniverseSettings = settings;
             this._dualPlayerRepository = dualPlayerRepository;
+        }
+
+        public override Task BotConnectionTestAsync()
+        {
+            return ThreadSafeExecution.ThreadExecution(nameof(GeneralBot), this.InternalBotConnectionTestAsync);
         }
 
         #region Admin Functions

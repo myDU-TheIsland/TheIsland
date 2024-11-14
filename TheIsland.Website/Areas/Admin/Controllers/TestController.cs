@@ -46,7 +46,7 @@ namespace TheIsland.Website.Areas.Admin.Controllers
         [ApiKey]
         public async Task<IActionResult> PriceItems()
         {
-            await this._buildService.PriceItems().ConfigureAwait(false);
+            await this._buildService.ConvertOreIntoPure().ConfigureAwait(false);
             return this.Json(true);
         }
 
