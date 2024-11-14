@@ -1,0 +1,2082 @@
+@model ImportBPModel
+@{
+  ViewData["Title"] = "Edit Blueprint Page";
+}
+
+<partial name="_Blueprints" />
+<div class="max-w-7xl space-y-3 mx-auto text-white font-sans xs:px-3 md:px-0 xs:pb-10 md:pb-3">
+  <!-- Important Note -->
+  <div class="space-y-2 rounded-md bg-slate-900 p-4">
+    <h4 class="font-medium text-slate-400">Important Note:</h4>
+    <p class="text-sm text-slate-400 leading-relaxed">
+      Most Sizes are not changeable. You can change the size on Radars, Gunner Seats, and Weapons only. Keep in mind if
+      you change a size you may run into overlapping elements. You will have to fix that ingame via build mode. Use at
+      your own risk.
+    </p>
+    <p class="text-sm text-slate-400 leading-normal">
+      To quickly reset an element to basic there is a reset button left of the delete button.
+    </p>
+    <p class="text-sm text-slate-400 leading-normal">
+      Core type is changeable but size is not.
+    </p>
+  </div>
+  <!-- Upload -->
+  <div class="bg-darkBlue w-full rounded-md px-4 pb-4">
+    <div class="flex flex-col justify-center">
+      <div class="flex items-center justify-between py-4">
+        <label class="text-lg text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">
+          Upload Blueprint:
+        </label>
+        <div class="flex items-center gap-2">
+          <span id="loaded" class="hidden flex text-green-500 px-2">Blueprint Loaded</span>
+        </div>
+      </div>
+      <div class="flex items-center gap-1">
+        <div class="w-5/6">
+          <div class="flex items-center bg-gray-700 rounded-md border border-purple-700">
+            <label for="blueprint" class="flex w-full cursor-pointer p-2">
+              <span class="mr-2">Choose Files</span>
+              <span class="text-gray-400" id="file-chosen">No file chosen</span>
+            </label>
+          </div>
+          <input type="file" id="blueprint" accept=".json" class="hidden" name="blueprint"
+            onchange="handleFileChange(event)" />
+        </div>
+        <button class="flex-grow bg-purple-600 hover:bg-purple-700/60 px-4 py-2 rounded-md transition-colors w-28">Parse
+          File</button>
+        <button id="save"
+          class="flex-grow bg-red-500 hover:bg-red-500/60 px-4 py-2 rounded-md transition-colors">Save</button>
+      </div>
+    </div>
+  </div>
+  <!-- Blueprint Data -->
+  <div class="flex w-full gap-3">
+    <!-- Basic Info -->
+    <div class="bg-darkBlue rounded-md w-1/5 px-4 max-h-fit">
+      <div class="border-b border-gray-700 py-4">
+        <h2 class="text-lg text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">Blueprint Info
+        </h2>
+      </div>
+      <div class="flex flex-col gap-3 py-4">
+        <div class="flex flex-col space-y-2">
+          <label class="text-purple-400">Construct Name:</label>
+          <input id="constructName"
+            class="bg-gray-700 py-1 px-2 rounded-md text-gray-100 border border-gray-500 focus:outline-none focus:border-purple-500 focus:ring-2 focus:ring-purple-500"
+            placeholder="Construct Name" />
+        </div>
+        <div class="flex items-center gap-2 w-full">
+          <p class="text-purple-400">Core Type:</p>
+          <div
+            class="flex flex-grow gap-1 items-center justify-between text-center rounded-md border border-gray-500 p-1 w-1/2">
+            <p id="coreStatic" class="w-1/3 p-0.5 cursor-pointer">St</p>
+            <p id="coreDynamic" class="w-1/3 p-0.5 cursor-pointer">Dy</p>
+            <p id="coreSpace" class="w-1/3 p-0.5 cursor-pointer">Sp</p>
+          </div>
+        </div>
+        <div class="flex flex-col gap-2">
+          <p class="text-purple-400">Core Size:</p>
+          <p>L</p>
+        </div>
+        <div class="flex flex-col gap-2">
+          <p class="text-purple-400">File Size:</p>
+          <p id="fileSize"></p>
+        </div>
+        <div class="flex flex-col gap-2">
+          <p class="text-purple-400">Number of Elements:</p>
+          <p id="elementCount"></p>
+        </div>
+      </div>
+    </div>
+    <div class="flex flex-col gap-2 w-4/5">
+      <!-- Engines -->
+      <div class="flex gap-2 w-full max-h-fit">
+        <!-- Atmo Engines -->
+        <div class="bg-darkBlue rounded-md px-4 pb-4 w-1/2">
+          <div class="border-b border-gray-700 py-3">
+            <h2 class="text-lg text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">Atmospheric
+              Engines
+            </h2>
+          </div>
+          <div class="overflow-auto">
+            <table class="table-fixed w-full max-h-40">
+              <thead>
+                <tr class="bg-gray-800 text-gray-100">
+                  <th class="w-2/6 p-2 text-left">Tier</th>
+                  <th class="w-2/6 p-2 text-center">Type</th>
+                  <th class="w-1/6 p-2 text-center">Size</th>
+                  <th class="w-1/6 p-2 text-right">Actions</th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+          <div class="max-h-44 overflow-y-auto">
+            <table class="table-fixed w-full">
+              <tbody id="AtmosphericEngine"></tbody>
+            </table>
+          </div>
+        </div>
+        <!-- Space Engines -->
+        <div class="bg-darkBlue rounded-md px-4 pb-4 w-1/2">
+          <div class="border-b border-gray-700 py-3">
+            <h2 class="text-lg text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">Space
+              Engines
+            </h2>
+          </div>
+          <div class="overflow-auto">
+            <table class="table-fixed w-full max-h-40">
+              <thead>
+                <tr class="bg-gray-800 text-gray-100">
+                  <th class="w-2/6 p-2 text-left">Tier</th>
+                  <th class="w-2/6 p-2 text-center">Type</th>
+                  <th class="w-1/6 p-2 text-center">Size</th>
+                  <th class="w-1/6 p-2 text-right">Actions</th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+          <div class="max-h-44 overflow-y-auto">
+            <table class="table-fixed w-full">
+              <tbody id="SpaceEngine"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- Hovers/Boosters -->
+      <div class="flex gap-2 w-full max-h-fit">
+        <!-- Hover Engines -->
+        <div class="bg-darkBlue rounded-md px-4 pb-4 w-1/2">
+          <div class="border-b border-gray-700 py-3">
+            <h2 class="text-lg text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">Hover Engines
+            </h2>
+          </div>
+          <div class="overflow-auto">
+            <table class="table-fixed w-full max-h-40">
+              <thead>
+                <tr class="bg-gray-800 text-gray-100">
+                  <th class="w-2/6 p-2 text-left">Tier</th>
+                  <th class="w-2/6 p-2 text-center">Type</th>
+                  <th class="w-1/6 p-2 text-center">Size</th>
+                  <th class="w-1/6 p-2 text-right">Actions</th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+          <div class="max-h-44 overflow-y-auto">
+            <table class="table-fixed w-full">
+              <tbody id="Hovercraft"></tbody>
+            </table>
+          </div>
+        </div>
+        <!-- Vertical Boosters -->
+        <div class="bg-darkBlue rounded-md px-4 pb-4 w-1/2">
+          <div class="border-b border-gray-700 py-3">
+            <h2 class="text-lg text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">Vertical
+              Boosters
+            </h2>
+          </div>
+          <div class="overflow-auto">
+            <table class="table-fixed w-full max-h-40">
+              <thead>
+                <tr class="bg-gray-800 text-gray-100">
+                  <th class="w-2/6 p-2 text-left">Tier</th>
+                  <th class="w-2/6 p-2 text-center">Type</th>
+                  <th class="w-1/6 p-2 text-center">Size</th>
+                  <th class="w-1/6 p-2 text-right">Actions</th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+          <div class="max-h-44 overflow-y-auto">
+            <table class="table-fixed w-full">
+              <tbody id="VerticalBooster"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- Radars -->
+      <div class="flex gap-2 w-full max-h-fit">
+        <!-- Atmo Radar -->
+        <div class="bg-darkBlue rounded-md px-4 pb-4 w-1/2">
+          <div class="border-b border-gray-700 py-3">
+            <h2 class="text-lg text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">Atmophereic
+              Radar
+            </h2>
+          </div>
+          <div class="overflow-auto">
+            <table class="table-fixed w-full max-h-40">
+              <thead>
+                <tr class="bg-gray-800 text-gray-100">
+                  <th class="w-2/6 p-2 text-left">Tier</th>
+                  <th class="w-2/6 p-2 text-center">Type</th>
+                  <th class="w-1/6 p-2 text-center">Size</th>
+                  <th class="w-1/6 p-2 text-right">Actions</th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+          <div class="max-h-44 overflow-y-auto">
+            <table class="table-fixed w-full">
+              <tbody id="RadarPVPUnitAtmo"></tbody>
+            </table>
+          </div>
+        </div>
+        <!-- Space Radar -->
+        <div class="bg-darkBlue rounded-md px-4 pb-4 w-1/2">
+          <div class="border-b border-gray-700 py-3">
+            <h2 class="text-lg text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">Space Radar
+            </h2>
+          </div>
+          <div class="overflow-auto">
+            <table class="table-fixed w-full max-h-40">
+              <thead>
+                <tr class="bg-gray-800 text-gray-100">
+                  <th class="w-2/6 p-2 text-left">Tier</th>
+                  <th class="w-2/6 p-2 text-center">Type</th>
+                  <th class="w-1/6 p-2 text-center">Size</th>
+                  <th class="w-1/6 p-2 text-right">Actions</th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+          <div class="max-h-44 overflow-y-auto">
+            <table class="table-fixed w-full">
+              <tbody id="RadarPVPUnitSpace"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- Gunner Seats/Weapons -->
+      <div class="flex gap-2 w-full max-h-fit">
+        <!-- Gunner Seats -->
+        <div class="bg-darkBlue rounded-md px-4 pb-4 w-1/2">
+          <div class="border-b border-gray-700 py-3">
+            <h2 class="text-lg text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">Gunner Seat
+            </h2>
+          </div>
+          <div class="overflow-auto">
+            <table class="table-fixed w-full max-h-40">
+              <thead>
+                <tr class="bg-gray-800 text-gray-100">
+                  <th class="w-2/6 p-2 text-left">Tier</th>
+                  <th class="w-2/6 p-2 text-center">Type</th>
+                  <th class="w-1/6 p-2 text-center">Size</th>
+                  <th class="w-1/6 p-2 text-right">Actions</th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+          <div class="max-h-44 overflow-y-auto">
+            <table class="table-fixed w-full">
+              <tbody id="GunnerControlUnit"></tbody>
+            </table>
+          </div>
+        </div>
+        <!-- Weapons -->
+        <div class="bg-darkBlue rounded-md px-4 pb-4 w-1/2">
+          <div class="border-b border-gray-700 py-3">
+            <h2 class="text-lg text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">Weapons
+            </h2>
+          </div>
+          <div class="overflow-auto">
+            <table class="table-fixed w-full max-h-40">
+              <thead>
+                <tr class="bg-gray-800 text-gray-100">
+                  <th class="w-24 p-2 text-left">Tier</th>
+                  <th class="w-24 p-2 text-center">Type</th>
+                  <th class="w-1/5 p-2 text-center">Model</th>
+                  <th class="w-11 p-2 text-center">Size</th>
+                  <th class="w-1/5 p-2 text-right">Actions</th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+          <div class="max-h-44 overflow-y-auto">
+            <table class="table-fixed w-full">
+              <tbody id="Weapons"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- Shield/Container -->
+      <div class="flex gap-2 w-full max-h-fit">
+        <!-- Shield -->
+        <div class="bg-darkBlue rounded-md px-4 pb-4 w-1/2">
+          <div class="border-b border-gray-700 py-3">
+            <h2 class="text-lg text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">Shield
+            </h2>
+          </div>
+          <div class="overflow-auto">
+            <table class="table-fixed w-full max-h-40">
+              <thead>
+                <tr class="bg-gray-800 text-gray-100">
+                  <th class="w-2/6 p-2 text-left">Tier</th>
+                  <th class="w-2/6 p-2 text-center">Type</th>
+                  <th class="w-1/6 p-2 text-center">Size</th>
+                  <th class="w-1/6 p-2 text-right">Actions</th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+          <div class="max-h-44 overflow-y-auto">
+            <table class="table-fixed w-full">
+              <tbody id="Shield"></tbody>
+            </table>
+          </div>
+        </div>
+        <!-- Container -->
+        <div class="bg-darkBlue rounded-md px-4 pb-4 w-1/2">
+          <div class="border-b border-gray-700 py-3">
+            <h2 class="text-lg text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">Containers
+            </h2>
+          </div>
+          <div class="overflow-auto">
+            <table class="table-fixed w-full max-h-40">
+              <thead>
+                <tr class="bg-gray-800 text-gray-100">
+                  <th class="w-2/6 p-2 text-left">Tier</th>
+                  <th class="w-2/6 p-2 text-center">Type</th>
+                  <th class="w-1/6 p-2 text-center">Size</th>
+                  <th class="w-1/6 p-2 text-right">Actions</th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+          <div class="max-h-44 overflow-y-auto">
+            <table class="table-fixed w-full">
+              <tbody id="Containers"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <!-- Misc -->
+      <div class="w-full max-h-fit">
+        <div class="bg-darkBlue rounded-md px-4 pb-4 w-full">
+          <div class="border-b border-gray-700 py-3">
+            <h2 class="text-lg text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-600">Misc
+            </h2>
+          </div>
+          <div class="overflow-auto">
+            <table class="table-fixed w-full max-h-40">
+              <thead>
+                <tr class="bg-gray-800 text-gray-100">
+                  <th class="w-1/2 p-2 text-left">Element</th>
+                  <th class="w-1/2 p-2 text-right">Actions</th>
+                </tr>
+              </thead>
+            </table>
+          </div>
+          <div class="max-h-72 overflow-y-auto">
+            <table class="table-fixed w-full">
+              <tbody id="Misc"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const Core = [];
+    const AtmosphericEngine = [];
+    const SpaceEngine = [];
+    const Hovercraft = [];
+    const VerticalBooster = [];
+    const RadarPVPUnitAtmo = [];
+    const RadarPVPUnitSpace = [];
+    const GunnerControlUnit = [];
+    const Weapons = [];
+    const Shield = [];
+    const Containers = [];
+    const Misc = [];
+
+    function handleFileChange(event) {
+      // Clear all arrays
+      Core.length = 0;
+      AtmosphericEngine.length = 0;
+      SpaceEngine.length = 0;
+      Hovercraft.length = 0;
+      VerticalBooster.length = 0;
+      RadarPVPUnitAtmo.length = 0;
+      RadarPVPUnitSpace.length = 0;
+      GunnerControlUnit.length = 0;
+      Weapons.length = 0;
+      Shield.length = 0;
+      Containers.length = 0;
+      Misc.length = 0;
+
+      // Reset construct name 
+      document.getElementById("constructName").value = "";
+      // Reset styles for all core types
+      document.getElementById("coreStatic").classList.remove("bg-purple-500", "rounded-md");
+      document.getElementById("coreDynamic").classList.remove("bg-purple-500", "rounded-md");
+      document.getElementById("coreSpace").classList.remove("bg-purple-500", "rounded-md");
+      // Reset all Table bodys
+      document.getElementById("AtmosphericEngine").innerHTML = "";
+      document.getElementById("SpaceEngine").innerHTML = "";
+      document.getElementById("Hovercraft").innerHTML = "";
+      document.getElementById("VerticalBooster").innerHTML = "";
+      document.getElementById("RadarPVPUnitAtmo").innerHTML = "";
+      document.getElementById("RadarPVPUnitSpace").innerHTML = "";
+      document.getElementById("GunnerControlUnit").innerHTML = "";
+      document.getElementById("Weapons").innerHTML = "";
+      document.getElementById("Shield").innerHTML = "";
+      document.getElementById("Containers").innerHTML = "";
+      document.getElementById("Misc").innerHTML = "";
+      // Reset file size
+      document.getElementById("fileSize").innerHTML = ""
+      // Reset element count
+      document.getElementById("elementCount").innerHTML = "";
+
+      document.getElementById("loaded").classList.add("hidden");
+
+      const fileInput = event.target;
+      const files = fileInput.files;
+      const maxFiles = 1;
+      const maxSize = 75 * 1024 * 1024; // 75MB in bytes
+
+      let totalSize = 0;
+      let fileNames = [];
+
+      if (files.length > maxFiles) {
+        alert(`You can only upload up to ${maxFiles} files.`);
+        fileInput.value = ""; // Clear the file input
+        document.getElementById('file-chosen').textContent = 'No file chosen';
+        return;
+      }
+
+      for (const file of files) {
+        totalSize += file.size;
+        fileNames.push(file.name);
+      }
+
+      if (totalSize > maxSize) {
+        alert(`Total file size must not exceed ${maxSize / (1024 * 1024)} MB.`);
+        fileInput.value = ""; // Clear the file input
+        document.getElementById('file-chosen').textContent = 'No file chosen';
+        return;
+      }
+
+      document.getElementById('file-chosen').textContent = fileNames.join(', ');
+
+      // Reader to load the JSON file
+      const reader = new FileReader();
+      reader.onload = function (event) {
+        try {
+          // Parse the JSON and store a deep copy of the original content
+          originalJsonContent = JSON.parse(event.target.result);
+          jsonContent = JSON.parse(JSON.stringify(originalJsonContent)); // Make a deep copy
+
+          fileSize = (files[0].size / (1024 * 1024)).toFixed(1);
+          // Extract the Elements array
+          extractedElements = jsonContent.Elements || [];
+          extractedLinks = jsonContent.Links || [];
+          // Set element count
+          elementCount = extractedElements.length;
+          console.log("Extracted Elements:", extractedElements);
+
+        } catch (error) {
+          console.error("Error parsing JSON:", error);
+          alert("Invalid JSON file format. File must be .json!");
+        }
+      };
+
+      // Trigger file reading
+      reader.readAsText(files[0]);
+    }
+
+    let originalJsonContent = {}; // To store the original JSON structure
+
+    let jsonContent = {}
+
+    let extractedLinks = []
+    let extractedName = "";
+    let extractedKind = "";
+    let extractedElements = [];
+    let fetchedItems = [];
+    let fileSize = "";
+    let elementCount = "";
+
+    // Event listener to update Name when the input changes
+    document.getElementById("constructName").addEventListener("input", (event) => {
+      jsonContent.Model.Name = event.target.value;
+    });
+
+    document.getElementById("save").addEventListener("click", () => {
+      // Create a new copy of the original JSON to update
+      const updatedJsonContent = JSON.parse(JSON.stringify(originalJsonContent));
+
+      // Update only specific fields
+      updatedJsonContent.Model.Name = jsonContent.Model.Name;
+      updatedJsonContent.Model.JsonProperties.kind = jsonContent.Model.JsonProperties.kind;
+      updatedJsonContent.Model.Static = jsonContent.Model.Static;
+      updatedJsonContent.Model.FreeDeploy = false;
+
+      // Compile all elements into the Elements array, filtering out empty arrays
+      const elementArrays = [
+        Core,
+        AtmosphericEngine,
+        SpaceEngine,
+        Hovercraft,
+        VerticalBooster,
+        RadarPVPUnitAtmo,
+        RadarPVPUnitSpace,
+        GunnerControlUnit,
+        Weapons,
+        Shield,
+        Containers,
+        Misc,
+      ];
+
+      const compiledElements = elementArrays
+        .filter(array => array && array.length > 0) // Filter out empty or undefined arrays
+        .flat();
+
+      updatedJsonContent.Elements = compiledElements;
+      updatedJsonContent.Links = extractedLinks;
+
+      // Convert updated JSON to a JSON string
+      const updatedJsonString = JSON.stringify(updatedJsonContent, null, 2);
+
+      // Create a filename based on extractedName, replacing spaces with underscores
+      const fileName = `${(updatedJsonContent.Model.Name || 'Construct').replace(/\s+/g, '_')}_updated.json`;
+
+      // Create a Blob with the updated JSON string
+      const blob = new Blob([updatedJsonString], { type: "application/json" });
+
+      // Create a temporary link element for downloading
+      const downloadLink = document.createElement("a");
+      downloadLink.href = URL.createObjectURL(blob);
+      downloadLink.download = fileName;
+
+      // Programmatically click the download link to trigger the download
+      downloadLink.click();
+
+      // Clean up the URL object
+      setTimeout(() => {
+        URL.revokeObjectURL(downloadLink.href);
+      }, 100);
+    });
+
+    // Function to update Core element based on selected core type
+    function updateCoreElementType(coreTypeName, coreKindValue, isStatic) {
+      // Update the core kind in jsonContent
+      jsonContent.Model.JsonProperties.kind = coreKindValue;
+      jsonContent.Model.Static = isStatic;
+
+      // Get the first object in the Core array (assuming only one Core element)
+      const coreElement = Core[0];
+      if (!coreElement) {
+        console.warn("No core element found in the Core array.");
+        return;
+      }
+
+      // Get the current display name of the core element from fetchedItems
+      const currentItem = fetchedItems.find(item => item.id === coreElement.elementType);
+      if (!currentItem) {
+        console.warn("No item found in fetchedItems for the core element.");
+        return;
+      }
+
+      // Modify the display name to update the core type
+      const currentDisplayName = currentItem.displayName;
+      const modifiedDisplayName = currentDisplayName.replace(/^\w+/, coreTypeName); // Replace first word with coreTypeName
+
+      // Search fetchedItems for the modified displayName to get the new elementType
+      const newItem = fetchedItems.find(item => item.displayName === modifiedDisplayName);
+      if (!newItem) {
+        console.warn(`No item found in fetchedItems with displayName "${modifiedDisplayName}".`);
+        return;
+      }
+
+      // Update the elementType in the Core array
+      coreElement.elementType = newItem.id;
+      console.log(`Updated core elementType to ${newItem.id} for displayName "${modifiedDisplayName}".`);
+
+      // Update the UI
+      updateCoreTypeUI(coreKindValue);
+    }
+
+    // Event listeners for core type selection
+    document.getElementById("coreStatic").addEventListener("click", () => {
+      updateCoreElementType("Static", 3, true);
+    });
+
+    document.getElementById("coreDynamic").addEventListener("click", () => {
+      updateCoreElementType("Dynamic", 4, false);
+    });
+
+    document.getElementById("coreSpace").addEventListener("click", () => {
+      updateCoreElementType("Space", 5, true);
+    });
+
+    // Function to update the UI based on the selected core type
+    function updateCoreTypeUI(selectedKind) {
+      // Clear the classes from all core elements
+      document.getElementById("coreStatic").classList.remove("bg-purple-500", "rounded-md");
+      document.getElementById("coreDynamic").classList.remove("bg-purple-500", "rounded-md");
+      document.getElementById("coreSpace").classList.remove("bg-purple-500", "rounded-md");
+
+      // Add classes to the selected core type
+      if (jsonContent.Model.JsonProperties.kind === 3) {
+        document.getElementById("coreStatic").classList.add("bg-purple-500", "rounded-md");
+      } else if (jsonContent.Model.JsonProperties.kind === 4) {
+        document.getElementById("coreDynamic").classList.add("bg-purple-500", "rounded-md");
+      } else if (jsonContent.Model.JsonProperties.kind === 5) {
+        document.getElementById("coreSpace").classList.add("bg-purple-500", "rounded-md");
+      }
+    }
+
+    function populateEnginesTables(array, tableBodyId) {
+      const tableBody = document.getElementById(tableBodyId);
+      if (!tableBody) {
+        console.warn(`No table body found with ID "${tableBodyId}"`);
+        return;
+      }
+
+      tableBody.innerHTML = ""; // Clear existing rows
+
+      array.forEach((element, index) => {  // Add index parameter here
+        // Find the corresponding fetched item by elementType
+        const matchedItem = fetchedItems.find(item => item.id === element.elementType);
+        if (!matchedItem) return; // Skip if no match is found
+
+        // Parse displayName for Tier, Type, and Size
+        const { displayName } = matchedItem;
+        const [defaultTier, defaultType, ...rest] = displayName.split(" ");
+        const defaultSize = rest.pop(); // Assuming size is always the last word in displayName
+
+        // Create table row
+        const row = document.createElement("tr");
+        row.classList.add("bg-gray-700", "text-gray-100");
+
+        // Create and populate Tier cell
+        const tierCell = document.createElement("td");
+        tierCell.classList.add("w-2/6", "p-2", "text-left");
+        const tierSelect = document.createElement("select");
+        tierSelect.classList.add("w-full", "py-1", "bg-gray-600", "border", "border-gray-500", "rounded-md", "text-gray-100");
+        ["Basic", "Uncommon", "Advanced", "Rare", "Exotic"].forEach(optionTier => {
+          const option = document.createElement("option");
+          option.value = optionTier;
+          option.textContent = optionTier;
+          if (optionTier === defaultTier) option.selected = true;
+          tierSelect.appendChild(option);
+        });
+        tierCell.appendChild(tierSelect);
+
+        // Create and populate Type cell
+        const typeCell = document.createElement("td");
+        typeCell.classList.add("w-2/6", "p-2", "text-center");
+        const typeSelect = document.createElement("select");
+        typeSelect.classList.add("w-full", "py-1", "bg-gray-600", "border", "border-gray-500", "rounded-md", "text-gray-100");
+        ["Basic", "Maneuver", "Military", "Safe", "Freight"].forEach(optionType => {
+          const option = document.createElement("option");
+          option.value = optionType;
+          option.textContent = optionType;
+          if (optionType === defaultType) option.selected = true;
+          typeSelect.appendChild(option);
+        });
+        typeCell.appendChild(typeSelect);
+
+        // Create and populate Size cell (static text)
+        const sizeCell = document.createElement("td");
+        sizeCell.classList.add("w-1/6", "p-2", "text-center");
+        sizeCell.textContent = defaultSize || "XS"; // Display size or default to "XS"
+
+        // Create Actions cell
+        const actionsCell = document.createElement("td");
+        actionsCell.classList.add("w-1/6", "p-2", "text-right");
+        const actionsDiv = document.createElement("div");
+        actionsDiv.classList.add("flex", "gap-2", "justify-end");
+
+        // Add help icon
+        const helpIcon = document.createElement("a");
+        helpIcon.classList.add("text-purple-500", "hover:text-purple-500/60", "cursor-pointer");
+        helpIcon.innerHTML = '<i class="fa-duotone fa-solid fa-circle-question"></i>';
+        actionsDiv.appendChild(helpIcon);
+
+        // Add reset icon
+        const resetIcon = document.createElement("a");
+        resetIcon.classList.add("text-purple-500", "hover:text-purple-500/60", "cursor-pointer");
+        resetIcon.innerHTML = '<i class="fa-solid fa-clock-rotate-left"></i>';
+        actionsDiv.appendChild(resetIcon);
+
+        // Add reset functionality to the reset icon
+        resetIcon.addEventListener("click", () => {
+          tierSelect.value = "Basic";
+          typeSelect.value = "Basic";
+          updateElementType(); // Update the elementType after reset
+        });
+
+        // Add delete icon
+        const deleteIcon = document.createElement("a");
+        deleteIcon.classList.add("text-red-500", "hover:text-red-500/60", "cursor-pointer");
+        deleteIcon.innerHTML = '<i class="fa-solid fa-trash"></i>';
+        actionsDiv.appendChild(deleteIcon);
+
+        // Delete row and remove item from array
+        deleteIcon.addEventListener("click", () => {
+          row.remove(); // Remove row from table
+
+          // Find the current index of the element in the array
+          const currentIndex = array.indexOf(element);
+          if (currentIndex > -1) {
+            array.splice(currentIndex, 1); // Remove element from array
+            console.log(`Removed element with index ${currentIndex} from array`);
+          }
+          // Remove any link from extractedLinks where the fromElementId or toElementId matches element.elementId
+          extractedLinks = extractedLinks.filter(link => {
+            if (link.fromElementId === element.elementId) {
+              console.warn(`Removing From Link with elementId "${element.elementId}" from extractedLinks.`);
+              return false; // Exclude this link from the array
+            }
+            if (link.toElementId === element.elementId) {
+              console.warn(`Removing To Link with elementId "${element.elementId}" from extractedLinks.`);
+              return false; // Exclude this link from the array
+            }
+            return true; // Keep this link in the array
+          });
+        });
+
+        actionsCell.appendChild(actionsDiv);
+
+        // Append cells to row
+        row.appendChild(tierCell);
+        row.appendChild(typeCell);
+        row.appendChild(sizeCell);
+        row.appendChild(actionsCell);
+
+        // Append row to table body
+        tableBody.appendChild(row);
+
+        // Event listener for updating elementType based on dropdown changes
+        function updateElementType() {
+          let selectedTier = tierSelect.value;
+          let selectedType = typeSelect.value;
+
+          // Adjust Type to "Maneuver" if Tier changes from "Basic" and Type is "Basic"
+          if (selectedTier !== "Basic" && selectedType === "Basic") {
+            selectedType = "Maneuver";
+            typeSelect.value = "Maneuver";
+          }
+
+          if (selectedTier === "Basic" && selectedType !== "Basic") {
+            selectedType = "Basic";
+            typeSelect.value = "Basic";
+          } else if (selectedType === "Basic" && selectedTier !== "Basic") {
+            selectedTier = "Basic";
+            tierSelect.value = "Basic";
+          }
+
+          const newDisplayName = `${selectedTier} ${selectedType === "Basic" ? "" : selectedType} ${tableBodyId.replace(/([A-Z])/g, ' $1').trim()} ${defaultSize}`.replace(/\s+/g, ' ').trim();
+          const newMatchedItem = fetchedItems.find(item => item.displayName === newDisplayName);
+
+          if (newMatchedItem) {
+            element.elementType = newMatchedItem.id;
+            console.log(`Updated elementType to ${newMatchedItem.id} for displayName "${newDisplayName}"`);
+          } else {
+            console.warn(`No item found with displayName "${newDisplayName}"`);
+          }
+        }
+
+        // Attach event listeners to the dropdowns
+        tierSelect.addEventListener("change", updateElementType);
+        typeSelect.addEventListener("change", updateElementType);
+      });
+    }
+
+    function populateHovercraftTable(array, tableBodyId) {
+      const tableBody = document.getElementById(tableBodyId);
+      if (!tableBody) {
+        console.warn(`No table body found with ID "${tableBodyId}"`);
+        return;
+      }
+
+      tableBody.innerHTML = ""; // Clear existing rows
+
+      array.forEach((element, index) => {
+        // Find the corresponding fetched item by elementType
+        const matchedItem = fetchedItems.find(item => item.id === element.elementType);
+        if (!matchedItem) return; // Skip if no match is found
+
+        // Parse displayName for Tier, Type, and Size
+        const { displayName } = matchedItem;
+        const isFlatModel = displayName.includes("Flat");
+        const [defaultTier, defaultType, ...rest] = displayName.split(" ");
+        const defaultSize = rest.pop(); // Assuming size is always the last word in displayName
+
+        // Create table row
+        const row = document.createElement("tr");
+        row.classList.add("bg-gray-700", "text-gray-100");
+
+        // Create and populate Tier cell
+        const tierCell = document.createElement("td");
+        tierCell.classList.add("w-2/6", "p-2", "text-left");
+        const tierSelect = document.createElement("select");
+        tierSelect.classList.add("w-full", "py-1", "bg-gray-600", "border", "border-gray-500", "rounded-md", "text-gray-100");
+        ["Basic", "Uncommon", "Advanced", "Rare", "Exotic"].forEach(optionTier => {
+          const option = document.createElement("option");
+          option.value = optionTier;
+          option.textContent = optionTier;
+          if (optionTier === defaultTier) option.selected = true;
+          tierSelect.appendChild(option);
+        });
+        tierCell.appendChild(tierSelect);
+
+        // Create and populate Type cell
+        const typeCell = document.createElement("td");
+        typeCell.classList.add("w-2/6", "p-2", "text-center");
+        const typeSelect = document.createElement("select");
+        typeSelect.classList.add("w-full", "py-1", "bg-gray-600", "border", "border-gray-500", "rounded-md", "text-gray-100");
+        ["Basic", "Maneuver", "Military", "Safe", "Freight"].forEach(optionType => {
+          const option = document.createElement("option");
+          option.value = optionType;
+          option.textContent = optionType;
+          if (optionType === defaultType) option.selected = true;
+          typeSelect.appendChild(option);
+        });
+        typeCell.appendChild(typeSelect);
+
+        // Create and populate Size cell (static text)
+        const sizeCell = document.createElement("td");
+        sizeCell.classList.add("w-1/6", "p-2", "text-center");
+        sizeCell.textContent = defaultSize || "XS"; // Display size or default to "XS"
+
+        // Create Actions cell
+        const actionsCell = document.createElement("td");
+        actionsCell.classList.add("w-1/6", "p-2", "text-right");
+        const actionsDiv = document.createElement("div");
+        actionsDiv.classList.add("flex", "gap-2", "justify-end");
+
+        // Add help icon
+        const helpIcon = document.createElement("a");
+        helpIcon.classList.add("text-purple-500", "hover:text-purple-500/60", "cursor-pointer");
+        helpIcon.innerHTML = '<i class="fa-duotone fa-solid fa-circle-question"></i>';
+        actionsDiv.appendChild(helpIcon);
+
+        // Add reset icon
+        const resetIcon = document.createElement("a");
+        resetIcon.classList.add("text-purple-500", "hover:text-purple-500/60", "cursor-pointer");
+        resetIcon.innerHTML = '<i class="fa-solid fa-clock-rotate-left"></i>';
+        actionsDiv.appendChild(resetIcon);
+
+        // Add reset functionality to the reset icon
+        resetIcon.addEventListener("click", () => {
+          tierSelect.value = "Basic";
+          typeSelect.value = "Basic";
+          updateElementType(); // Update the elementType after reset
+        });
+
+        // Add delete icon
+        const deleteIcon = document.createElement("a");
+        deleteIcon.classList.add("text-red-500", "hover:text-red-500/60", "cursor-pointer");
+        deleteIcon.innerHTML = '<i class="fa-solid fa-trash"></i>';
+        actionsDiv.appendChild(deleteIcon);
+
+        // Delete row and remove item from array
+        deleteIcon.addEventListener("click", () => {
+          row.remove(); // Remove row from table
+
+          // Find the current index of the element in the array
+          const currentIndex = array.indexOf(element);
+          if (currentIndex > -1) {
+            array.splice(currentIndex, 1); // Remove element from array
+            console.log(`Removed element with index ${currentIndex} from array`);
+          }
+          // Remove any link from extractedLinks where the fromElementId or toElementId matches element.elementId
+          extractedLinks = extractedLinks.filter(link => {
+            if (link.fromElementId === element.elementId) {
+              console.warn(`Removing From Link with elementId "${element.elementId}" from extractedLinks.`);
+              return false; // Exclude this link from the array
+            }
+            if (link.toElementId === element.elementId) {
+              console.warn(`Removing To Link with elementId "${element.elementId}" from extractedLinks.`);
+              return false; // Exclude this link from the array
+            }
+            return true; // Keep this link in the array
+          });
+        });
+
+        actionsCell.appendChild(actionsDiv);
+
+        // Append cells to row
+        row.appendChild(tierCell);
+        row.appendChild(typeCell);
+        row.appendChild(sizeCell);
+        row.appendChild(actionsCell);
+
+        // Append row to table body
+        tableBody.appendChild(row);
+
+        // Function to update the elementType based on selected Tier, Type, and Size
+        function updateElementType() {
+          let selectedTier = tierSelect.value;
+          let selectedType = typeSelect.value;
+
+          // Adjust Type to "Maneuver" if Tier changes from "Basic" and Type is "Basic"
+          if (selectedTier !== "Basic" && selectedType === "Basic") {
+            selectedType = "Maneuver";
+            typeSelect.value = "Maneuver";
+          }
+          // Adjust Tier to "Uncommon" if Type changes from "Basic" and Tier is "Basic"
+          else if (selectedType !== "Basic" && selectedTier === "Basic") {
+            selectedTier = "Uncommon";
+            tierSelect.value = "Uncommon";
+          }
+
+          // Construct displayName based on model (Flat or regular)
+          const newDisplayName = isFlatModel
+            ? `${selectedTier} ${selectedType === "Basic" ? "" : selectedType} Flat Hover Engine ${defaultSize}`.replace(/\s+/g, ' ').trim()
+            : `${selectedTier} ${selectedType} Hover Engine ${defaultSize}`;
+
+          // Find the new elementType based on the constructed displayName
+          const newMatchedItem = fetchedItems.find(item => item.displayName === newDisplayName);
+
+          if (newMatchedItem) {
+            element.elementType = newMatchedItem.id;
+            console.log(`Updated elementType to ${newMatchedItem.id} for displayName "${newDisplayName}"`);
+          } else {
+            console.warn(`No item found with displayName "${newDisplayName}"`);
+          }
+        }
+
+        // Attach event listeners to the dropdowns
+        tierSelect.addEventListener("change", updateElementType);
+        typeSelect.addEventListener("change", updateElementType);
+      });
+    }
+
+    function populateRadarPVPUnitAtmoTable(array, tableBodyId) {
+      const tableBody = document.getElementById(tableBodyId);
+      if (!tableBody) {
+        console.warn(`No table body found with ID "${tableBodyId}"`);
+        return;
+      }
+
+      tableBody.innerHTML = ""; // Clear existing rows
+
+      array.forEach((element, index) => {
+        // Find the corresponding fetched item by elementType
+        const matchedItem = fetchedItems.find(item => item.id === element.elementType);
+        if (!matchedItem) return; // Skip if no match is found
+
+        // Parse displayName for Size
+        const { displayName } = matchedItem;
+        const size = displayName.split(" ").pop(); // Assuming size is always the last word in displayName
+
+        // Create table row
+        const row = document.createElement("tr");
+        row.classList.add("bg-gray-700", "text-gray-100");
+
+        // Tier cell (static text "Atmospheric")
+        const tierCell = document.createElement("td");
+        tierCell.classList.add("w-2/6", "p-2", "text-left");
+        tierCell.textContent = "Atmospheric";
+
+        // Type cell (static text "Radar")
+        const typeCell = document.createElement("td");
+        typeCell.classList.add("w-2/6", "p-2", "text-center");
+        typeCell.textContent = "Radar";
+
+        // Size cell (selectable dropdown)
+        const sizeCell = document.createElement("td");
+        sizeCell.classList.add("w-1/6", "p-2", "text-center");
+        const sizeSelect = document.createElement("select");
+        sizeSelect.classList.add("w-full", "py-1", "bg-gray-600", "border", "border-gray-500", "rounded-md", "text-gray-100");
+        ["S", "M", "L"].forEach(optionSize => {
+          const option = document.createElement("option");
+          option.value = optionSize;
+          option.textContent = optionSize;
+          if (optionSize === size) option.selected = true;
+          sizeSelect.appendChild(option);
+        });
+        sizeCell.appendChild(sizeSelect);
+
+        // Actions cell
+        const actionsCell = document.createElement("td");
+        actionsCell.classList.add("w-1/6", "p-2", "text-right");
+        const actionsDiv = document.createElement("div");
+        actionsDiv.classList.add("flex", "gap-2", "justify-end");
+
+        // Add help icon
+        const helpIcon = document.createElement("a");
+        helpIcon.classList.add("text-purple-500", "hover:text-purple-500/60", "cursor-pointer");
+        helpIcon.innerHTML = '<i class="fa-duotone fa-solid fa-circle-question"></i>';
+        actionsDiv.appendChild(helpIcon);
+
+        // Add reset icon
+        const resetIcon = document.createElement("a");
+        resetIcon.classList.add("text-purple-500", "hover:text-purple-500/60", "cursor-pointer");
+        resetIcon.innerHTML = '<i class="fa-solid fa-clock-rotate-left"></i>';
+        resetIcon.addEventListener("click", () => {
+          sizeSelect.value = size; // Reset the size select to default
+          updateElementType();
+        });
+        actionsDiv.appendChild(resetIcon);
+
+        // Add delete icon
+        const deleteIcon = document.createElement("a");
+        deleteIcon.classList.add("text-red-500", "hover:text-red-500/60", "cursor-pointer");
+        deleteIcon.innerHTML = '<i class="fa-solid fa-trash"></i>';
+        actionsDiv.appendChild(deleteIcon);
+
+        // Delete row and remove item from array
+        deleteIcon.addEventListener("click", () => {
+          row.remove(); // Remove row from table
+
+          // Find the current index of the element in the array
+          const currentIndex = array.indexOf(element);
+          if (currentIndex > -1) {
+            array.splice(currentIndex, 1); // Remove element from array
+            console.log(`Removed element with index ${currentIndex} from array`);
+          }
+          // Remove any link from extractedLinks where the fromElementId or toElementId matches element.elementId
+          extractedLinks = extractedLinks.filter(link => {
+            if (link.fromElementId === element.elementId) {
+              console.warn(`Removing From Link with elementId "${element.elementId}" from extractedLinks.`);
+              return false; // Exclude this link from the array
+            }
+            if (link.toElementId === element.elementId) {
+              console.warn(`Removing To Link with elementId "${element.elementId}" from extractedLinks.`);
+              return false; // Exclude this link from the array
+            }
+            return true; // Keep this link in the array
+          });
+        });
+
+        actionsCell.appendChild(actionsDiv);
+
+        // Append cells to row
+        row.appendChild(tierCell);
+        row.appendChild(typeCell);
+        row.appendChild(sizeCell);
+        row.appendChild(actionsCell);
+
+        // Append row to table body
+        tableBody.appendChild(row);
+
+        // Function to update the elementType based on selected Size
+        function updateElementType() {
+          const selectedSize = sizeSelect.value;
+          const newDisplayName = `Atmospheric Radar ${selectedSize}`;
+
+          const newMatchedItem = fetchedItems.find(item => item.displayName === newDisplayName);
+
+          if (newMatchedItem) {
+            element.elementType = newMatchedItem.id;
+            console.log(`Updated elementType to ${newMatchedItem.id} for displayName "${newDisplayName}"`);
+          } else {
+            console.warn(`No item found with displayName "${newDisplayName}"`);
+          }
+        }
+
+        // Attach event listener to size dropdown
+        sizeSelect.addEventListener("change", updateElementType);
+      });
+    }
+
+    function populateRadarPVPUnitSpaceTable(array, tableBodyId) {
+      const tableBody = document.getElementById(tableBodyId);
+      if (!tableBody) {
+        console.warn(`No table body found with ID "${tableBodyId}"`);
+        return;
+      }
+
+      tableBody.innerHTML = ""; // Clear existing rows
+
+      array.forEach((element, index) => {
+        // Find the corresponding fetched item by elementType
+        const matchedItem = fetchedItems.find(item => item.id === element.elementType);
+        if (!matchedItem) return; // Skip if no match is found
+
+        // Parse displayName for Size
+        const { displayName } = matchedItem;
+        const [defaultTier, defaultType, ...rest] = displayName.split(" ");
+        const size = rest.pop();
+
+        // Create table row
+        const row = document.createElement("tr");
+        row.classList.add("bg-gray-700", "text-gray-100");
+
+        // Tier cell (dropdown)
+        const tierCell = document.createElement("td");
+        tierCell.classList.add("w-2/6", "p-2", "text-left");
+        const tierSelect = document.createElement("select");
+        tierSelect.classList.add("w-full", "py-1", "bg-gray-600", "border", "border-gray-500", "rounded-md", "text-gray-100");
+        ["Space", "Advanced", "Rare", "Exotic"].forEach(optionTier => {
+          const option = document.createElement("option");
+          option.value = optionTier;
+          option.textContent = optionTier;
+          if (optionTier === defaultTier) option.selected = true;
+          tierSelect.appendChild(option);
+        });
+        tierCell.appendChild(tierSelect);
+
+        // Type cell (dropdown)
+        const typeCell = document.createElement("td");
+        typeCell.classList.add("w-2/6", "p-2", "text-center");
+        const typeSelect = document.createElement("select");
+        typeSelect.classList.add("w-full", "py-1", "bg-gray-600", "border", "border-gray-500", "rounded-md", "text-gray-100");
+        ["Radar", "Phased-Array", "Protected", "Quick-Wired"].forEach(optionType => {
+          const option = document.createElement("option");
+          option.value = optionType;
+          option.textContent = optionType;
+          if (optionType === defaultType) option.selected = true;
+          typeSelect.appendChild(option);
+        });
+        typeCell.appendChild(typeSelect);
+
+        // Size cell (dropdown)
+        const sizeCell = document.createElement("td");
+        sizeCell.classList.add("w-1/6", "p-2", "text-center");
+        const sizeSelect = document.createElement("select");
+        sizeSelect.classList.add("w-full", "py-1", "bg-gray-600", "border", "border-gray-500", "rounded-md", "text-gray-100");
+        ["S", "M", "L"].forEach(optionSize => {
+          const option = document.createElement("option");
+          option.value = optionSize;
+          option.textContent = optionSize;
+          if (optionSize === size) option.selected = true;
+          sizeSelect.appendChild(option);
+        });
+        sizeCell.appendChild(sizeSelect);
+
+        // Actions cell
+        const actionsCell = document.createElement("td");
+        actionsCell.classList.add("w-1/6", "p-2", "text-right");
+        const actionsDiv = document.createElement("div");
+        actionsDiv.classList.add("flex", "gap-2", "justify-end");
+
+        // Add help icon
+        const helpIcon = document.createElement("a");
+        helpIcon.classList.add("text-purple-500", "hover:text-purple-500/60", "cursor-pointer");
+        helpIcon.innerHTML = '<i class="fa-duotone fa-solid fa-circle-question"></i>';
+        actionsDiv.appendChild(helpIcon);
+
+        // Add reset icon
+        const resetIcon = document.createElement("a");
+        resetIcon.classList.add("text-purple-500", "hover:text-purple-500/60", "cursor-pointer");
+        resetIcon.innerHTML = '<i class="fa-solid fa-clock-rotate-left"></i>';
+        resetIcon.addEventListener("click", () => {
+          tierSelect.value = "Space";
+          typeSelect.value = "Radar";
+          updateElementType();
+        });
+        actionsDiv.appendChild(resetIcon);
+
+        // Add delete icon
+        const deleteIcon = document.createElement("a");
+        deleteIcon.classList.add("text-red-500", "hover:text-red-500/60", "cursor-pointer");
+        deleteIcon.innerHTML = '<i class="fa-solid fa-trash"></i>';
+        actionsDiv.appendChild(deleteIcon);
+
+        // Delete row and remove item from array
+        deleteIcon.addEventListener("click", () => {
+          row.remove(); // Remove row from table
+
+          // Find the current index of the element in the array
+          const currentIndex = array.indexOf(element);
+          if (currentIndex > -1) {
+            array.splice(currentIndex, 1); // Remove element from array
+            console.log(`Removed element with index ${currentIndex} from array`);
+          }
+          // Remove any link from extractedLinks where the fromElementId or toElementId matches element.elementId
+          extractedLinks = extractedLinks.filter(link => {
+            if (link.fromElementId === element.elementId) {
+              console.warn(`Removing From Link with elementId "${element.elementId}" from extractedLinks.`);
+              return false; // Exclude this link from the array
+            }
+            if (link.toElementId === element.elementId) {
+              console.warn(`Removing To Link with elementId "${element.elementId}" from extractedLinks.`);
+              return false; // Exclude this link from the array
+            }
+            return true; // Keep this link in the array
+          });
+        });
+
+        actionsCell.appendChild(actionsDiv);
+
+        // Append cells to row
+        row.appendChild(tierCell);
+        row.appendChild(typeCell);
+        row.appendChild(sizeCell);
+        row.appendChild(actionsCell);
+
+        // Append row to table body
+        tableBody.appendChild(row);
+
+        // Function to update the elementType based on selected Size
+        function updateElementType() {
+          let selectedTier = tierSelect.value;
+          let selectedType = typeSelect.value;
+          let selectedSize = sizeSelect.value;
+
+          let newDisplayName = ""
+
+          // Adjust Type to "Phased-Array" if Tier changes from "Space" and Type is "Radar"
+          if (selectedTier !== "Space" && selectedType === "Radar") {
+            selectedType = "Phased-Array";
+            typeSelect.value = "Phased-Array";
+          }
+
+          if (selectedTier === "Space" && selectedType !== "Radar") {
+            selectedType = "Radar";
+            typeSelect.value = "Radar";
+          } else if (selectedType === "Radar" && selectedTier !== "Space") {
+            selectedTier = "Space";
+            tierSelect.value = "Space";
+          }
+
+          if (selectedTier !== "Space" && selectedType !== "Radar") {
+            newDisplayName = `${selectedTier} ${selectedType} Space Radar ${selectedSize}`
+          } else {
+            newDisplayName = `${selectedTier} ${selectedType} ${selectedSize}`
+          }
+
+          const newMatchedItem = fetchedItems.find(item => item.displayName === newDisplayName);
+
+          if (newMatchedItem) {
+            element.elementType = newMatchedItem.id;
+            console.log(`Updated elementType to ${newMatchedItem.id} for displayName "${newDisplayName}"`);
+          } else {
+            console.warn(`No item found with displayName "${newDisplayName}"`);
+          }
+        }
+
+        // Attach event listener to size dropdown
+        tierSelect.addEventListener("change", updateElementType);
+        typeSelect.addEventListener("change", updateElementType);
+        sizeSelect.addEventListener("change", updateElementType);
+      });
+    }
+
+    function populateGunnerControlUnitTable(array, tableBodyId) {
+      const tableBody = document.getElementById(tableBodyId);
+      if (!tableBody) {
+        console.warn(`No table body found with ID "${tableBodyId}"`);
+        return;
+      }
+
+      tableBody.innerHTML = ""; // Clear existing rows
+
+      array.forEach((element, index) => {
+        // Find the corresponding fetched item by elementType
+        const matchedItem = fetchedItems.find(item => item.id === element.elementType);
+        if (!matchedItem) return; // Skip if no match is found
+
+        // Parse displayName for Size
+        const { displayName } = matchedItem;
+        const size = displayName.split(" ").pop(); // Assuming size is always the last word in displayName
+
+        // Create table row
+        const row = document.createElement("tr");
+        row.classList.add("bg-gray-700", "text-gray-100");
+
+        // Tier cell (static text "Atmospheric")
+        const tierCell = document.createElement("td");
+        tierCell.classList.add("w-2/6", "p-2", "text-left");
+        tierCell.textContent = "Gunner";
+
+        // Type cell (static text "Radar")
+        const typeCell = document.createElement("td");
+        typeCell.classList.add("w-2/6", "p-2", "text-center");
+        typeCell.textContent = "Module";
+
+        // Size cell (selectable dropdown)
+        const sizeCell = document.createElement("td");
+        sizeCell.classList.add("w-1/6", "p-2", "text-center");
+        const sizeSelect = document.createElement("select");
+        sizeSelect.classList.add("w-full", "py-1", "bg-gray-600", "border", "border-gray-500", "rounded-md", "text-gray-100");
+        ["XS", "S", "M", "L"].forEach(optionSize => {
+          const option = document.createElement("option");
+          option.value = optionSize;
+          option.textContent = optionSize;
+          if (optionSize === size) option.selected = true;
+          sizeSelect.appendChild(option);
+        });
+        sizeCell.appendChild(sizeSelect);
+
+        // Actions cell
+        const actionsCell = document.createElement("td");
+        actionsCell.classList.add("w-1/6", "p-2", "text-right");
+        const actionsDiv = document.createElement("div");
+        actionsDiv.classList.add("flex", "gap-2", "justify-end");
+
+        // Add help icon
+        const helpIcon = document.createElement("a");
+        helpIcon.classList.add("text-purple-500", "hover:text-purple-500/60", "cursor-pointer");
+        helpIcon.innerHTML = '<i class="fa-duotone fa-solid fa-circle-question"></i>';
+        actionsDiv.appendChild(helpIcon);
+
+        // Add delete icon
+        const deleteIcon = document.createElement("a");
+        deleteIcon.classList.add("text-red-500", "hover:text-red-500/60", "cursor-pointer");
+        deleteIcon.innerHTML = '<i class="fa-solid fa-trash"></i>';
+        actionsDiv.appendChild(deleteIcon);
+
+        // Delete row and remove item from array
+        deleteIcon.addEventListener("click", () => {
+          row.remove(); // Remove row from table
+
+          // Find the current index of the element in the array
+          const currentIndex = array.indexOf(element);
+          if (currentIndex > -1) {
+            array.splice(currentIndex, 1); // Remove element from array
+            console.log(`Removed element with index ${currentIndex} from array`);
+          }
+          // Remove any link from extractedLinks where the fromElementId or toElementId matches element.elementId
+          extractedLinks = extractedLinks.filter(link => {
+            if (link.fromElementId === element.elementId) {
+              console.warn(`Removing From Link with elementId "${element.elementId}" from extractedLinks.`);
+              return false; // Exclude this link from the array
+            }
+            if (link.toElementId === element.elementId) {
+              console.warn(`Removing To Link with elementId "${element.elementId}" from extractedLinks.`);
+              return false; // Exclude this link from the array
+            }
+            return true; // Keep this link in the array
+          });
+        });
+
+        actionsCell.appendChild(actionsDiv);
+
+        // Append cells to row
+        row.appendChild(tierCell);
+        row.appendChild(typeCell);
+        row.appendChild(sizeCell);
+        row.appendChild(actionsCell);
+
+        // Append row to table body
+        tableBody.appendChild(row);
+
+        // Function to update the elementType based on selected Size
+        function updateElementType() {
+          const selectedSize = sizeSelect.value;
+          const newDisplayName = `Gunner Module ${selectedSize}`;
+
+          const newMatchedItem = fetchedItems.find(item => item.displayName === newDisplayName);
+
+          if (newMatchedItem) {
+            element.elementType = newMatchedItem.id;
+            console.log(`Updated elementType to ${newMatchedItem.id} for displayName "${newDisplayName}"`);
+          } else {
+            console.warn(`No item found with displayName "${newDisplayName}"`);
+          }
+        }
+
+        // Attach event listener to size dropdown
+        sizeSelect.addEventListener("change", updateElementType);
+      });
+    }
+
+    function populateWeaponsTable(array, tableBodyId) {
+      const tableBody = document.getElementById(tableBodyId);
+      if (!tableBody) {
+        console.warn(`No table body found with ID "${tableBodyId}"`);
+        return;
+      }
+
+      tableBody.innerHTML = ""; // Clear existing rows
+
+      array.forEach((element, index) => {
+        // Find the corresponding fetched item by elementType
+        const matchedItem = fetchedItems.find(item => item.id === element.elementType);
+        if (!matchedItem) return; // Skip if no match is found
+
+        // Parse displayName for Size
+        const { displayName } = matchedItem;
+        const [defaultTier, defaultType, defaultModel, ...rest] = displayName.split(" ");
+        const size = rest.pop();
+
+        // Create table row
+        const row = document.createElement("tr");
+        row.classList.add("bg-gray-700", "text-gray-100");
+
+        // Tier cell (dropdown)
+        const tierCell = document.createElement("td");
+        tierCell.classList.add("w-24", "p-2", "text-left");
+        const tierSelect = document.createElement("select");
+        tierSelect.classList.add("w-24", "py-1", "bg-gray-600", "border", "border-gray-500", "rounded-md", "text-gray-100");
+        ["Basic", "Advanced", "Rare", "Exotic"].forEach(optionTier => {
+          const option = document.createElement("option");
+          option.value = optionTier;
+          option.textContent = optionTier;
+          if (optionTier === defaultTier) option.selected = true;
+          tierSelect.appendChild(option);
+        });
+        tierCell.appendChild(tierSelect);
+
+        // Type cell (dropdown)
+        const typeCell = document.createElement("td");
+        typeCell.classList.add("w-24", "p-2", "text-center");
+        const typeSelect = document.createElement("select");
+        typeSelect.classList.add("w-24", "py-1", "bg-gray-600", "border", "border-gray-500", "rounded-md", "text-gray-100");
+        ["Basic", "Agile", "Defense", "Heavy", "Precision"].forEach(optionType => {
+          const option = document.createElement("option");
+          option.value = optionType;
+          option.textContent = optionType;
+          if (optionType === defaultType) option.selected = true;
+          typeSelect.appendChild(option);
+        });
+        typeCell.appendChild(typeSelect);
+
+        // Model cell (dropdown)
+        const modelCell = document.createElement("td");
+        modelCell.classList.add("w-1/5", "p-2", "text-center");
+        const modelSelect = document.createElement("select");
+        modelSelect.classList.add("w-full", "py-1", "bg-gray-600", "border", "border-gray-500", "rounded-md", "text-gray-100");
+        ["Cannon", "Laser", "Missile", "Railgun", "Stasis"].forEach(optionType => {
+          const option = document.createElement("option");
+          option.value = optionType;
+          option.textContent = optionType;
+          if (optionType === defaultType) option.selected = true;
+          modelSelect.appendChild(option);
+        });
+        modelCell.appendChild(modelSelect);
+
+        // Size cell (dropdown)
+        const sizeCell = document.createElement("td");
+        sizeCell.classList.add("w-11", "p-2", "text-center");
+        const sizeSelect = document.createElement("select");
+        sizeSelect.classList.add("w-11", "py-1", "bg-gray-600", "border", "border-gray-500", "rounded-md", "text-gray-100");
+        ["XS", "S", "M", "L"].forEach(optionSize => {
+          const option = document.createElement("option");
+          option.value = optionSize;
+          option.textContent = optionSize;
+          if (optionSize === size) option.selected = true;
+          sizeSelect.appendChild(option);
+        });
+        sizeCell.appendChild(sizeSelect);
+
+        // Actions cell
+        const actionsCell = document.createElement("td");
+        actionsCell.classList.add("w-1/5", "p-2", "text-right");
+        const actionsDiv = document.createElement("div");
+        actionsDiv.classList.add("flex", "gap-2", "justify-end");
+
+        // Add help icon
+        const helpIcon = document.createElement("a");
+        helpIcon.classList.add("text-purple-500", "hover:text-purple-500/60", "cursor-pointer");
+        helpIcon.innerHTML = '<i class="fa-duotone fa-solid fa-circle-question"></i>';
+        actionsDiv.appendChild(helpIcon);
+
+        // Add reset icon
+        const resetIcon = document.createElement("a");
+        resetIcon.classList.add("text-purple-500", "hover:text-purple-500/60", "cursor-pointer");
+        resetIcon.innerHTML = '<i class="fa-solid fa-clock-rotate-left"></i>';
+        resetIcon.addEventListener("click", () => {
+          tierSelect.value = "Basic";
+          typeSelect.value = "Basic";
+          updateElementType();
+        });
+        actionsDiv.appendChild(resetIcon);
+
+        // Add delete icon
+        const deleteIcon = document.createElement("a");
+        deleteIcon.classList.add("text-red-500", "hover:text-red-500/60", "cursor-pointer");
+        deleteIcon.innerHTML = '<i class="fa-solid fa-trash"></i>';
+        actionsDiv.appendChild(deleteIcon);
+
+        // Delete row and remove item from array
+        deleteIcon.addEventListener("click", () => {
+          row.remove(); // Remove row from table
+
+          // Find the current index of the element in the array
+          const currentIndex = array.indexOf(element);
+          if (currentIndex > -1) {
+            array.splice(currentIndex, 1); // Remove element from array
+            console.log(`Removed element with index ${currentIndex} from array`);
+          }
+          // Remove any link from extractedLinks where the fromElementId or toElementId matches element.elementId
+          extractedLinks = extractedLinks.filter(link => {
+            if (link.fromElementId === element.elementId) {
+              console.warn(`Removing From Link with elementId "${element.elementId}" from extractedLinks.`);
+              return false; // Exclude this link from the array
+            }
+            if (link.toElementId === element.elementId) {
+              console.warn(`Removing To Link with elementId "${element.elementId}" from extractedLinks.`);
+              return false; // Exclude this link from the array
+            }
+            return true; // Keep this link in the array
+          });
+        });
+
+        actionsCell.appendChild(actionsDiv);
+
+        // Append cells to row
+        row.appendChild(tierCell);
+        row.appendChild(typeCell);
+        row.appendChild(modelCell);
+        row.appendChild(sizeCell);
+        row.appendChild(actionsCell);
+
+        // Append row to table body
+        tableBody.appendChild(row);
+
+        // Function to update the elementType based on selected Size
+        function updateElementType() {
+          let selectedTier = tierSelect.value;
+          let selectedType = typeSelect.value;
+          let selectedModel = modelSelect.value;
+          let selectedSize = sizeSelect.value;
+
+          let newDisplayName = ""
+
+          // Adjust Type to "Agile" if Tier changes from "Basic" and Type is "Basic"
+          if (selectedTier !== "Basic" && selectedType === "Basic") {
+            selectedType = "Agile";
+            typeSelect.value = "Agile";
+          }
+          // Adjust Tier to "Advanced" if Type changes from "Radar" and Tier is "Space"
+          else if (selectedType !== "Basic" && selectedTier === "Basic") {
+            selectedTier = "Advanced";
+            tierSelect.value = "Advanced";
+          } else if (selectedModel === "Stasis") {
+            selectedType = "Basic";
+            selectedTier = "Basic";
+            tierSelect.value = "Basic";
+            typeSelect.value = "Basic";
+          }
+
+          if (selectedTier !== "Basic" && selectedType !== "Basic") {
+            newDisplayName = `${selectedTier} ${selectedType} ${selectedModel} ${selectedSize}`
+          } else if (selectedModel === "Stasis" && selectedTier === "Basic" && selectedType === "Basic") {
+            newDisplayName = `${selectedModel} Weapon ${selectedSize}`
+          } else if (selectedModel !== "Stasis") {
+            newDisplayName = `${selectedModel} ${selectedSize}`
+          }
+
+          const newMatchedItem = fetchedItems.find(item => item.displayName === newDisplayName);
+
+          if (newMatchedItem) {
+            element.elementType = newMatchedItem.id;
+            console.log(`Updated elementType to ${newMatchedItem.id} for displayName "${newDisplayName}"`);
+          } else {
+            console.warn(`No item found with displayName "${newDisplayName}"`);
+          }
+        }
+
+        // Attach event listener to size dropdown
+        tierSelect.addEventListener("change", updateElementType);
+        typeSelect.addEventListener("change", updateElementType);
+        modelSelect.addEventListener("change", updateElementType);
+        sizeSelect.addEventListener("change", updateElementType);
+      });
+    }
+
+    function populateShieldTable(array, tableBodyId) {
+      const tableBody = document.getElementById(tableBodyId);
+      if (!tableBody) {
+        console.warn(`No table body found with ID "${tableBodyId}"`);
+        return;
+      }
+
+      tableBody.innerHTML = ""; // Clear existing rows
+
+      array.forEach((element, index) => {
+        // Find the corresponding fetched item by elementType
+        const matchedItem = fetchedItems.find(item => item.id === element.elementType);
+        if (!matchedItem) return; // Skip if no match is found
+
+        // Parse displayName for Tier, Type, and Size
+        const { displayName } = matchedItem;
+        const [defaultTier, defaultType, ...rest] = displayName.split(" ");
+        const defaultSize = rest.pop(); // Assuming size is always the last word in displayName
+
+        // Create table row
+        const row = document.createElement("tr");
+        row.classList.add("bg-gray-700", "text-gray-100");
+
+        // Create and populate Tier cell
+        const tierCell = document.createElement("td");
+        tierCell.classList.add("w-2/6", "p-2", "text-left");
+        const tierSelect = document.createElement("select");
+        tierSelect.classList.add("w-full", "py-1", "bg-gray-600", "border", "border-gray-500", "rounded-md", "text-gray-100");
+        ["Advanced", "Rare", "Exotic"].forEach(optionTier => {
+          const option = document.createElement("option");
+          option.value = optionTier;
+          option.textContent = optionTier;
+          if (optionTier === defaultTier) option.selected = true;
+          tierSelect.appendChild(option);
+        });
+        tierCell.appendChild(tierSelect);
+
+        // Create and populate Type cell
+        const typeCell = document.createElement("td");
+        typeCell.classList.add("w-2/6", "p-2", "text-center");
+        const typeSelect = document.createElement("select");
+        typeSelect.classList.add("w-full", "py-1", "bg-gray-600", "border", "border-gray-500", "rounded-md", "text-gray-100");
+        ["Basic", "Active", "Capacitor", "Variable"].forEach(optionType => {
+          const option = document.createElement("option");
+          option.value = optionType;
+          option.textContent = optionType;
+          if (optionType === defaultType) option.selected = true;
+          typeSelect.appendChild(option);
+        });
+        typeCell.appendChild(typeSelect);
+
+        // Create and populate Size cell (static text)
+        const sizeCell = document.createElement("td");
+        sizeCell.classList.add("w-1/6", "p-2", "text-center");
+        sizeCell.textContent = defaultSize || "XS";
+
+        // Create Actions cell
+        const actionsCell = document.createElement("td");
+        actionsCell.classList.add("w-1/6", "p-2", "text-right");
+        const actionsDiv = document.createElement("div");
+        actionsDiv.classList.add("flex", "gap-2", "justify-end");
+
+        // Add help icon
+        const helpIcon = document.createElement("a");
+        helpIcon.classList.add("text-purple-500", "hover:text-purple-500/60", "cursor-pointer");
+        helpIcon.innerHTML = '<i class="fa-duotone fa-solid fa-circle-question"></i>';
+        actionsDiv.appendChild(helpIcon);
+
+        // Add reset icon
+        const resetIcon = document.createElement("a");
+        resetIcon.classList.add("text-purple-500", "hover:text-purple-500/60", "cursor-pointer");
+        resetIcon.innerHTML = '<i class="fa-solid fa-clock-rotate-left"></i>';
+        actionsDiv.appendChild(resetIcon);
+
+        // Add reset functionality to the reset icon
+        resetIcon.addEventListener("click", () => {
+          tierSelect.value = "Advanced";
+          typeSelect.value = "Basic";
+          updateElementType(); // Update the elementType after reset
+        });
+
+        // Add delete icon
+        const deleteIcon = document.createElement("a");
+        deleteIcon.classList.add("text-red-500", "hover:text-red-500/60", "cursor-pointer");
+        deleteIcon.innerHTML = '<i class="fa-solid fa-trash"></i>';
+        actionsDiv.appendChild(deleteIcon);
+
+        // Delete row and remove item from array
+        deleteIcon.addEventListener("click", () => {
+          row.remove(); // Remove row from table
+
+          // Find the current index of the element in the array
+          const currentIndex = array.indexOf(element);
+          if (currentIndex > -1) {
+            array.splice(currentIndex, 1); // Remove element from array
+            console.log(`Removed element with index ${currentIndex} from array`);
+          }
+          // Remove any link from extractedLinks where the fromElementId or toElementId matches element.elementId
+          extractedLinks = extractedLinks.filter(link => {
+            if (link.fromElementId === element.elementId) {
+              console.warn(`Removing From Link with elementId "${element.elementId}" from extractedLinks.`);
+              return false; // Exclude this link from the array
+            }
+            if (link.toElementId === element.elementId) {
+              console.warn(`Removing To Link with elementId "${element.elementId}" from extractedLinks.`);
+              return false; // Exclude this link from the array
+            }
+            return true; // Keep this link in the array
+          });
+        });
+
+        actionsCell.appendChild(actionsDiv);
+
+        // Append cells to row
+        row.appendChild(tierCell);
+        row.appendChild(typeCell);
+        row.appendChild(sizeCell);
+        row.appendChild(actionsCell);
+
+        // Append row to table body
+        tableBody.appendChild(row);
+
+        // Function to update the elementType based on selected Tier, Type, and Size
+        function updateElementType() {
+          let selectedTier = tierSelect.value;
+          let selectedType = typeSelect.value;
+
+          // Adjust Type to "Maneuver" if Tier changes from "Basic" and Type is "Basic"
+          if (selectedTier !== "Advanced" && selectedType === "Basic") {
+            selectedType = "Active";
+            typeSelect.value = "Active";
+          }
+
+          if (selectedTier === "Advanced" && selectedType !== "Basic") {
+            selectedType = "Basic";
+            typeSelect.value = "Basic";
+          } else if (selectedType === "Basic" && selectedTier !== "Advanced") {
+            selectedTier = "Advanced";
+            tierSelect.value = "Advanced";
+          }
+
+          // Construct displayName based on Tier & Type
+          const newDisplayName = selectedType === "Basic"
+            ? `${selectedTier} Shield Generator ${defaultSize}`
+            : `${selectedTier} ${selectedType} Shield Generator ${defaultSize}`;
+
+          // Find the new elementType based on the constructed displayName
+          const newMatchedItem = fetchedItems.find(item => item.displayName === newDisplayName);
+
+          if (newMatchedItem) {
+            element.elementType = newMatchedItem.id;
+            console.log(`Updated elementType to ${newMatchedItem.id} for displayName "${newDisplayName}"`);
+          } else {
+            console.warn(`No item found with displayName "${newDisplayName}"`);
+          }
+        }
+
+        // Attach event listeners to the dropdowns
+        tierSelect.addEventListener("change", updateElementType);
+        typeSelect.addEventListener("change", updateElementType);
+      });
+    }
+
+    function populateMiscTable(array, tableBodyId) {
+      const tableBody = document.getElementById(tableBodyId);
+      if (!tableBody) {
+        console.warn(`No table body found with ID "${tableBodyId}"`);
+        return;
+      }
+
+      tableBody.innerHTML = ""; // Clear existing rows
+
+      array.forEach((element, index) => {
+        // Find the corresponding fetched item by elementType
+        const matchedItem = fetchedItems.find(item => item.id === element.elementType);
+        if (!matchedItem) return; // Skip if no match is found
+
+        // Parse displayName for Size
+        const { displayName } = matchedItem;
+
+        // Create table row
+        const row = document.createElement("tr");
+        row.classList.add("bg-gray-700", "text-gray-100");
+
+        // Element cell (static text "Atmospheric")
+        const elementCell = document.createElement("td");
+        elementCell.classList.add("w-1/2", "p-2", "text-left");
+        elementCell.textContent = displayName;
+
+        // Actions cell
+        const actionsCell = document.createElement("td");
+        actionsCell.classList.add("w-1/2", "p-2", "text-right");
+        const actionsDiv = document.createElement("div");
+        actionsDiv.classList.add("flex", "gap-2", "justify-end");
+
+        // Add help icon
+        const helpIcon = document.createElement("a");
+        helpIcon.classList.add("text-purple-500", "hover:text-purple-500/60", "cursor-pointer");
+        helpIcon.innerHTML = '<i class="fa-duotone fa-solid fa-circle-question"></i>';
+        actionsDiv.appendChild(helpIcon);
+
+        // Add delete icon
+        const deleteIcon = document.createElement("a");
+        deleteIcon.classList.add("text-red-500", "hover:text-red-500/60", "cursor-pointer");
+        deleteIcon.innerHTML = '<i class="fa-solid fa-trash"></i>';
+        actionsDiv.appendChild(deleteIcon);
+
+        // Delete row and remove item from array
+        deleteIcon.addEventListener("click", () => {
+          row.remove(); // Remove row from table
+
+          // Find the current index of the element in the array
+          const currentIndex = array.indexOf(element);
+          if (currentIndex > -1) {
+            array.splice(currentIndex, 1); // Remove element from array
+            console.log(`Removed element with index ${currentIndex} from array`);
+          }
+          // Remove any link from extractedLinks where the fromElementId or toElementId matches element.elementId
+          extractedLinks = extractedLinks.filter(link => {
+            if (link.fromElementId === element.elementId) {
+              console.warn(`Removing From Link with elementId "${element.elementId}" from extractedLinks.`);
+              return false; // Exclude this link from the array
+            }
+            if (link.toElementId === element.elementId) {
+              console.warn(`Removing To Link with elementId "${element.elementId}" from extractedLinks.`);
+              return false; // Exclude this link from the array
+            }
+            return true; // Keep this link in the array
+          });
+        });
+
+        actionsCell.appendChild(actionsDiv);
+
+        // Append cells to row
+        row.appendChild(elementCell);
+        row.appendChild(actionsCell);
+
+        // Append row to table body
+        tableBody.appendChild(row);
+      });
+    }
+
+    function populateContainersTable(array, tableBodyId) {
+      const tableBody = document.getElementById(tableBodyId);
+      if (!tableBody) {
+        console.warn(`No table body found with ID "${tableBodyId}"`);
+        return;
+      }
+
+      tableBody.innerHTML = ""; // Clear existing rows
+
+      array.forEach((element, index) => {
+        // Find the corresponding fetched item by elementType
+        const matchedItem = fetchedItems.find(item => item.id === element.elementType);
+        if (!matchedItem) return; // Skip if no match is found
+
+        // Parse displayName for Tier, Type, and Size
+        const { displayName } = matchedItem;
+        const [defaultTier, defaultType, ...rest] = displayName.split(" ");
+        const defaultSize = rest.pop();
+
+        // Create table row
+        const row = document.createElement("tr");
+        row.classList.add("bg-gray-700", "text-gray-100");
+
+        // Create and populate Tier cell
+        const tierCell = document.createElement("td");
+        tierCell.classList.add("w-2/6", "p-2", "text-left");
+        const tierSelect = document.createElement("select");
+        tierSelect.classList.add("w-full", "py-1", "bg-gray-600", "border", "border-gray-500", "rounded-md", "text-gray-100");
+        ["Basic", "Uncommon", "Advanced", "Rare", "Exotic"].forEach(optionTier => {
+          const option = document.createElement("option");
+          option.value = optionTier;
+          option.textContent = optionTier;
+          if (optionTier === defaultTier) option.selected = true;
+          tierSelect.appendChild(option);
+        });
+        tierCell.appendChild(tierSelect);
+
+        // Create and populate Type cell
+        const typeCell = document.createElement("td");
+        typeCell.classList.add("w-2/6", "p-2", "text-center");
+        const typeSelect = document.createElement("select");
+        typeSelect.classList.add("w-full", "py-1", "bg-gray-600", "border", "border-gray-500", "rounded-md", "text-gray-100");
+        ["Basic", "Gravity-Inverted", "Optimised"].forEach(optionType => {
+          const option = document.createElement("option");
+          option.value = optionType;
+          option.textContent = optionType;
+          if (optionType === defaultType) option.selected = true;
+          typeSelect.appendChild(option);
+        });
+        typeCell.appendChild(typeSelect);
+
+        // Create and populate Size cell (static text)
+        const sizeCell = document.createElement("td");
+        sizeCell.classList.add("w-1/6", "p-2", "text-center");
+        sizeCell.textContent = defaultSize || "XS"; // Display size or default to "XS"
+
+        // Create Actions cell
+        const actionsCell = document.createElement("td");
+        actionsCell.classList.add("w-1/6", "p-2", "text-right");
+        const actionsDiv = document.createElement("div");
+        actionsDiv.classList.add("flex", "gap-2", "justify-end");
+
+        // Add help icon
+        const helpIcon = document.createElement("a");
+        helpIcon.classList.add("text-purple-500", "hover:text-purple-500/60", "cursor-pointer");
+        helpIcon.innerHTML = '<i class="fa-duotone fa-solid fa-circle-question"></i>';
+        actionsDiv.appendChild(helpIcon);
+
+        // Add reset icon
+        const resetIcon = document.createElement("a");
+        resetIcon.classList.add("text-purple-500", "hover:text-purple-500/60", "cursor-pointer");
+        resetIcon.innerHTML = '<i class="fa-solid fa-clock-rotate-left"></i>';
+        actionsDiv.appendChild(resetIcon);
+
+        // Add reset functionality to the reset icon
+        resetIcon.addEventListener("click", () => {
+          tierSelect.value = "Basic";
+          typeSelect.value = "Basic";
+          updateElementType(); // Update the elementType after reset
+        });
+
+        // Add delete icon
+        const deleteIcon = document.createElement("a");
+        deleteIcon.classList.add("text-red-500", "hover:text-red-500/60", "cursor-pointer");
+        deleteIcon.innerHTML = '<i class="fa-solid fa-trash"></i>';
+        actionsDiv.appendChild(deleteIcon);
+
+        // Delete row and remove item from array
+        deleteIcon.addEventListener("click", () => {
+          row.remove(); // Remove row from table
+
+          // Find the current index of the element in the array
+          const currentIndex = array.indexOf(element);
+          if (currentIndex > -1) {
+            array.splice(currentIndex, 1); // Remove element from array
+            console.log(`Removed element with index ${currentIndex} from array`);
+          }
+          // Remove any link from extractedLinks where the fromElementId or toElementId matches element.elementId
+          extractedLinks = extractedLinks.filter(link => {
+            if (link.fromElementId === element.elementId) {
+              console.warn(`Removing From Link with elementId "${element.elementId}" from extractedLinks.`);
+              return false; // Exclude this link from the array
+            }
+            if (link.toElementId === element.elementId) {
+              console.warn(`Removing To Link with elementId "${element.elementId}" from extractedLinks.`);
+              return false; // Exclude this link from the array
+            }
+            return true; // Keep this link in the array
+          });
+        });
+
+        actionsCell.appendChild(actionsDiv);
+
+        // Append cells to row
+        row.appendChild(tierCell);
+        row.appendChild(typeCell);
+        row.appendChild(sizeCell);
+        row.appendChild(actionsCell);
+
+        // Append row to table body
+        tableBody.appendChild(row);
+
+        // Function to update the elementType based on selected Tier, Type, and Size
+        function updateElementType() {
+          let selectedTier = tierSelect.value;
+          let selectedType = typeSelect.value;
+
+          // Adjust Type to "Maneuver" if Tier changes from "Basic" and Type is "Basic"
+          if (selectedTier !== "Basic" && selectedType === "Basic") {
+            selectedType = "Optimised";
+            typeSelect.value = "Optimised";
+          }
+
+          if (selectedTier === "Basic" && selectedType !== "Basic") {
+            selectedType = "Basic";
+            typeSelect.value = "Basic";
+          } else if (selectedType === "Basic" && selectedTier !== "Basic") {
+            selectedTier = "Basic";
+            tierSelect.value = "Basic";
+          }
+
+          // Construct displayName based on model (Flat or regular)
+          const newDisplayName = selectedType === "Basic"
+            ? `${selectedTier} Container ${defaultSize}`
+            : `${selectedTier} ${selectedType} Container ${defaultSize}`;
+
+          // Find the new elementType based on the constructed displayName
+          const newMatchedItem = fetchedItems.find(item => item.displayName === newDisplayName);
+
+          if (newMatchedItem) {
+            element.elementType = newMatchedItem.id;
+            console.log(`Updated elementType to ${newMatchedItem.id} for displayName "${newDisplayName}"`);
+          } else {
+            console.warn(`No item found with displayName "${newDisplayName}"`);
+          }
+        }
+
+        // Attach event listeners to the dropdowns
+        tierSelect.addEventListener("change", updateElementType);
+        typeSelect.addEventListener("change", updateElementType);
+      });
+    }
+
+    // Function to parse elements based on fetched items
+    function parseElements() {
+      if (extractedElements.length === 0) {
+        alert("No elements to parse. Please upload a valid JSON file first.");
+        return;
+      }
+
+      // Set extracted construct name 
+      document.getElementById("constructName").value = jsonContent.Model.Name;
+
+      // Set file size
+      document.getElementById("fileSize").innerHTML = `${fileSize}MB`;
+
+      // Set element count
+      document.getElementById("elementCount").innerHTML = elementCount;
+
+      // Categorize each element based on the `elementType` in extracted elements
+      extractedElements.forEach(element => {
+        const matchedItem = fetchedItems.find(item => item.id === element.elementType);
+
+        if (matchedItem) {
+          switch (matchedItem.grandParentName) {
+            case 'AtmosphericEngine':
+              AtmosphericEngine.push(element);
+              break;
+            case 'SpaceEngine':
+              SpaceEngine.push(element);
+              break;
+            case 'Hovercraft':
+              Hovercraft.push(element);
+              break;
+            case 'VerticalBooster':
+              VerticalBooster.push(element);
+              break;
+            case 'RadarPVPUnit':
+              if (matchedItem.displayName.includes('Atmospheric')) {
+                RadarPVPUnitAtmo.push(element);
+              } else if (matchedItem.displayName.includes('Space')) {
+                RadarPVPUnitSpace.push(element);
+              }
+              break;
+            case 'RadarPvPSpace':
+              if (matchedItem.displayName.includes('Atmospheric')) {
+                RadarPVPUnitAtmo.push(element);
+              } else if (matchedItem.displayName.includes('Space')) {
+                RadarPVPUnitSpace.push(element);
+              }
+              break;
+            case 'ControlUnit':
+              if (matchedItem.displayName.includes('Gunner Module')) {
+                GunnerControlUnit.push(element);
+              }
+              break;
+            case 'ShieldGeneratorUnit':
+              Shield.push(element);
+              break;
+            case 'ItemContainer':
+              if (!matchedItem.displayName.includes('Admin')) {
+                Containers.push(element);
+              }
+              break;
+            case 'CoreUnit':
+              Core.push(element);
+              break;
+            default:
+              if (matchedItem.grandParentName.includes('Weapon')) {
+                Weapons.push(element);
+              } else {
+                if (!matchedItem.grandParentName.includes('CoreUnit')) {
+                  Misc.push(element);
+                }
+              }
+              break;
+          }
+        } else {
+          Misc.push(element);
+        }
+      });
+
+      populateEnginesTables(AtmosphericEngine, "AtmosphericEngine");
+      populateEnginesTables(SpaceEngine, "SpaceEngine");
+      populateHovercraftTable(Hovercraft, "Hovercraft");
+      populateEnginesTables(VerticalBooster, "VerticalBooster");
+      populateRadarPVPUnitAtmoTable(RadarPVPUnitAtmo, "RadarPVPUnitAtmo");
+      populateRadarPVPUnitSpaceTable(RadarPVPUnitSpace, "RadarPVPUnitSpace");
+      populateGunnerControlUnitTable(GunnerControlUnit, "GunnerControlUnit");
+      populateWeaponsTable(Weapons, "Weapons");
+      populateShieldTable(Shield, "Shield");
+      populateContainersTable(Containers, "Containers");
+      populateMiscTable(Misc, "Misc");
+
+      updateCoreTypeUI(jsonContent.Model.JsonProperties.kind);
+
+      document.getElementById("loaded").classList.remove("hidden");
+    }
+
+    document.querySelector('.bg-purple-600').addEventListener('click', parseElements);
+
+    // Fetch the items data when the page loads
+    fetch('/Api/Data/GetPlaceableItems/?type=json')
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Network response was not ok ' + response.statusText);
+        }
+        return response.json();
+      })
+      .then(data => {
+        fetchedItems = data;
+      })
+      .catch(error => {
+        console.error('There was a problem with the fetch operation:', error);
+      });
+  </script>

@@ -3,9 +3,10 @@
     ViewData["Title"] = "Import Blueprint";
 }
 
-<div class="min-h-screen text-white font-sans pt-35 xs:px-3 xs:pb-10">
+<partial name="_Blueprints" />
+<div class="text-white font-sans xs:px-3 xs:pb-10">
     <div
-        class="max-w-6xl mx-auto md:flex md:flex-row xs:flex-col items-stretch md:space-x-5 md:space-y-0 xs:space-y-5 xs:space-x-0 h-full">
+        class="max-w-7xl mx-auto md:flex md:flex-row xs:flex-col items-stretch md:space-x-5 md:space-y-0 xs:space-y-5 xs:space-x-0 h-full">
         <!-- Left Side (Upload & Preview) -->
         <div class="flex flex-col md:w-1/2 xs:w-full space-y-5 h-full">
             <!-- Blueprint Preview Section -->
@@ -42,6 +43,10 @@
                     </button>
                 </div>
             </form>
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <p class="p-1 text-center text-red-500">@Html.Raw(Model.ErrorMessage)</p>
+            }
         </div>
 
         <!-- Right Side (Instructions) -->
