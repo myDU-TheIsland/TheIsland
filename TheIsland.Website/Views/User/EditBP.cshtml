@@ -1985,7 +1985,6 @@
       // Categorize each element based on the `elementType` in extracted elements
       extractedElements.forEach(element => {
         const matchedItem = fetchedItems.find(item => item.id === element.elementType);
-        console.log("Matched Item:", matchedItem)
 
         if (matchedItem) {
           switch (matchedItem.grandParentName) {
@@ -2046,22 +2045,6 @@
         }
       });
 
-      // Console log the groups for verification
-      console.log("ConstructName:", extractedName)
-      console.log("Core:", Core);
-      console.log("AtmosphericEngine:", AtmosphericEngine);
-      console.log("SpaceEngine:", SpaceEngine);
-      console.log("Hovercraft:", Hovercraft);
-      console.log("VerticalBooster:", VerticalBooster);
-      console.log("RadarPVPUnitAtmo:", RadarPVPUnitAtmo);
-      console.log("RadarPVPUnitSpace:", RadarPVPUnitSpace);
-      console.log("GunnerControlUnit:", GunnerControlUnit);
-      console.log("Weapons:", Weapons);
-      console.log("Shield:", Shield);
-      console.log("Containers:", Containers);
-      console.log("Misc:", Misc);
-      console.log("File Size:", fileSize + "MB")
-
       populateEnginesTables(AtmosphericEngine, "AtmosphericEngine");
       populateEnginesTables(SpaceEngine, "SpaceEngine");
       populateHovercraftTable(Hovercraft, "Hovercraft");
@@ -2091,7 +2074,6 @@
       })
       .then(data => {
         fetchedItems = data;
-        console.log("Fetched Items:", fetchedItems);
       })
       .catch(error => {
         console.error('There was a problem with the fetch operation:', error);
