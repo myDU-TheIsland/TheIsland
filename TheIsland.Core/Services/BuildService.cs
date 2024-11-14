@@ -11,6 +11,7 @@ namespace TheIsland.Core.Services
     using NQ.Interfaces;
     using NQutils.Def;
     using TheIsland.Core.Bots;
+    using TheIsland.Core.Services.SQL;
 
     public class BuildService : IAppService
     {
@@ -18,8 +19,13 @@ namespace TheIsland.Core.Services
         private readonly IRecipes _recipes;
         private readonly IGameplayBank _gameplayBank;
 
-        public BuildService(IMarketBot dualClient)
+        private readonly FactoryLedgerRepository _factoryLedgerRepository;
+
+        public BuildService(
+            FactoryLedgerRepository factoryLedgerRepository,
+            IMarketBot dualClient)
         {
+            this._factoryLedgerRepository = factoryLedgerRepository;
             this._marketBot = dualClient;
             this._gameplayBank = this._marketBot.ServiceProvider.GetRequiredService<IGameplayBank>();
             this._recipes = this._marketBot.ServiceProvider.GetRequiredService<IRecipes>();
@@ -27,14 +33,15 @@ namespace TheIsland.Core.Services
 
         #region ItemCosts
 
-        public Task ConvertOreIntoPure()
+        public async Task ConvertOreIntoPure()
         {
             var pures = this._marketBot.GetAllItemsMarketEntries().Where(item => item.Type == "Pure").ToList();
+            var puresDB = (await this._factoryLedgerRepository.GetAllEntriesByItemIdsAsync(pures.Select(item => item.Id).ToArray()).ConfigureAwait(false)).ToList();
             foreach (var pure in pures)
             {
             }
 
-            return Task.CompletedTask;
+            return;
         }
 
         public async Task<ulong> GetRecipeId(double itemId)
