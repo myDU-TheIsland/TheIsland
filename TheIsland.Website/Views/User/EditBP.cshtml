@@ -19,10 +19,6 @@
     <p class="text-sm text-slate-400 leading-normal">
       Core type is changeable but size is not.
     </p>
-    <p class="text-sm text-slate-400 leading-normal">
-      You may choose to save your blueprint(download) or directly upload it to the current character you are logged in
-      on.
-    </p>
   </div>
   <!-- Upload -->
   <div class="bg-darkBlue w-full rounded-md px-4 pb-4">
@@ -50,13 +46,6 @@
           File</button>
         <button id="save"
           class="flex-grow bg-red-500 hover:bg-red-500/60 px-4 py-2 rounded-md transition-colors">Save</button>
-        <form id="import-bp-form" asp-action="ImportBPFile" method="post" enctype="multipart/form-data">
-          <!-- Hidden file input to hold the JSON file data -->
-          <input type="file" id="blueprintImport" accept=".json" name="blueprintImport" class="hidden" />
-          <button type="button"
-            class="flex-grow bg-blue-600 hover:bg-blue-600/60 px-4 py-2 rounded-md transition-colors"
-            onclick="submitFiles()">Import</button>
-        </form>
       </div>
     </div>
   </div>
@@ -2057,22 +2046,6 @@
         }
       });
 
-      // Console log the groups for verification
-      console.log("ConstructName:", extractedName)
-      console.log("Core:", Core);
-      console.log("AtmosphericEngine:", AtmosphericEngine);
-      console.log("SpaceEngine:", SpaceEngine);
-      console.log("Hovercraft:", Hovercraft);
-      console.log("VerticalBooster:", VerticalBooster);
-      console.log("RadarPVPUnitAtmo:", RadarPVPUnitAtmo);
-      console.log("RadarPVPUnitSpace:", RadarPVPUnitSpace);
-      console.log("GunnerControlUnit:", GunnerControlUnit);
-      console.log("Weapons:", Weapons);
-      console.log("Shield:", Shield);
-      console.log("Containers:", Containers);
-      console.log("Misc:", Misc);
-      console.log("File Size:", fileSize + "MB")
-
       populateEnginesTables(AtmosphericEngine, "AtmosphericEngine");
       populateEnginesTables(SpaceEngine, "SpaceEngine");
       populateHovercraftTable(Hovercraft, "Hovercraft");
@@ -2092,55 +2065,6 @@
 
     document.querySelector('.bg-purple-600').addEventListener('click', parseElements);
 
-    function submitFiles() {
-      // Create a new copy of the original JSON to update
-      const updatedJsonContent = JSON.parse(JSON.stringify(originalJsonContent));
-
-      // Update only specific fields
-      updatedJsonContent.Model.Name = jsonContent.Model.Name;
-      updatedJsonContent.Model.JsonProperties.kind = jsonContent.Model.JsonProperties.kind;
-      updatedJsonContent.Model.Static = jsonContent.Model.Static;
-      updatedJsonContent.Model.FreeDeploy = false;
-
-      // Compile all elements into the Elements array, filtering out empty arrays
-      const elementArrays = [
-        Core,
-        AtmosphericEngine,
-        SpaceEngine,
-        Hovercraft,
-        VerticalBooster,
-        RadarPVPUnitAtmo,
-        RadarPVPUnitSpace,
-        GunnerControlUnit,
-        Weapons,
-        Shield,
-        Containers,
-        Misc,
-      ];
-
-      const compiledElements = elementArrays
-        .filter(array => array && array.length > 0) // Filter out empty or undefined arrays
-        .flat();
-
-      updatedJsonContent.Elements = compiledElements;
-      updatedJsonContent.Links = extractedLinks;
-
-      // Convert updated JSON to a JSON string
-      const updatedJsonString = JSON.stringify(updatedJsonContent, null, 2);
-
-      // Create a Blob with the updated JSON string
-      const blob = new Blob([updatedJsonString], { type: "application/json" });
-      const file = new File([blob], `${(updatedJsonContent.Model.Name || 'Construct').replace(/\s+/g, '_')}_updated.json`, { type: "application/json" });
-
-      // Create a DataTransfer object and assign the file to the hidden input
-      const dataTransfer = new DataTransfer();
-      dataTransfer.items.add(file);
-      document.getElementById("blueprintImport").files = dataTransfer.files;
-
-      // Submit the form
-      document.getElementById("import-bp-form").submit();
-    }
-
     // Fetch the items data when the page loads
     fetch('/Api/Data/GetPlaceableItems/?type=json')
       .then(response => {
@@ -2151,7 +2075,6 @@
       })
       .then(data => {
         fetchedItems = data;
-        console.log("Fetched Items:", fetchedItems);
       })
       .catch(error => {
         console.error('There was a problem with the fetch operation:', error);
