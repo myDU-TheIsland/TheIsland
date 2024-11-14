@@ -74,7 +74,7 @@
         </div>
         <div class="flex flex-col gap-2">
           <p class="text-purple-400">Core Size:</p>
-          <p>L</p>
+          <p id="coreSize"></p>
         </div>
         <div class="flex flex-col gap-2">
           <p class="text-purple-400">File Size:</p>
@@ -588,7 +588,6 @@
 
       // Update the elementType in the Core array
       coreElement.elementType = newItem.id;
-      console.log(`Updated core elementType to ${newItem.id} for displayName "${modifiedDisplayName}".`);
 
       // Update the UI
       updateCoreTypeUI(coreKindValue);
@@ -719,7 +718,6 @@
           const currentIndex = array.indexOf(element);
           if (currentIndex > -1) {
             array.splice(currentIndex, 1); // Remove element from array
-            console.log(`Removed element with index ${currentIndex} from array`);
           }
           // Remove any link from extractedLinks where the fromElementId or toElementId matches element.elementId
           extractedLinks = extractedLinks.filter(link => {
@@ -770,7 +768,6 @@
 
           if (newMatchedItem) {
             element.elementType = newMatchedItem.id;
-            console.log(`Updated elementType to ${newMatchedItem.id} for displayName "${newDisplayName}"`);
           } else {
             console.warn(`No item found with displayName "${newDisplayName}"`);
           }
@@ -878,7 +875,6 @@
           const currentIndex = array.indexOf(element);
           if (currentIndex > -1) {
             array.splice(currentIndex, 1); // Remove element from array
-            console.log(`Removed element with index ${currentIndex} from array`);
           }
           // Remove any link from extractedLinks where the fromElementId or toElementId matches element.elementId
           extractedLinks = extractedLinks.filter(link => {
@@ -931,7 +927,6 @@
 
           if (newMatchedItem) {
             element.elementType = newMatchedItem.id;
-            console.log(`Updated elementType to ${newMatchedItem.id} for displayName "${newDisplayName}"`);
           } else {
             console.warn(`No item found with displayName "${newDisplayName}"`);
           }
@@ -1025,7 +1020,6 @@
           const currentIndex = array.indexOf(element);
           if (currentIndex > -1) {
             array.splice(currentIndex, 1); // Remove element from array
-            console.log(`Removed element with index ${currentIndex} from array`);
           }
           // Remove any link from extractedLinks where the fromElementId or toElementId matches element.elementId
           extractedLinks = extractedLinks.filter(link => {
@@ -1061,7 +1055,6 @@
 
           if (newMatchedItem) {
             element.elementType = newMatchedItem.id;
-            console.log(`Updated elementType to ${newMatchedItem.id} for displayName "${newDisplayName}"`);
           } else {
             console.warn(`No item found with displayName "${newDisplayName}"`);
           }
@@ -1174,7 +1167,6 @@
           const currentIndex = array.indexOf(element);
           if (currentIndex > -1) {
             array.splice(currentIndex, 1); // Remove element from array
-            console.log(`Removed element with index ${currentIndex} from array`);
           }
           // Remove any link from extractedLinks where the fromElementId or toElementId matches element.elementId
           extractedLinks = extractedLinks.filter(link => {
@@ -1233,7 +1225,6 @@
 
           if (newMatchedItem) {
             element.elementType = newMatchedItem.id;
-            console.log(`Updated elementType to ${newMatchedItem.id} for displayName "${newDisplayName}"`);
           } else {
             console.warn(`No item found with displayName "${newDisplayName}"`);
           }
@@ -1318,7 +1309,6 @@
           const currentIndex = array.indexOf(element);
           if (currentIndex > -1) {
             array.splice(currentIndex, 1); // Remove element from array
-            console.log(`Removed element with index ${currentIndex} from array`);
           }
           // Remove any link from extractedLinks where the fromElementId or toElementId matches element.elementId
           extractedLinks = extractedLinks.filter(link => {
@@ -1354,7 +1344,6 @@
 
           if (newMatchedItem) {
             element.elementType = newMatchedItem.id;
-            console.log(`Updated elementType to ${newMatchedItem.id} for displayName "${newDisplayName}"`);
           } else {
             console.warn(`No item found with displayName "${newDisplayName}"`);
           }
@@ -1481,7 +1470,6 @@
           const currentIndex = array.indexOf(element);
           if (currentIndex > -1) {
             array.splice(currentIndex, 1); // Remove element from array
-            console.log(`Removed element with index ${currentIndex} from array`);
           }
           // Remove any link from extractedLinks where the fromElementId or toElementId matches element.elementId
           extractedLinks = extractedLinks.filter(link => {
@@ -1546,7 +1534,6 @@
 
           if (newMatchedItem) {
             element.elementType = newMatchedItem.id;
-            console.log(`Updated elementType to ${newMatchedItem.id} for displayName "${newDisplayName}"`);
           } else {
             console.warn(`No item found with displayName "${newDisplayName}"`);
           }
@@ -1655,7 +1642,6 @@
           const currentIndex = array.indexOf(element);
           if (currentIndex > -1) {
             array.splice(currentIndex, 1); // Remove element from array
-            console.log(`Removed element with index ${currentIndex} from array`);
           }
           // Remove any link from extractedLinks where the fromElementId or toElementId matches element.elementId
           extractedLinks = extractedLinks.filter(link => {
@@ -1711,7 +1697,6 @@
 
           if (newMatchedItem) {
             element.elementType = newMatchedItem.id;
-            console.log(`Updated elementType to ${newMatchedItem.id} for displayName "${newDisplayName}"`);
           } else {
             console.warn(`No item found with displayName "${newDisplayName}"`);
           }
@@ -1775,7 +1760,6 @@
           const currentIndex = array.indexOf(element);
           if (currentIndex > -1) {
             array.splice(currentIndex, 1); // Remove element from array
-            console.log(`Removed element with index ${currentIndex} from array`);
           }
           // Remove any link from extractedLinks where the fromElementId or toElementId matches element.elementId
           extractedLinks = extractedLinks.filter(link => {
@@ -1897,7 +1881,6 @@
           const currentIndex = array.indexOf(element);
           if (currentIndex > -1) {
             array.splice(currentIndex, 1); // Remove element from array
-            console.log(`Removed element with index ${currentIndex} from array`);
           }
           // Remove any link from extractedLinks where the fromElementId or toElementId matches element.elementId
           extractedLinks = extractedLinks.filter(link => {
@@ -1953,7 +1936,6 @@
 
           if (newMatchedItem) {
             element.elementType = newMatchedItem.id;
-            console.log(`Updated elementType to ${newMatchedItem.id} for displayName "${newDisplayName}"`);
           } else {
             console.warn(`No item found with displayName "${newDisplayName}"`);
           }
@@ -2028,6 +2010,17 @@
               break;
             case 'CoreUnit':
               Core.push(element);
+              // Get the current display name of the core element from fetchedItems
+              const currentItem = fetchedItems.find(item => item.id === element.elementType);
+              if (!currentItem) {
+                console.warn("No item found in fetchedItems for the core element.");
+                return;
+              }
+              const currentDisplayName = currentItem.displayName;
+              const [defaultTier, defaultType, defaultUnit, ...rest] = currentDisplayName.split(" ");
+              const defaultSize = rest.pop();
+              // Set Core Size
+              document.getElementById("coreSize").innerHTML = defaultSize;
               break;
             default:
               if (matchedItem.grandParentName.includes('Weapon')) {
