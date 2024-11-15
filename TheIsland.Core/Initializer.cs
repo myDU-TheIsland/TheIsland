@@ -22,6 +22,7 @@ namespace TheIsland.Core
 
             // Initialize Custom SQL Mappers.
             SqlMapper.AddTypeHandler(typeof(List<string>), new JsonTypeHandler<List<string>>());
+            SqlMapper.AddTypeHandler(typeof(Dictionary<double, double>), new JsonTypeHandler<Dictionary<double, double>>());
             SqlMapper.AddTypeHandler(typeof(StoreItemContent), new JsonTypeHandler<StoreItemContent>());
             SqlMapper.AddTypeHandler(typeof(StoreItem), new JsonTypeHandler<StoreItem>());
         }

@@ -21,7 +21,7 @@ namespace TheIsland.Core.Services.SQL
         {
             using (DbConnection databaseConnection = this.GetConnection())
             {
-                return await databaseConnection.QueryAsync<FactoryLedgerEntry>("SELECT * FROM public.factory_ledger WHERE item_id IN @itemIds", new { itemIds }).ConfigureAwait(false);
+                return await databaseConnection.QueryAsync<FactoryLedgerEntry>("SELECT * FROM public.factory_ledger WHERE item_id = ANY(@itemIds)", new { itemIds }).ConfigureAwait(false);
             }
         }
     }

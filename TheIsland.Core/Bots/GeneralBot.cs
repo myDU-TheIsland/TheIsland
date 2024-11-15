@@ -4,19 +4,15 @@
 
 namespace TheIsland.Core.Bots
 {
-    using System.Collections.Concurrent;
     using System.Collections.Generic;
     using Backend;
     using Backend.Database;
     using BotLib.Generated;
     using Microsoft.Extensions.Logging;
     using NQ;
-    using StackExchange.Redis;
-    using TheIsland.Core.Classes;
     using TheIsland.Core.Helpers;
     using TheIsland.Core.Services.SQL;
     using TheIsland.Core.Settings;
-    using static Backend.Fixture.Construct.Schema.ConstructFixtureV1;
 
     public interface IGeneralBot : IBotClient
     {
