@@ -31,6 +31,10 @@ namespace TheIsland.Core.Classes
 
         public string SubType { get; set; } = string.Empty;
 
+        public double Volume { get; set; } = 0;
+
+        public double Mass { get; set; } = 0;
+
         [JsonIgnore]
         public List<ItemEntry> Children { get; set; } = new List<ItemEntry>();
     }

@@ -820,6 +820,8 @@ namespace TheIsland.Core.Bots
                 bool hidden = baseEntry.GetStaticPropertyOpt("hidden")?.boolValue ?? false;
                 string size = baseEntry.GetStaticPropertyOpt("scale")?.stringValue ?? string.Empty;
                 long tier = baseEntry.GetStaticPropertyOpt("level")?.intValue ?? 0;
+                double mass = baseEntry.GetStaticPropertyOpt("unitMass")?.doubleValue ?? 0;
+                double volume = baseEntry.GetStaticPropertyOpt("unitVolume")?.doubleValue ?? 0;
 
                 if (string.IsNullOrEmpty(displayName) || hidden)
                 {
@@ -843,6 +845,8 @@ namespace TheIsland.Core.Bots
                     Name = baseEntry.Name,
                     Size = size.Trim(),
                     Tier = tier,
+                    Volume = volume,
+                    Mass = mass,
                     DisplayName = $@"{displayName}{size}",
                 };
 

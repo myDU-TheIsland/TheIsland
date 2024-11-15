@@ -4,6 +4,7 @@
 
 namespace TheIsland.Website.Areas.Admin.Controllers
 {
+    using System.Text.Json;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using TheIsland.Core.Bots;
@@ -46,7 +47,9 @@ namespace TheIsland.Website.Areas.Admin.Controllers
         [ApiKey]
         public async Task<IActionResult> PriceItems()
         {
-            await this._buildService.CraftItems().ConfigureAwait(false);
+            var items = await this._buildService.CraftItems().ConfigureAwait(false);
+
+            await System.IO.File.WriteAllBytesAsync("output.json", JsonSerializer.SerializeToUtf8Bytes(items)).ConfigureAwait(false);
             return this.Json(true);
         }
 

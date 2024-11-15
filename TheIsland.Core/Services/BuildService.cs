@@ -11,10 +11,12 @@ namespace TheIsland.Core.Services
     using Amazon.Runtime.Internal.Transform;
     using Backend;
     using Microsoft.Extensions.DependencyInjection;
+    using Microsoft.Toolkit.HighPerformance;
     using NQ;
     using NQ.Interfaces;
     using NQutils.Def;
     using TheIsland.Core.Bots;
+    using TheIsland.Core.Classes;
     using TheIsland.Core.Entities;
     using TheIsland.Core.Helpers;
     using TheIsland.Core.Helpers.Caching;
@@ -67,7 +69,7 @@ namespace TheIsland.Core.Services
             foreach (var ore in totals)
             {
                 var recipe = await this.CraftItem((await this.GetRecipeIdsByIngredientItemIdAsync(ore.item_id).ConfigureAwait(false)).First()).ConfigureAwait(false);
-                if (recipe == null)
+                if (recipe.recipe == null)
                 {
                     //remove this ore from the list
                     oresDB = oresDB.Where(item => item.item_id != ore.item_id).ToList();
@@ -75,11 +77,11 @@ namespace TheIsland.Core.Services
                 }
 
 #pragma warning disable CS8602 // Dereference of a possibly null reference.
-                double multiplier = ore.quantity / recipe.ingredients.First().quantity.ToVolume();
+                double multiplier = ore.quantity / recipe.recipe.ingredients.First().quantity.ToVolume();
 
-                for (var i = 0; i < (recipe?.products.Count ?? 0); i++)
+                for (var i = 0; i < (recipe.recipe?.products.Count ?? 0); i++)
                 {
-                    var item = recipe.products[i];
+                    var item = recipe.recipe.products[i];
 
                     pures.Add(new FactoryLedgerEntry()
                     {
@@ -100,18 +102,41 @@ namespace TheIsland.Core.Services
             return;
         }
 
-        public async Task CraftItems()
+        public async Task<CraftedItem[]> CraftItems()
         {
             ConcurrentDictionary<double, CraftedItem> recipesDictionary = new ConcurrentDictionary<double, CraftedItem>();
-            List<Classes.ItemEntry> pures = this._marketBot.GetAllItemsMarketEntries().Where(item => item.Type == "Pure").ToList();
+            Dictionary<double, ItemEntry> marketEntries = this._marketBot.GetAllItemsMarketEntries().ToDictionary(key => key.Id, value => value);
+            List<ItemEntry> pures = marketEntries.Values.Where(item => item.Type == "Pure" || item.SubType == "Pure").ToList();
 
-            List<ulong> removeRecipes = new List<ulong>();
-            foreach (var item in pures)
+            double GetVolume(double itemId)
             {
-                removeRecipes.Add(await this.GetRecipeIdByProductItemIdAsync(item.Id).ConfigureAwait(false));
+                if (marketEntries.TryGetValue(itemId, out ItemEntry? output))
+                {
+                    return output.Volume;
+                }
+                else
+                {
+                    return 1;
+                }
             }
 
-            Queue<ulong> queue = new Queue<ulong>(this._marketBot.Bot.Recipes.Where(item => !removeRecipes.Contains(item.id)).Select(item => item.id));
+            double GetQuantity(Ingredient ingredient)
+            {
+                var quan = Math.Round(ingredient.quantity.ToVolume() / GetVolume(ingredient.itemId), 2);
+                return quan == 0 ? ingredient.quantity.value : quan;
+            }
+
+            bool isPure(double itemId)
+            {
+                return pures.Select(item => item.Id).Contains(itemId);
+            }
+
+            bool isOnlyPure(CraftedItem item)
+            {
+                return item.crafting_requirements.Keys.All(isPure);
+            }
+
+            Queue<ulong> queue = new Queue<ulong>(this._marketBot.Bot.Recipes.Select(item => item.id).ToArray());
 
             while (queue.Count != 0)
             {
@@ -119,65 +144,85 @@ namespace TheIsland.Core.Services
 
                 var craftedItem = await this.CraftItem(queueId, 10000).ConfigureAwait(false);
 
-                if (craftedItem == null)
+                if (craftedItem.recipe == null)
                 {
                     continue;
                 }
 
-                var itemId = craftedItem.products[0].itemId;
-                var quantityProduced = craftedItem.products[0].quantity.ToVolume();
+                var itemId = craftedItem.recipe.products[0].itemId;
 
-                recipesDictionary.TryAdd(
-                    itemId,
-                    new CraftedItem()
-                    {
-                        id = itemId,
-                        crafting_requirements = craftedItem.ingredients.ToDictionary(key => (double)key.itemId, value => Math.Round(value.quantity.ToVolume() / quantityProduced, 2)),
-                    });
+                if (!marketEntries.ContainsKey(itemId) || isPure(itemId))
+                {
+                    //probably a hidden item or pure.
+                    continue;
+                }
+
+                var quantityProduced = GetQuantity(craftedItem.recipe.products[0]);
+
+                var craftedItemEntry = new CraftedItem()
+                {
+                    item_id = itemId,
+                    crafting_requirements = craftedItem.recipe.ingredients
+                            .ToDictionary(
+                                key => Convert.ToDouble(key.itemId),
+                                value => Math.Round(GetQuantity(value) / quantityProduced, 2)),
+                };
+
+                recipesDictionary.TryAdd(itemId, craftedItemEntry);
             }
 
             void Reduce(CraftedItem item)
             {
-                List<double> items = item.crafting_requirements.Keys.Where(item => !isPure(item)).ToList();
-                while (items.Count() > 0)
+                bool isPureOnly = item.crafting_requirements.All(item => isPure(item.Key));
+                var items = item.crafting_requirements.Keys.ToList();
+                while (!isPureOnly)
                 {
                     foreach (var entry in items)
                     {
-                        item.crafting_requirements.Remove(entry);
+                        var quantity = item.crafting_requirements[entry];
 
-                        if (recipesDictionary.ContainsKey(entry))
+                        if (double.IsNaN(quantity) || double.IsInfinity(quantity))
                         {
-                            if (!isOnlyPure(recipesDictionary[entry]))
+                            quantity = 1;
+                        }
+
+                        if (!isPure(entry))
+                        {
+                            item.crafting_requirements.Remove(entry);
+                        }
+                        else
+                        {
+                            item.crafting_requirements[entry] = Math.Round(item.crafting_requirements[entry], 2);
+                        }
+
+                        if (recipesDictionary.TryGetValue(entry, out CraftedItem? value))
+                        {
+                            if (!isOnlyPure(value))
                             {
-                                Reduce(recipesDictionary[entry]);
+                                Reduce(value);
                             }
 
-                            foreach (var newIngredient in recipesDictionary[entry].crafting_requirements)
+                            foreach (var newIngredient in value.crafting_requirements)
                             {
-                                if (item.crafting_requirements.ContainsKey(newIngredient.Key))
+                                var ingredientValue = newIngredient.Value;
+                                if (double.IsNaN(ingredientValue) || double.IsInfinity(ingredientValue))
                                 {
-                                    item.crafting_requirements[newIngredient.Key] += newIngredient.Value;
+                                    ingredientValue = 1;
                                 }
-                                else
+
+                                double quantityRequired = Math.Round(ingredientValue * quantity, 2);
+
+                                if (!item.crafting_requirements.TryAdd(newIngredient.Key, quantityRequired))
                                 {
-                                    item.crafting_requirements.Add(newIngredient);
+                                    item.crafting_requirements[newIngredient.Key] = Math.Round(item.crafting_requirements[newIngredient.Key] + quantityRequired, 2);
                                 }
                             }
                         }
                     }
 
-                    items = item.crafting_requirements.Keys.Where(item => !isPure(item)).ToList();
+                    items = item.crafting_requirements.Keys.ToList();
+                    isPureOnly = item.crafting_requirements.All(item => isPure(item.Key));
                 }
-            }
-
-            bool isPure(double itemId)
-            {
-                return pures.Select(item => item.Id).ToArray().Contains(itemId);
-            }
-
-            bool isOnlyPure(CraftedItem item)
-            {
-                return item.crafting_requirements.Keys.All(isPure);
             }
 
             foreach (var item in recipesDictionary)
@@ -186,8 +231,26 @@ namespace TheIsland.Core.Services
             }
 
             var addToDB = recipesDictionary.Values.ToArray();
-            await System.IO.File.WriteAllBytesAsync("output.json", JsonSerializer.SerializeToUtf8Bytes(addToDB)).ConfigureAwait(false);
-            return;
+
+            foreach (var databaseEntry in addToDB)
+            {
+                try
+                {
+                    if (databaseEntry.crafting_requirements.Any(req => double.IsNaN(req.Value) || double.IsInfinity(req.Value)))
+                    {
+                        continue;
+                    }
+
+                    await this._craftedItemRepository.AddAsync(databaseEntry).ConfigureAwait(false);
+                }
+                catch
+                {
+                    //do nothing
+                    continue;
+                }
+            }
+
+            return (await this._craftedItemRepository.GetAsync().ConfigureAwait(false)).ToArray();
         }
 
         #endregion
@@ -218,13 +281,13 @@ namespace TheIsland.Core.Services
         /// <param name="playerId"></param>
         /// <returns></returns>
         /// <remarks>Duplicated from Orleans IndustryUnitGrain.cs.</remarks>
-        public async Task<Recipe?> CraftItem(ulong recipeId, double playerId = 10000)
+        public async Task<(NQ.Recipe? recipe, ulong batchSize)> CraftItem(ulong recipeId, double playerId = 10000)
         {
             NQ.Recipe? recipe = this._marketBot.Bot.Recipes.FirstOrDefault(item => item.id == recipeId);
 
             if (recipe == null)
             {
-                return null;
+                return (null, 0UL);
             }
 
             NQ.Recipe res = new NQ.Recipe()
@@ -295,7 +358,7 @@ namespace TheIsland.Core.Services
             long minRecipeTime = (long)this._gameplayBank.GetBaseObject<IndustryConfig>().MinRecipeTime;
             if ((double)res.time >= (double)minRecipeTime)
             {
-                return res;
+                return (res, 1UL);
             }
 
             long num = minRecipeTime / (long)res.time;
@@ -311,7 +374,7 @@ namespace TheIsland.Core.Services
                 product.quantity *= num;
             }
 
-            return res;
+            return (res, (ulong)num);
         }
         #endregion
     }
