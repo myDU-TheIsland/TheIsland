@@ -8,7 +8,6 @@ namespace TheIsland.Core.Services
     using System.Collections.Generic;
     using System.Reflection.Metadata.Ecma335;
     using System.Text.Json;
-    using Amazon.Runtime.Internal.Transform;
     using Backend;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.Toolkit.HighPerformance;
@@ -28,7 +27,6 @@ namespace TheIsland.Core.Services
         private readonly IRecipes _recipes;
         private readonly IGameplayBank _gameplayBank;
 
-        private readonly ThreadSafeCacheLookup<Task> _threadSafeCacheLookup;
         private readonly FactoryLedgerRepository _factoryLedgerRepository;
         private readonly CraftedItemRepository _craftedItemRepository;
 
@@ -43,8 +41,6 @@ namespace TheIsland.Core.Services
             this._marketBot = dualClient;
             this._gameplayBank = this._marketBot.ServiceProvider.GetRequiredService<IGameplayBank>();
             this._recipes = this._marketBot.ServiceProvider.GetRequiredService<IRecipes>();
-
-            this._threadSafeCacheLookup = new ThreadSafeCacheLookup<Task>();
         }
 
         #region Factory Stuff

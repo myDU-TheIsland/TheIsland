@@ -47,10 +47,22 @@ namespace TheIsland.Website.Areas.Admin.Controllers
         [ApiKey]
         public async Task<IActionResult> PriceItems()
         {
-            var items = await this._buildService.CraftItems().ConfigureAwait(false);
+            return this.Json(await this._buildService.CraftItems().ConfigureAwait(false));
+        }
 
-            await System.IO.File.WriteAllBytesAsync("output.json", JsonSerializer.SerializeToUtf8Bytes(items)).ConfigureAwait(false);
+        [HttpGet]
+        [ApiKey]
+        public async Task<IActionResult> FactoryConvertOreIntoPure()
+        {
+            await this._buildService.FactoryConvertOreIntoPure().ConfigureAwait(false);
             return this.Json(true);
+        }
+
+        [HttpGet]
+        [ApiKey]
+        public async Task<IActionResult> CraftItems()
+        {
+            return this.Json(await this._buildService.CraftItems().ConfigureAwait(false));
         }
 
         [HttpGet]
