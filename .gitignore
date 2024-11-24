@@ -241,16 +241,6 @@ ModelManifest.xml
 .fake/
 
 *BKP*
-SoftripNext.STServerWeb.WebApi/wwwroot/lib/
-SoftripNext.STServerWeb.WebApi/appsettings.json
-SoftripNext.STServerWeb.WebApi/[Nn]log.json
-SoftripNext.STServerWeb.WebApi/[Cc][Cc]Settings.json
-SoftripNext.STServerWeb.WebApi/[Ii]ssue[Mm]anager.json
-!SoftripNext.STServerWeb.WebApi/ExternalLibraries/*
-!SoftripNext.STServerWeb.WebApi.Tests/SoftripNext.STServerWeb.WebApi.Tests.Databases/databases.json
-!SoftripNext.STServerWeb.WebApi.Tests/SoftripNext.STServerWeb.WebApi.Tests.Databases/TestDatabase.mdf
-!SoftripNext.STServerWeb.WebApi.Tests/SoftripNext.STServerWeb.WebApi.Tests.Databases/TestDatabase_log.ldf
-!SoftripNext.STServerWeb.WebApi.Tests/SoftripNext.STServerWeb.WebApi.Tests.Databases/TestDatabase.bak
 [Ww]eb.[Cc]onfig
 
 ![Nn]u[Gg]et.exe
