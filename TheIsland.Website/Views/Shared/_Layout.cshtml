@@ -70,12 +70,12 @@
                     class="md:hidden text-center absolute right-0 mt-7 w-96 bg-gray-900 text-white font-sans rounded-md py-4 z-10 hidden max-h-[80vh] overflow-y-auto">
                     @if (currentPlayerName != "User")
                     {
-                        <form id="playerChange" asp-action="SetPlayerId" asp-controller="User" method="post"
+                        <form id="playerChangeMobile" asp-action="SetPlayerId" asp-controller="User" method="post"
                             class="flex items-center justify-center px-4 py-2">
                             @{
                                 var selectedPlayer = this.SelectedPlayer;
                             }
-                            <select name="playerId" id="playerSelection"
+                            <select name="playerId" id="playerSelectionMobile"
                                 class="w-72 bg-gray-700 p-2 py-4 rounded border-gray-600">
                                 @foreach (var player in players)
                                 {
@@ -177,7 +177,7 @@
                             class="absolute right-0 mt-2 w-60 bg-gray-900 text-white font-sans rounded-md shadow-lg py-2 z-10 hidden">
                             @if (currentPlayerName != "User")
                             {
-                                <form id="playerChange" asp-area="" asp-action="SetPlayerId" asp-controller="User" method="post"
+                                <form id="playerChange" asp-action="SetPlayerId" asp-controller="User" method="post"
                                     class="px-4 py-2">
                                     @{
                                         var selectedPlayer = this.SelectedPlayer;
@@ -287,6 +287,9 @@
     <script type="text/javascript">
         $("#playerSelection").on("change", function () {
             $("#playerChange").trigger("submit");
+        });
+        $("#playerSelectionMobile").on("change", function () {
+            $("#playerChangeMobile").trigger("submit");
         });
     </script>
     @await RenderSectionAsync("Scripts", required: false)
