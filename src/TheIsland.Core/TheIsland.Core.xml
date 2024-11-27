@@ -1,0 +1,215 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TheIsland.Core</name>
+    </assembly>
+    <members>
+        <member name="M:TheIsland.Core.Bots.MarketBot.GetListOfSellableItems">
+            <summary>
+            Gets a list of all sellible items on the market.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TheIsland.Core.Helpers.ParallelizationHelpers.ForEachAsync``1(System.Collections.Generic.IEnumerable{``0},System.Int32,System.Func{``0,System.Threading.Tasks.Task},System.Threading.CancellationToken)">
+            <summary>
+            The for each async.
+            </summary>
+            <param name="source">
+            The source.
+            </param>
+            <param name="dop">
+            The dop.
+            </param>
+            <param name="body">
+            The body.
+            </param>
+            <param name="cancellationToken">
+            The cancellation token.
+            </param>
+            <typeparam name="T">
+            </typeparam>
+            <returns>
+            The <see cref="T:System.Threading.Tasks.Task"/>.
+            </returns>
+            <remarks>Referenced from https://blogs.msdn.microsoft.com/pfxteam/2012/03/05/implementing-a-simple-foreachasync-part-2/.</remarks>
+        </member>
+        <member name="M:TheIsland.Core.Helpers.RedisCache`1.Add(System.String,`0,System.TimeSpan)">
+            <summary>
+            Adds the specified key.
+            </summary>
+            <param name="key">The key.</param>
+            <param name="item">The item.</param>
+            <param name="cacheTimeout">The cache timeout.</param>
+        </member>
+        <member name="M:TheIsland.Core.Helpers.RedisCache`1.Get(System.String)">
+            <summary>
+            Gets the specified key.
+            </summary>
+            <param name="key">The key.</param>
+            <returns>TValue.</returns>
+        </member>
+        <member name="M:TheIsland.Core.Helpers.ThreadSafeExecution.ThreadExecution(System.String,System.Func{System.Threading.Tasks.Task})">
+            <summary>
+            Threads the safe execution.
+            </summary>
+            <param name="key">The key.</param>
+            <param name="lookup">The lookup.</param>
+            <returns>Task&lt;TValue&gt;.</returns>
+        </member>
+        <member name="M:TheIsland.Core.Helpers.ThreadSafeExecutionWithType`1.ThreadSafeExecution(System.String,System.Func{System.Threading.Tasks.Task{`0}})">
+            <summary>
+            Threads the safe execution.
+            </summary>
+            <param name="key">The key.</param>
+            <param name="lookup">The lookup.</param>
+            <returns>Task&lt;TValue&gt;.</returns>
+        </member>
+        <member name="M:TheIsland.Core.Services.BuildService.CraftItem(System.UInt64,System.Double)">
+            <summary>
+            Gets the recipe results with talents applied for recipe provided.
+            </summary>
+            <param name="recipeId"></param>
+            <param name="playerId"></param>
+            <returns></returns>
+            <remarks>Duplicated from Orleans IndustryUnitGrain.cs.</remarks>
+        </member>
+        <member name="T:TheIsland.Core.Services.IAppService">
+            <summary>
+            Placeholder class to allow us to use reflection to include things.
+            </summary>
+        </member>
+        <member name="M:TheIsland.Core.Services.SQL.IEntityRepository`1.AddAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Adds the item asynchronous.
+            </summary>
+            <param name="item">The item.</param>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:TheIsland.Core.Services.SQL.IEntityRepository`1.AddAsync(System.Collections.Generic.IEnumerable{`0},System.Threading.CancellationToken)">
+            <summary>
+            Adds the items asynchronous.
+            </summary>
+            <param name="items">The items.</param>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns>Task.</returns>
+        </member>
+        <member name="M:TheIsland.Core.Services.SQL.IEntityRepository`1.GetAsync(System.Threading.CancellationToken)">
+            <summary>
+            Gets all the items asynchronous.
+            </summary>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns>Task&lt;IEnumerable&lt;TValue&gt;&gt;.</returns>
+        </member>
+        <member name="M:TheIsland.Core.Services.SQL.IEntityRepository`1.GetAsync(System.Collections.Generic.IEnumerable{System.Double},System.Threading.CancellationToken)">
+            <summary>
+            Gets the items with the specified keys asynchronous.
+            </summary>
+            <param name="keys">The keys.</param>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns>Task&lt;IEnumerable&lt;TValue&gt;&gt;.</returns>
+        </member>
+        <member name="M:TheIsland.Core.Services.SQL.IEntityRepository`1.GetAsync(System.Double,System.Threading.CancellationToken)">
+            <summary>
+            Gets the item with the specified key asynchronous.
+            </summary>
+            <param name="key">The key.</param>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns>Task&lt;TValue&gt;.</returns>
+        </member>
+        <member name="M:TheIsland.Core.Services.SQL.IEntityRepository`1.RemoveAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Removes the item asynchronous.
+            </summary>
+            <param name="item">The item.</param>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns>Task&lt;System.Boolean&gt;.</returns>
+        </member>
+        <member name="M:TheIsland.Core.Services.SQL.IEntityRepository`1.RemoveAsync(System.Double,System.Threading.CancellationToken)">
+            <summary>
+            Removes the item with the specified key asynchronous.
+            </summary>
+            <param name="key">The key.</param>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns>Task&lt;System.Boolean&gt;.</returns>
+        </member>
+        <member name="M:TheIsland.Core.Services.SQL.IEntityRepository`1.RemoveAsync(System.Collections.Generic.IEnumerable{System.Double},System.Threading.CancellationToken)">
+            <summary>
+            Removes the items with the specified keys asynchronous.
+            </summary>
+            <param name="keys">The keys.</param>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns>Task&lt;System.Double&gt;.</returns>
+        </member>
+        <member name="M:TheIsland.Core.Services.SQL.IEntityRepository`1.RemoveAsync(System.Collections.Generic.IEnumerable{`0},System.Threading.CancellationToken)">
+            <summary>
+            Removes the items asynchronous.
+            </summary>
+            <param name="items">The items.</param>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns>Task&lt;System.Double&gt;.</returns>
+        </member>
+        <member name="M:TheIsland.Core.Services.SQL.IEntityRepository`1.UpdateAsync(System.Collections.Generic.IEnumerable{`0},System.Threading.CancellationToken)">
+            <summary>
+            Updates the items asynchronous.
+            </summary>
+            <param name="items">The items.</param>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns>Task&lt;System.Double&gt;.</returns>
+        </member>
+        <member name="M:TheIsland.Core.Services.SQL.IEntityRepository`1.UpdateAsync(`0,System.Threading.CancellationToken)">
+            <summary>
+            Updates the item asynchronous.
+            </summary>
+            <param name="item">The item.</param>
+            <param name="cancellationToken">The cancellation token.</param>
+            <returns>Task&lt;System.Boolean&gt;.</returns>
+        </member>
+        <member name="T:TheIsland.Core.Settings.MarketBotConfig">
+            <summary>
+            A class containing the config settings for this mod.
+            </summary>
+        </member>
+        <member name="P:TheIsland.Core.Settings.MarketBotConfig.BuyPrices">
+            <summary>
+            Gets or sets list of items to buy and the top price to pay.
+            </summary>
+        </member>
+        <member name="P:TheIsland.Core.Settings.MarketBotConfig.BuyRecursivePrices">
+            <summary>
+            Gets or sets list of items to recursively buy and the top price to pay.
+            </summary>
+        </member>
+        <member name="P:TheIsland.Core.Settings.MarketBotConfig.Planets">
+            <summary>
+            Gets or sets planets / parents to iterate over for markets.
+            </summary>
+        </member>
+        <member name="P:TheIsland.Core.Settings.MarketBotConfig.DaysToWaitBeforeExpiration">
+            <summary>
+            Gets or sets the numbers days to buy before expiration.
+            </summary>
+            <example> 1 means once its goes under 24hrs remaining itll buy if within the buy range.</example>
+        </member>
+        <member name="P:TheIsland.Core.Settings.MarketBotConfig.MarketMarkUp">
+            <summary>
+            Gets or sets the mark up for item resells.
+            </summary>
+        </member>
+        <member name="P:TheIsland.Core.Settings.MarketBotConfig.OnlyResellItemsRecursive">
+            <summary>
+            Gets or sets list of items to recursively buy and the top price to pay.
+            </summary>
+        </member>
+        <member name="P:TheIsland.Core.Settings.MarketBotConfig.HotTimeMarkets">
+            <summary>
+            Gets or sets list of markets hot time events can happen at.
+            </summary>
+        </member>
+        <member name="P:TheIsland.Core.Settings.MarketBotConfig.LimitBracket">
+            <summary>
+            Gets or sets list of markets hot time events can happen at.
+            </summary>
+        </member>
+    </members>
+</doc>

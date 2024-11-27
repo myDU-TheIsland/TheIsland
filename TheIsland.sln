@@ -3,38 +3,76 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35201.131
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TheIsland.Website", "TheIsland.Website\TheIsland.Website.csproj", "{E2BC0B81-C793-4066-913D-B42BCFD67AE2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TheIsland.Website", "src\TheIsland.Website\TheIsland.Website.csproj", "{E2BC0B81-C793-4066-913D-B42BCFD67AE2}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TheIsland.Core", "TheIsland.Core\TheIsland.Core.csproj", "{E7C5F5D2-2C7B-42FC-8F13-C8C776E6DFF9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TheIsland.Core", "src\TheIsland.Core\TheIsland.Core.csproj", "{E7C5F5D2-2C7B-42FC-8F13-C8C776E6DFF9}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1AA1EF59-996B-48B2-A9E2-5E55B2E76EAB}"
 	ProjectSection(SolutionItems) = preProject
+		.dockerignore = .dockerignore
 		.editorconfig = .editorconfig
+		.gitignore = .gitignore
+		.prettierrc = .prettierrc
+		Dockerfile = Dockerfile
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheIsland.Core.Tests", "TheIsland.Core.Tests\TheIsland.Core.Tests.csproj", "{6EAC710F-A7B1-423D-A5BB-5436D4A88EB7}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheIsland.Core.Tests", "tests\TheIsland.Core.Tests\TheIsland.Core.Tests.csproj", "{6EAC710F-A7B1-423D-A5BB-5436D4A88EB7}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{5F9BF118-937E-4C2D-BABF-D48B5895BB8F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{E4D3FF1C-12BF-4AAC-9D22-231929915F51}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheIsland.BlueprintChecker", "src\TheIsland.BlueprintChecker\TheIsland.BlueprintChecker.csproj", "{81278F03-3EBA-4731-964A-4173B6CCFAD8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
 		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{E2BC0B81-C793-4066-913D-B42BCFD67AE2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E2BC0B81-C793-4066-913D-B42BCFD67AE2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E2BC0B81-C793-4066-913D-B42BCFD67AE2}.Debug|x64.ActiveCfg = Debug|x64
+		{E2BC0B81-C793-4066-913D-B42BCFD67AE2}.Debug|x64.Build.0 = Debug|x64
 		{E2BC0B81-C793-4066-913D-B42BCFD67AE2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E2BC0B81-C793-4066-913D-B42BCFD67AE2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E2BC0B81-C793-4066-913D-B42BCFD67AE2}.Release|x64.ActiveCfg = Release|x64
+		{E2BC0B81-C793-4066-913D-B42BCFD67AE2}.Release|x64.Build.0 = Release|x64
 		{E7C5F5D2-2C7B-42FC-8F13-C8C776E6DFF9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{E7C5F5D2-2C7B-42FC-8F13-C8C776E6DFF9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E7C5F5D2-2C7B-42FC-8F13-C8C776E6DFF9}.Debug|x64.ActiveCfg = Debug|x64
+		{E7C5F5D2-2C7B-42FC-8F13-C8C776E6DFF9}.Debug|x64.Build.0 = Debug|x64
 		{E7C5F5D2-2C7B-42FC-8F13-C8C776E6DFF9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E7C5F5D2-2C7B-42FC-8F13-C8C776E6DFF9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E7C5F5D2-2C7B-42FC-8F13-C8C776E6DFF9}.Release|x64.ActiveCfg = Release|x64
+		{E7C5F5D2-2C7B-42FC-8F13-C8C776E6DFF9}.Release|x64.Build.0 = Release|x64
 		{6EAC710F-A7B1-423D-A5BB-5436D4A88EB7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{6EAC710F-A7B1-423D-A5BB-5436D4A88EB7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6EAC710F-A7B1-423D-A5BB-5436D4A88EB7}.Debug|x64.ActiveCfg = Debug|x64
+		{6EAC710F-A7B1-423D-A5BB-5436D4A88EB7}.Debug|x64.Build.0 = Debug|x64
 		{6EAC710F-A7B1-423D-A5BB-5436D4A88EB7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6EAC710F-A7B1-423D-A5BB-5436D4A88EB7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6EAC710F-A7B1-423D-A5BB-5436D4A88EB7}.Release|x64.ActiveCfg = Release|x64
+		{6EAC710F-A7B1-423D-A5BB-5436D4A88EB7}.Release|x64.Build.0 = Release|x64
+		{81278F03-3EBA-4731-964A-4173B6CCFAD8}.Debug|Any CPU.ActiveCfg = Debug|x64
+		{81278F03-3EBA-4731-964A-4173B6CCFAD8}.Debug|Any CPU.Build.0 = Debug|x64
+		{81278F03-3EBA-4731-964A-4173B6CCFAD8}.Debug|x64.ActiveCfg = Debug|x64
+		{81278F03-3EBA-4731-964A-4173B6CCFAD8}.Debug|x64.Build.0 = Debug|x64
+		{81278F03-3EBA-4731-964A-4173B6CCFAD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81278F03-3EBA-4731-964A-4173B6CCFAD8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81278F03-3EBA-4731-964A-4173B6CCFAD8}.Release|x64.ActiveCfg = Release|x64
+		{81278F03-3EBA-4731-964A-4173B6CCFAD8}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{E2BC0B81-C793-4066-913D-B42BCFD67AE2} = {5F9BF118-937E-4C2D-BABF-D48B5895BB8F}
+		{E7C5F5D2-2C7B-42FC-8F13-C8C776E6DFF9} = {5F9BF118-937E-4C2D-BABF-D48B5895BB8F}
+		{6EAC710F-A7B1-423D-A5BB-5436D4A88EB7} = {E4D3FF1C-12BF-4AAC-9D22-231929915F51}
+		{81278F03-3EBA-4731-964A-4173B6CCFAD8} = {5F9BF118-937E-4C2D-BABF-D48B5895BB8F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {88279F31-9F19-42F0-B0B5-D931D8890D1D}

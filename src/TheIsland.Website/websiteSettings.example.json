@@ -1,0 +1,52 @@
+{
+  "Site": {
+    "RedisServer": "10.10.42.169",
+    "DPKPath": "",
+    "admins": [ "696573372879994961", "218223185026482176" ],
+    "apikey": [ "" ],
+    "Discord": {
+      "ClientId": "",
+      "ClientSecret": ""
+    },
+    "DualUniverse": {
+      "ExportPath": "",
+      "ConfigPath": "",
+      "StoreImagePath": "",
+      "StoreImageUrl": "",
+      "MarketHeaderIds": [
+        2353764381,
+        424107616,
+        834276617,
+        1315100172,
+        1237953170
+      ],
+      "WebsiteBot": {
+        "BotUser": "",
+        "BotPassword": "",
+        "PlayerName": "",
+        "QueueingUri": "https://dev-queueing.theisle.online"
+      },
+      "MarketBot": {
+        "BotUser": "",
+        "BotPassword": "",
+        "PlayerName": "",
+        "QueueingUri": "https://dev-queueing.theisle.online"
+      }
+    },
+    "Postgres": {
+      "Server": "dev-postgre-1.servers.v0.design",
+      "Port": 5432,
+      "UserName": "",
+      "Password": "",
+      "Database": "TheIsland"
+    }
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*"
+}
+
