@@ -23,6 +23,6 @@ namespace TheIsland.Website.Classes
 
         public string[] ApiKey { get; set; } = { "5108b23c-9fec-497e-88a6-07f9d3032dcc" };
 
-        public string DPKPath { get; set; } = "/config/dpk";
+        public string RedisServer { get; set; } = "10.10.42.169";
     }
 }

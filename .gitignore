@@ -260,7 +260,7 @@ global.json
 
 #Don't commit any templates other than DEFAULT
 .idea/
-src/TheIsland.Website/website.json
+src/TheIsland.Website/websiteSettings.json
 src/TheIsland.Website/wwwroot/dual.yaml
 src/TheIsland.Website/wwwroot/dual-old.yaml
 src/TheIsland.DiscordBot/discordbot.json

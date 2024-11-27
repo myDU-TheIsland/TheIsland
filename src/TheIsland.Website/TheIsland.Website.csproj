@@ -74,6 +74,7 @@
 		<PackageReference Include="Hangfire.AspNetCore" Version="1.8.15" />
 		<PackageReference Include="Hangfire.InMemory" Version="1.0.0" />
 		<PackageReference Include="Microsoft.AspNetCore.Authentication.OpenIdConnect" Version="8.0.10" />
+		<PackageReference Include="Microsoft.AspNetCore.DataProtection.StackExchangeRedis" Version="8.0.11" />
 		<PackageReference Include="Microsoft.AspNetCore.Mvc.Razor.RuntimeCompilation" Version="8.0.10" />
 		<PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
 		<PackageReference Include="Npgsql" Version="6.0.11" />
@@ -89,9 +90,6 @@
 		<PackageReference Include="Microsoft.IdentityModel.JsonWebTokens" Version="7.1.2" />
 		<PackageReference Include="Microsoft.Identity.Client" Version="4.66.2" />
 		<PackageReference Include="Azure.Identity" Version="1.13.1" />
-	</ItemGroup>
-	<ItemGroup>
-	  <None Include="..\.editorconfig" Link=".editorconfig" />
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\TheIsland.Core\TheIsland.Core.csproj" />

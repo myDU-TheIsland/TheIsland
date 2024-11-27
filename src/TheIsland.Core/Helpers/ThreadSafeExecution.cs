@@ -1,4 +1,4 @@
-﻿// <copyright file="ThreadSafeCache.cs" company="Paul Layne">
+﻿// <copyright file="ThreadSafeExecution.cs" company="Paul Layne">
 // Copyright (c) Paul Layne. All rights reserved.
 // </copyright>
 

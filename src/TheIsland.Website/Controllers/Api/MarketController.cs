@@ -29,25 +29,6 @@ namespace TheIsland.Website.Controllers.Api
         [HttpGet]
         [Route("{id}")]
         [Route("{id}/{marketId}")]
-        public async Task<IActionResult> Hourly(double id, double marketId = -1, string type = "graph")
-        {
-            type ??= "graph";
-
-            IEnumerable<MarketStatistics> results = await this._marketService.GetHourlyStats(id, marketId).ConfigureAwait(false);
-
-            switch (type)
-            {
-                case "chartjs":
-                    return this.Json(results.ToChartJS());
-                case "graph":
-                default:
-                    return this.Json(results.ToGraph());
-            }
-        }
-
-        [HttpGet]
-        [Route("{id}")]
-        [Route("{id}/{marketId}")]
         public async Task<IActionResult> Daily(double id, double marketId = -1, string type = "graph")
         {
             type ??= "graph";

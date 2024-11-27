@@ -5,24 +5,22 @@
 @model MarketModel
 @{
     ViewData["Title"] = "Market Data";
-
-    var items = _marketBot.GetListOfSellableItems().OrderBy(items => items.Value).ToDictionary();
+    var items = _marketBot.GetListOfSellableItems().OrderBy(items => items.Value).ToDictionary(); 
+    bool itemExists = items.ContainsKey(Model.ItemId);
 
     var markets = (await _marketRepo.GetAsync().ConfigureAwait(false)).ToDictionary(key => key.id, value =>
     value.name.Replace("Market", string.Empty).Replace("District", string.Empty).Trim());
     markets.Add(0, "All Markets");
-
-    var itemExists = items.ContainsKey(Model.ItemId);
+       
     var selectedMarket = markets[Model.MarketId];
     var selectedItem = itemExists ? items[Model.ItemId] : string.Empty;
 
     double botPurchasePrice = _marketBot.GetItemPrice(Convert.ToUInt64(Model.MarketId), Convert.ToUInt64(Model.ItemId)) / 100;
     double botLimit = await _marketBot.GetItemLimitAsync(Model.ItemId);
-    double userLimit = botLimit - ((await _marketBot.GetPlayerItemLimitAsync(this.SelectedPlayer, Model.MarketId, Model.ItemId))?.quantity ?? 0); 
+    double userLimit = botLimit - ((await _marketBot.GetPlayerItemLimitAsync(this.SelectedPlayer, Model.MarketId, Model.ItemId))?.quantity ?? 0);
 
     string graphHeader = markets.ContainsKey(Model.MarketId) ? " @ " + markets[Model.MarketId] : string.Empty;
 }
-
 <div class="min-h-screen text-white font-sans pt-35">
     <div class="max-w-7xl mx-auto xs:px-3 xs:pb-5 space-y-4">
         <!-- Navigation Bar -->
@@ -33,7 +31,7 @@
                     <div class="relative md:w-1/3 xs:w-full dropdown-container">
                         <!-- Item Dropdown with Search (using Select2) -->
                         <select asp-for="ItemId" id="dropdownSearch"
-                            class="block w-full px-4 py-2 text-white bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600">
+                                class="block w-full px-4 py-2 text-white bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600">
                             <option value="">Search Item...</option>
                             @foreach (var item in items)
                             {
@@ -45,7 +43,7 @@
                     <div class="relative md:w-1/3 xs:w-full dropdown-container-2">
                         <!-- Market Dropdown using Select2 -->
                         <select asp-for="MarketId" id="marketSearch" name="MarketId"
-                            class="block w-full px-4 py-2 text-white bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600">
+                                class="block w-full px-4 py-2 text-white bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600">
                             <option value="0">All Markets</option> <!-- Default option for All Markets -->
                             @foreach (var market in markets.OrderBy(item => item.Value).ToArray())
                             {
@@ -56,7 +54,9 @@
 
                     <!-- Search Button -->
                     <button id="btnSearch"
-                        class="px-4 py-2 bg-purple-600 rounded-md text-white hover:bg-purple-500 md:ml-2 md:w-24 xs:w-full">Search</button>
+                            class="px-4 py-2 bg-purple-600 rounded-md text-white hover:bg-purple-500 md:ml-2 md:w-24 xs:w-full">
+                        Search
+                    </button>
 
                     <!-- Hidden inputs to store selected IDs -->
                     <input type="hidden" id="selectedItemId" name="ItemId" value="">
@@ -79,7 +79,8 @@
 
                 @* <!-- Chart Section --> *@
                 <div class="bg-darkBlue rounded-lg shadow-lg px-2 py-3 border border-purple-500/30">
-                    <h2 class="text-2xl font-bold mb-4 text-white">@items[Model.ItemId] (Last 72hrs) @graphHeader
+                    <h2 class="text-2xl font-bold mb-4 text-white">
+                        @items[Model.ItemId] (Last 72hrs) @graphHeader
                     </h2>
                     @if (botPurchasePrice > 0)
                     {
@@ -96,7 +97,7 @@
                                     }
                                 }
                             </i> ⭐
-                            </p>
+                        </p>
                     }
                     <div class="border border-purple-500 w-full"></div>
                     <canvas id="priceChart" class="pt-5" style="max-height: 300px;"></canvas>
@@ -106,7 +107,7 @@
                 <div class="flex xs:flex-col md:flex-row w-full md:space-x-4 xs:space-y-4 md:space-y-0">
                     @* <!-- Buy Orders --> *@
                     <div id="buyOrdersSection"
-                        class="bg-darkBlue rounded-lg md:w-1/2 xs:w-full shadow-lg border border-purple-500/30">
+                            class="bg-darkBlue rounded-lg md:w-1/2 xs:w-full shadow-lg border border-purple-500/30">
                         <div class="p-4 bg-purple-600 rounded-lg">
                             <h2 class="text-xl font-bold text-white">Buy Orders</h2>
                         </div>
@@ -115,13 +116,16 @@
                                 <thead>
                                     <tr class="border-b border-purple-500 text-left text-purple-400">
                                         <th class="pb-2 w-1/3 sortable cursor-pointer" data-column="price"
-                                            data-target="buyOrdersTable">Unit Price <span
-                                                class="inline-block ml-1">▲▼</span></th>
+                                            data-target="buyOrdersTable">
+                                            Unit Price <span class="inline-block ml-1">▲▼</span>
+                                        </th>
                                         <th class="pb-2 w-1/3 sortable cursor-pointer" data-column="quantity"
-                                            data-target="buyOrdersTable">Quantity <span class="inline-block ml-1">▲▼</span>
+                                            data-target="buyOrdersTable">
+                                            Quantity <span class="inline-block ml-1">▲▼</span>
                                         </th>
                                         <th class="pb-2 w-1/3 sortable cursor-pointer" data-column="market"
-                                            data-target="buyOrdersTable">Market <span class="inline-block ml-1">▲▼</span>
+                                            data-target="buyOrdersTable">
+                                            Market <span class="inline-block ml-1">▲▼</span>
                                         </th>
                                     </tr>
                                 </thead>
@@ -145,7 +149,7 @@
 
                     @* <!-- Sell Orders --> *@
                     <div id="sellOrdersSection"
-                        class="bg-darkBlue rounded-lg md:w-1/2 xs:w-full shadow-lg border border-purple-500/30">
+                            class="bg-darkBlue rounded-lg md:w-1/2 xs:w-full shadow-lg border border-purple-500/30">
                         <div class="p-4 bg-purple-600 rounded-lg">
                             <h2 class="text-xl font-bold text-white">Sell Orders</h2>
                         </div>
@@ -154,13 +158,16 @@
                                 <thead class="bg-darkBlue">
                                     <tr class="border-b border-purple-500 text-left text-purple-400">
                                         <th class="pb-2 w-1/3 sortable cursor-pointer" data-column="price"
-                                            data-target="sellOrdersTable">Unit Price <span
-                                                class="inline-block ml-1">▲▼</span></th>
+                                            data-target="sellOrdersTable">
+                                            Unit Price <span class="inline-block ml-1">▲▼</span>
+                                        </th>
                                         <th class="pb-2 w-1/3 sortable cursor-pointer" data-column="quantity"
-                                            data-target="sellOrdersTable">Quantity <span class="inline-block ml-1">▲▼</span>
+                                            data-target="sellOrdersTable">
+                                            Quantity <span class="inline-block ml-1">▲▼</span>
                                         </th>
                                         <th class="pb-2 w-1/3 sortable cursor-pointer" data-column="market"
-                                            data-target="sellOrdersTable">Market <span class="inline-block ml-1">▲▼</span>
+                                            data-target="sellOrdersTable">
+                                            Market <span class="inline-block ml-1">▲▼</span>
                                         </th>
                                     </tr>
                                 </thead>

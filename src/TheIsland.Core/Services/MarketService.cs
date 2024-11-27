@@ -8,6 +8,7 @@ namespace TheIsland.Core.Services
     using System.Linq;
     using System.Text.Json;
     using System.Threading.Tasks;
+    using StackExchange.Redis;
     using TheIsland.Core.Bots;
     using TheIsland.Core.Entities;
     using TheIsland.Core.Helpers;
@@ -28,7 +29,8 @@ namespace TheIsland.Core.Services
             DualMarketTransactionRepository dualMarketTransactionRepository,
             DualWalletRepository dualWalletRepository,
             MarketBotConfig marketBotConfig,
-            IMarketBot dualClient)
+            IMarketBot dualClient,
+            IDatabase redisDatabase)
         {
             this._dualMarketRepository = dualMarketRepository;
             this._dualMarketTransactionRepository = dualMarketTransactionRepository;
@@ -166,20 +168,6 @@ namespace TheIsland.Core.Services
         public async Task<IEnumerable<MarketStatistics>> GetDailyStats(double itemId, double marketId = -1)
         {
             IEnumerable<MarketStatistics> results = await this._dualWalletRepository.GetDailyStats(itemId, marketId).ConfigureAwait(false);
-
-            IEnumerable<DualMarket> markets = await this._dualMarketRepository.GetAsync().ConfigureAwait(false);
-
-            foreach (MarketStatistics item in results)
-            {
-                item.market_name = markets.FirstOrDefault(market => market.id == item.market_id)?.name ?? string.Empty;
-            }
-
-            return results;
-        }
-
-        public async Task<IEnumerable<MarketStatistics>> GetHourlyStats(double itemId, double marketId = -1)
-        {
-            IEnumerable<MarketStatistics> results = await this._dualWalletRepository.GetHourlyStats(itemId, marketId).ConfigureAwait(false);
 
             IEnumerable<DualMarket> markets = await this._dualMarketRepository.GetAsync().ConfigureAwait(false);
 

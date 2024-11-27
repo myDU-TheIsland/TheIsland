@@ -9,7 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "TheIsland.Core", "src\TheIs
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{1AA1EF59-996B-48B2-A9E2-5E55B2E76EAB}"
 	ProjectSection(SolutionItems) = preProject
+		.dockerignore = .dockerignore
 		.editorconfig = .editorconfig
+		.gitignore = .gitignore
+		.prettierrc = .prettierrc
+		Dockerfile = Dockerfile
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TheIsland.Core.Tests", "tests\TheIsland.Core.Tests\TheIsland.Core.Tests.csproj", "{6EAC710F-A7B1-423D-A5BB-5436D4A88EB7}"

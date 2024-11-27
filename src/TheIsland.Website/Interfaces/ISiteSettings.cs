@@ -13,7 +13,7 @@ namespace TheIsland.Website.Interfaces
 
         string[] ApiKey { get; set; }
 
-        string DPKPath { get; set; }
+        string RedisServer { get; set; }
 
         DiscordSettings Discord { get; set; }
 

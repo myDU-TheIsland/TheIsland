@@ -19,6 +19,7 @@ namespace TheIsland.Website
     using Microsoft.IdentityModel.Logging;
     using Microsoft.OpenApi.Models;
     using StackExchange.Exceptional.Stores;
+    using StackExchange.Redis;
     using TheIsland.Core;
     using TheIsland.Core.Bots;
     using TheIsland.Core.Services;
@@ -161,16 +162,12 @@ namespace TheIsland.Website
                 .AddPolicy("Admin", policy => policy.RequireRole("Admin"))
                 .AddPolicy("User", policy => policy.RequireRole("User"));
 
-            if (this.HostingEnvironment.IsDevelopment())
-            {
-                services.AddDataProtection()
-                    .PersistKeysToFileSystem(new DirectoryInfo(@"./dpk"));
-            }
-            else
-            {
-                services.AddDataProtection()
-                    .PersistKeysToFileSystem(new DirectoryInfo(SiteSettings.DPKPath));
+            var redis = ConnectionMultiplexer.Connect(SiteSettings.RedisServer);
+            services.AddDataProtection()
+                .PersistKeysToStackExchangeRedis(redis, "Website-DPK");
 
+            if (!this.HostingEnvironment.IsDevelopment())
+            {
                 services.AddResponseCompression(options =>
                 {
                     options.EnableForHttps = true;
@@ -199,6 +196,7 @@ namespace TheIsland.Website
             services.AddSingleton(SiteSettings.Postgres);
             services.AddSingleton(MarketBotConfig);
             services.AddSingleton<ApiKeyAuthorizationFilter>();
+            services.AddSingleton(redis.GetDatabase(2));
 
             // repositories
             services.AddCoreDependencies();

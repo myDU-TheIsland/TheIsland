@@ -1,19 +1,43 @@
 {
   "Site": {
+    "RedisServer": "10.10.42.169",
+    "DPKPath": "",
+    "admins": [ "696573372879994961", "218223185026482176" ],
+    "apikey": [ "" ],
     "Discord": {
-      "clientId": "",
-      "clientSecret": ""
+      "ClientId": "",
+      "ClientSecret": ""
     },
     "DualUniverse": {
-      "BotUser": "",
-      "BotPassword": "",
-      "IngameName": "HelperBot"
+      "ExportPath": "",
+      "ConfigPath": "",
+      "StoreImagePath": "",
+      "StoreImageUrl": "",
+      "MarketHeaderIds": [
+        2353764381,
+        424107616,
+        834276617,
+        1315100172,
+        1237953170
+      ],
+      "WebsiteBot": {
+        "BotUser": "",
+        "BotPassword": "",
+        "PlayerName": "",
+        "QueueingUri": "https://dev-queueing.theisle.online"
+      },
+      "MarketBot": {
+        "BotUser": "",
+        "BotPassword": "",
+        "PlayerName": "",
+        "QueueingUri": "https://dev-queueing.theisle.online"
+      }
     },
     "Postgres": {
-      "Server": "localhost",
+      "Server": "dev-postgre-1.servers.v0.design",
       "Port": 5432,
-      "UserName": "dual",
-      "Password": "dual",
+      "UserName": "",
+      "Password": "",
       "Database": "TheIsland"
     }
   },
@@ -25,3 +49,4 @@
   },
   "AllowedHosts": "*"
 }
+
