@@ -251,8 +251,8 @@ ModelManifest.xml
 
 #Don't commit any .css files (.less only)
 *.css
-!wwwroot/css/style.css
-!wwwroot/css/tailwind.css
+!src/TheIsland.Website/wwwroot/css/style.css
+!src/TheIsland.Website/wwwroot/css/tailwind.css
 
 *.lock.json
 .vscode
@@ -260,12 +260,13 @@ global.json
 
 #Don't commit any templates other than DEFAULT
 .idea/
-TheIsland.Website/website.json
-TheIsland.Website/wwwroot/dual.yaml
-TheIsland.Website/wwwroot/dual-old.yaml
-TheIsland.DiscordBot/discordbot.json
-TheIsland.Website/marketBotSettings.json
-TheIsland.Website/websiteSettings.json
-TheIsland.Website/dual.yaml
+src/TheIsland.Website/website.json
+src/TheIsland.Website/wwwroot/dual.yaml
+src/TheIsland.Website/wwwroot/dual-old.yaml
+src/TheIsland.DiscordBot/discordbot.json
+src/TheIsland.Website/marketBotSettings.json
+src/TheIsland.Website/websiteSettings.json
+src/TheIsland.Website/dual.yaml
 dual.yaml
-TheIsland.Website/output.json
+src/TheIsland.Website/output.json
+!tests/TheIsland.Core.Tests/dual.yaml

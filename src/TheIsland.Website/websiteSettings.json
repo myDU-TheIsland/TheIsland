@@ -1,0 +1,52 @@
+{
+  "Site": {
+    "DPKPath": "",
+    "admins": [ "696573372879994961", "218223185026482176" ],
+    "apikey": [ "6864efd0-45fd-4280-b6aa-bd0b9e811718" ],
+    "Discord": {
+      "ClientId": "1300895405390954577",
+      "ClientSecret": "pWduLiMMzqb5gUR-WxeQ7YWd82DLegTH"
+    },
+    "DualUniverse": {
+      "QueueingURL": "https://dev-queueing.theisle.online",
+      "ExportPath": "C:\\Users\\paul.layne\\Dual Universe Server\\data\\bpExports\\",
+      "ConfigPath": "C:\\Users\\paul.layne\\Dual Universe Server\\config\\",
+      "StoreImagePath": "C:\\Users\\paul.layne\\Dual Universe Server\\data\\store_images\\",
+      "StoreImageUrl": "https://localhost:32785/static/",
+      "MarketHeaderIds": [
+        2353764381,
+        424107616,
+        834276617,
+        1315100172,
+        1237953170
+      ],
+      "WebsiteBot": {
+        "BotUser": "WebSiteIntergration",
+        "BotPassword": "M3fkW73sVAiuUEw",
+        "PlayerName": "HelperBotTest1",
+        "QueueingUri": "https://dev-queueing.theisle.online"
+      },
+      "MarketBot": {
+        "BotUser": "HonjoMinionMarket",
+        "BotPassword": "B6EB4BDF213B",
+        "PlayerName": "honjosminiontest1",
+        "QueueingUri": "https://dev-queueing.theisle.online"
+      }
+    },
+    "Postgres": {
+      "Server": "dev-postgre-1.servers.v0.design",
+      "Port": 5432,
+      "UserName": "dual",
+      "Password": "dual",
+      "Database": "TheIsland"
+    }
+  },
+  "Logging": {
+    "LogLevel": {
+      "Default": "Information",
+      "Microsoft.AspNetCore": "Warning"
+    }
+  },
+  "AllowedHosts": "*"
+}
+

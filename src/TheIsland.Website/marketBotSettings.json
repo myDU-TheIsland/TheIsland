@@ -1,0 +1,15 @@
+{
+  "buyPrices": {
+  },
+  "buyRecursivePrices": {
+    "Ore1": 30,
+    "Ore2": 120,
+    "Ore3": 250,
+    "Ore4": 500,
+    "Ore5": 1000
+  },
+  "planets": [ 0 ],
+  "DaysToWaitBeforeExpiration": 3,
+  "MarketMsrkUp": 1.1,
+  "OnlyResellItemsRecursive": [  ]
+}
