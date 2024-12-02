@@ -4,7 +4,7 @@
 
 namespace TheIsland.Website.Framework.Helpers
 {
-    using TheIsland.Core.Entities;
+    using TheIsland.Data.Entities;
     using TheIsland.Website.Models.Market.API;
 
     public static class GraphHelpers

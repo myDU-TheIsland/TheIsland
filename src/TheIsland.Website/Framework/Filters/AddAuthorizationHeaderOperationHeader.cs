@@ -13,10 +13,10 @@ namespace TheIsland.Website.Framework.Filters
     {
         public void Apply(OpenApiOperation operation, OperationFilterContext context)
         {
-            var actionMetadata = context.ApiDescription.ActionDescriptor.EndpointMetadata;
-            var isAPIKey = actionMetadata.Any(metadataItem => metadataItem is ApiKeyAttribute);
-            var isAuthorize = actionMetadata.Any(metadataItem => metadataItem is AuthorizeAttribute);
-            var allowAnonymous = actionMetadata.Any(metadataItem => metadataItem is AllowAnonymousAttribute);
+            IList<object> actionMetadata = context.ApiDescription.ActionDescriptor.EndpointMetadata;
+            bool isAPIKey = actionMetadata.Any(metadataItem => metadataItem is ApiKeyAttribute);
+            bool isAuthorize = actionMetadata.Any(metadataItem => metadataItem is AuthorizeAttribute);
+            bool allowAnonymous = actionMetadata.Any(metadataItem => metadataItem is AllowAnonymousAttribute);
 
             if ((!isAPIKey && !isAuthorize) || allowAnonymous)
             {

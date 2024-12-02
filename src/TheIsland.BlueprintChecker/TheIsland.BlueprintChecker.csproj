@@ -1,43 +1,25 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-	  <TargetFramework>net8.0</TargetFramework>
-	  <CodeAnalysisRuleSet>../../theisland.ruleset</CodeAnalysisRuleSet>
-	  <EnableNETAnalyzers>True</EnableNETAnalyzers>
-	  <EnforceCodeStyleInBuild>True</EnforceCodeStyleInBuild>
-	  <RunAnalyzersDuringLiveAnalysis>True</RunAnalyzersDuringLiveAnalysis>
-	  <RunAnalyzersDuringBuild>True</RunAnalyzersDuringBuild>
-	  <OutputType>Library</OutputType>
-	  <Platforms>x64</Platforms>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-	  <DocumentationFile>MyDU.BlueprintSanitizer.xml</DocumentationFile>
-	  <Optimize>true</Optimize>
-	  <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-	  <WarningsAsErrors />
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <DocumentationFile>MyDU.BlueprintSanitizer.xml</DocumentationFile>
-    <Optimize>true</Optimize>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <WarningsAsErrors />
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<CodeAnalysisRuleSet>../../theisland.ruleset</CodeAnalysisRuleSet>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Platforms>x64</Platforms>
+		<OutputType>Library</OutputType>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+	
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+		<DocumentationFile>TheIsland.BlueprintChecker.xml</DocumentationFile>
+		<Optimize>true</Optimize>
+	</PropertyGroup>
 
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-	  <DocumentationFile>MyDU.BlueprintSanitizer.xml</DocumentationFile>
-	  <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-	  <Optimize>false</Optimize>
-	  <DefineConstants>DEBUG;TRACE</DefineConstants>
-	  <WarningsAsErrors />
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <DocumentationFile>MyDU.BlueprintSanitizer.xml</DocumentationFile>
-    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
-    <Optimize>false</Optimize>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <WarningsAsErrors />
-  </PropertyGroup>
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+		<DocumentationFile>TheIsland.BlueprintChecker.xml</DocumentationFile>
+		<Optimize>false</Optimize>
+	</PropertyGroup>
 
 	<ItemGroup>
 		<AdditionalFiles Include="../../stylecop.json" Link="stylecop.json">
@@ -74,19 +56,19 @@
 		<PackageReference Include="System.Net.Primitives" Version="4.3.1" />
 	</ItemGroup>
 	<ItemGroup>
-	  <Reference Include="Backend">
-	    <HintPath>..\..\NQLibraries\Backend.dll</HintPath>
-	  </Reference>
-	  <Reference Include="Interfaces">
-	    <HintPath>..\..\NQLibraries\Interfaces.dll</HintPath>
-	  </Reference>
-	  <Reference Include="NQutils">
-	    <HintPath>..\..\NQLibraries\NQutils.dll</HintPath>
-	  </Reference>
+		<Reference Include="Backend">
+			<HintPath>..\..\NQLibraries\Backend.dll</HintPath>
+		</Reference>
+		<Reference Include="Interfaces">
+			<HintPath>..\..\NQLibraries\Interfaces.dll</HintPath>
+		</Reference>
+		<Reference Include="NQutils">
+			<HintPath>..\..\NQLibraries\NQutils.dll</HintPath>
+		</Reference>
 	</ItemGroup>
 	<ItemGroup>
-	  <None Update="Processors\VoxelData\Binary\du-blueprint.exe">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
+		<None Update="Processors\VoxelData\Binary\du-blueprint.exe">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</None>
 	</ItemGroup>
 </Project>

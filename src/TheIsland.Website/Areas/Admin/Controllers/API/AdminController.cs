@@ -6,8 +6,8 @@ namespace TheIsland.Website.Areas.Admin.Controllers.API
 {
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
-    using TheIsland.Core.Bots;
-    using TheIsland.Core.Services;
+    using TheIsland.Framework.Bots;
+    using TheIsland.Framework.Services;
     using TheIsland.Website.Classes;
     using TheIsland.Website.Framework.Attributes;
 

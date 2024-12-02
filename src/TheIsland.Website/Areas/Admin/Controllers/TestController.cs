@@ -6,9 +6,9 @@ namespace TheIsland.Website.Areas.Admin.Controllers
 {
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
-    using TheIsland.Core.Bots;
-    using TheIsland.Core.Services;
-    using TheIsland.Core.Services.SQL;
+    using TheIsland.Data.Repositories;
+    using TheIsland.Framework.Bots;
+    using TheIsland.Framework.Services;
     using TheIsland.Website.Classes;
     using TheIsland.Website.Framework.Attributes;
 
@@ -19,18 +19,18 @@ namespace TheIsland.Website.Areas.Admin.Controllers
     {
         private readonly BuildService _buildService;
         private readonly MarketService _marketService;
-        private readonly DualMarketRepository _dualMarketRepository;
+        private readonly IDualMarketRepository _dualMarketRepository;
         private readonly IGeneralBot _generalBot;
         private readonly IMarketBot _marketBot;
-        private readonly DualMarketRepository _marketRepo;
+        private readonly IDualMarketRepository _marketRepo;
 
         public TestController(
             BuildService buildService,
             MarketService marketService,
-            DualMarketRepository dualMarketRepository,
+            IDualMarketRepository dualMarketRepository,
             IGeneralBot generalBot,
             IMarketBot marketBot,
-            DualMarketRepository marketRepo,
+            IDualMarketRepository marketRepo,
             PlayerLinkingService playerLinkingService,
             IAuthorizationService authorizationService) : base(playerLinkingService, authorizationService)
         {

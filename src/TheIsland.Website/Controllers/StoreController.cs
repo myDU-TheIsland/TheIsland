@@ -6,9 +6,8 @@ namespace TheIsland.Website.Controllers
 {
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
-    using TheIsland.Core.Entities;
-    using TheIsland.Core.Services;
-    using TheIsland.Core.Services.SQL;
+    using TheIsland.Data.Repositories;
+    using TheIsland.Framework.Services;
     using TheIsland.Website.Classes;
     using TheIsland.Website.Models.Store;
 
@@ -17,11 +16,11 @@ namespace TheIsland.Website.Controllers
     public class StoreController : IslandController
     {
         private readonly IStoreService _storeService;
-        private readonly StorePurchaseHistoryRepository _storePurchaseHistoryRepository;
+        private readonly IStorePurchaseHistoryRepository _storePurchaseHistoryRepository;
 
         public StoreController(
             IStoreService storeService,
-            StorePurchaseHistoryRepository storePurchaseHistoryRepository,
+            IStorePurchaseHistoryRepository storePurchaseHistoryRepository,
             PlayerLinkingService playerLinkingService,
             IAuthorizationService authorizationService) : base(playerLinkingService, authorizationService)
         {
@@ -42,7 +41,7 @@ namespace TheIsland.Website.Controllers
         [HttpGet]
         public async Task<IActionResult> History()
         {
-            var model = (await this._storePurchaseHistoryRepository.GetPlayerPurchaseHistory(this.SelectedPlayer).ConfigureAwait(false))?.ToArray() ?? Array.Empty<StorePurchaseHistory>();
+            var model = (await this._storePurchaseHistoryRepository.GetPlayerPurchaseHistory(this.SelectedPlayer).ConfigureAwait(false)).ToArray();
 
             return this.View(model);
         }

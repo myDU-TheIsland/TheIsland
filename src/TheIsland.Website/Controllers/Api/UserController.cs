@@ -6,17 +6,17 @@ namespace TheIsland.Website.Controllers.Api
 {
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
-    using TheIsland.Core.Services;
-    using TheIsland.Core.Services.SQL;
+    using TheIsland.Data.Repositories;
+    using TheIsland.Framework.Services;
     using TheIsland.Website.Classes;
 
     [Area("Api")]
     [ApiExplorerSettings(IgnoreApi = true)]
     public class UserController : IslandController
     {
-        private readonly DualPlayerRepository _playerRepository;
+        private readonly IDualPlayerRepository _playerRepository;
 
-        public UserController(DualPlayerRepository playerRepository, PlayerLinkingService playerLinkingService, IAuthorizationService authorizationService) : base(playerLinkingService, authorizationService)
+        public UserController(IDualPlayerRepository playerRepository, PlayerLinkingService playerLinkingService, IAuthorizationService authorizationService) : base(playerLinkingService, authorizationService)
         {
             this._playerRepository = playerRepository;
         }

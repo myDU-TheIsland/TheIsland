@@ -4,7 +4,7 @@
 
 namespace TheIsland.Website.Models
 {
-    using TheIsland.Core.Entities;
+    using TheIsland.Data.Entities;
 
     public class ExportBPModel
     {

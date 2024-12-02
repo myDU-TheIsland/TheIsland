@@ -59,8 +59,8 @@ namespace TheIsland.BlueprintChecker.Sanitizers.Element
 
         private PropertyValue GetDefaultValue(ulong elementType, string propName, PropertyValue value)
         {
-            NQutils.Def.Element obj = this.GameplayBank.GetBaseObject<NQutils.Def.Element>(elementType);
-            IGameplayDefinition def = this.GameplayBank.GetDefinition(elementType);
+            NQutils.Def.Element? obj = this.GameplayBank.GetBaseObject<NQutils.Def.Element>(elementType);
+            IGameplayDefinition? def = this.GameplayBank.GetDefinition(elementType);
 
             if (def == null || obj == null)
             {
@@ -72,7 +72,7 @@ namespace TheIsland.BlueprintChecker.Sanitizers.Element
                 throw new InvalidOperationException("BP has hidden element");
             }
 
-            PropertyValue propVal = def.GetStaticPropertyOpt(propName);
+            PropertyValue? propVal = def.GetStaticPropertyOpt(propName);
 
             if (propVal != null)
             {

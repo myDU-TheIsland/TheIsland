@@ -5,6 +5,7 @@
 namespace TheIsland.Website.Interfaces
 {
     using TheIsland.Core.Settings;
+    using TheIsland.Data.PostgreSQL.Settings;
     using TheIsland.Website.Classes;
 
     public interface ISiteSettings

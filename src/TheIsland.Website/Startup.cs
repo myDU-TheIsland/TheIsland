@@ -20,10 +20,11 @@ namespace TheIsland.Website
     using Microsoft.OpenApi.Models;
     using StackExchange.Exceptional.Stores;
     using StackExchange.Redis;
-    using TheIsland.Core;
-    using TheIsland.Core.Bots;
-    using TheIsland.Core.Services;
     using TheIsland.Core.Settings;
+    using TheIsland.Data.PostgreSQL;
+    using TheIsland.Framework;
+    using TheIsland.Framework.Bots;
+    using TheIsland.Framework.Services;
     using TheIsland.Website.Classes;
     using TheIsland.Website.Framework.Activators;
     using TheIsland.Website.Framework.Filters;
@@ -66,7 +67,8 @@ namespace TheIsland.Website
             botConfig.Bind(marketBotConfig);
             MarketBotConfig = marketBotConfig;
 
-            Core.Initializer.InitializeCore();
+            TheIsland.Framework.Initializer.InitializeFramework();
+            TheIsland.Data.PostgreSQL.Initializer.InitializePostgre();
         }
 
         /// <summary>
@@ -137,7 +139,7 @@ namespace TheIsland.Website
                         (user.GetString("avatar") ?? string.Empty).StartsWith("a_") ? "gif" : "png"));
                 options.Events.OnTicketReceived = ctx =>
                 {
-                    var claims = new List<Claim>
+                    List<Claim> claims = new List<Claim>
                     {
                         new Claim(ClaimTypes.Role, "User"),
                     };
@@ -148,7 +150,7 @@ namespace TheIsland.Website
                         claims.Add(new Claim(ClaimTypes.Role, "Admin"));
                     }
 
-                    var appIdentity = new ClaimsIdentity(claims);
+                    ClaimsIdentity appIdentity = new ClaimsIdentity(claims);
 
                     ctx.Principal?.AddIdentity(appIdentity);
 
@@ -162,7 +164,7 @@ namespace TheIsland.Website
                 .AddPolicy("Admin", policy => policy.RequireRole("Admin"))
                 .AddPolicy("User", policy => policy.RequireRole("User"));
 
-            var redis = ConnectionMultiplexer.Connect(SiteSettings.RedisServer);
+            ConnectionMultiplexer redis = ConnectionMultiplexer.Connect(SiteSettings.RedisServer);
             services.AddDataProtection()
                 .PersistKeysToStackExchangeRedis(redis, "Website-DPK");
 
@@ -199,7 +201,8 @@ namespace TheIsland.Website
             services.AddSingleton(redis.GetDatabase(2));
 
             // repositories
-            services.AddCoreDependencies();
+            services.AddFrameworkDependencies();
+            services.AddPostgreDependencies();
 
             if (this.HostingEnvironment.IsDevelopment())
             {
@@ -285,7 +288,7 @@ namespace TheIsland.Website
             app.UseSwagger();
             app.UseSwaggerUI();
 
-            var recurringJobOptions = new RecurringJobOptions()
+            RecurringJobOptions recurringJobOptions = new RecurringJobOptions()
             {
                 TimeZone = TimeZoneInfo.Local,
             };

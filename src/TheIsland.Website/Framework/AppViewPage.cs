@@ -7,8 +7,9 @@ namespace TheIsland.Website.Framework
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc.Razor;
     using Microsoft.AspNetCore.Mvc.Razor.Internal;
-    using TheIsland.Core.Services;
-    using TheIsland.Core.Services.SQL;
+    using TheIsland.Data.Entities;
+    using TheIsland.Data.Repositories;
+    using TheIsland.Framework.Services;
 
     public abstract class AppViewPage<TModel> : RazorPage<TModel> where TModel : class
     {
@@ -32,7 +33,7 @@ namespace TheIsland.Website.Framework
         public PlayerLinkingService PlayerLinkingService { get; set; }
 
         [RazorInject]
-        public DualPlayerRepository _dualPlayerRepository { get; set; }
+        public IDualPlayerRepository _dualPlayerRepository { get; set; }
 #pragma warning restore CS8618 // Non-nullable field must contain a non-null value when exiting constructor. Consider adding the 'required' modifier or declaring as nullable.
 
         private double GetPlayer()
@@ -49,7 +50,7 @@ namespace TheIsland.Website.Framework
                 return currentPlayer;
             }
 
-            IEnumerable<Core.Entities.UserMapping> players = this.PlayerLinkingService.GetPlayerMapping(this.DiscordId).GetAwaiter().GetResult();
+            IEnumerable<UserMapping> players = this.PlayerLinkingService.GetPlayerMapping(this.DiscordId).GetAwaiter().GetResult();
 
             if (players.Any())
             {

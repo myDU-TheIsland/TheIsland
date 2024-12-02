@@ -6,9 +6,9 @@ namespace TheIsland.Website.Areas.Admin.Controllers
 {
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
-    using TheIsland.Core.Entities;
-    using TheIsland.Core.Services;
-    using TheIsland.Core.Services.SQL;
+    using TheIsland.Data.Entities;
+    using TheIsland.Data.Repositories;
+    using TheIsland.Framework.Services;
     using TheIsland.Website.Classes;
     using TheIsland.Website.Models.Admin;
     using TheIsland.Website.Models.Store;
@@ -19,11 +19,11 @@ namespace TheIsland.Website.Areas.Admin.Controllers
     public class StoreController : IslandController
     {
         private readonly IStoreService _storeService;
-        private readonly StorePurchaseHistoryRepository _storePurchaseHistoryRepository;
+        private readonly IStorePurchaseHistoryRepository _storePurchaseHistoryRepository;
 
         public StoreController(
             IStoreService storeService,
-            StorePurchaseHistoryRepository storePurchaseHistoryRepository,
+            IStorePurchaseHistoryRepository storePurchaseHistoryRepository,
             PlayerLinkingService playerLinkingService,
             IAuthorizationService authorizationService) : base(playerLinkingService, authorizationService)
         {
@@ -40,7 +40,7 @@ namespace TheIsland.Website.Areas.Admin.Controllers
         [HttpGet]
         public async Task<IActionResult> History()
         {
-            var model = (await this._storePurchaseHistoryRepository.GetAsync().ConfigureAwait(false))?.ToArray() ?? Array.Empty<StorePurchaseHistory>();
+            StorePurchaseHistory[] model = (await this._storePurchaseHistoryRepository.GetAsync().ConfigureAwait(false))?.ToArray() ?? Array.Empty<StorePurchaseHistory>();
 
             return this.View(model);
         }
@@ -49,7 +49,7 @@ namespace TheIsland.Website.Areas.Admin.Controllers
         [Route("~/[area]/[controller]/[action]/{purchaseId}")]
         public async Task<IActionResult> ViewLog(double purchaseId)
         {
-            var model = (await this._storePurchaseHistoryRepository.GetAsync(purchaseId).ConfigureAwait(false)) ?? new StorePurchaseHistory();
+            StorePurchaseHistory model = (await this._storePurchaseHistoryRepository.GetAsync(purchaseId).ConfigureAwait(false)) ?? new StorePurchaseHistory();
 
             return this.View(model);
         }

@@ -55,27 +55,27 @@ namespace TheIsland.BlueprintChecker.Validators.Blueprint
             switch (blueprint.Model.JsonProperties.kind)
             {
                 case ConstructKind.DYNAMIC:
-                    itemIds = this.GameplayBank.GetDefinition("CoreUnitDynamic").GetChildren().Select(item => item.Id).ToArray();
+                    itemIds = this.GameplayBank.GetDefinition("CoreUnitDynamic")?.GetChildren().Select(item => item.Id).ToArray() ?? Array.Empty<ulong>();
                     break;
                 case ConstructKind.STATIC:
-                    itemIds = this.GameplayBank.GetDefinition("CoreUnitStatic").GetChildren().Select(item => item.Id).ToArray();
+                    itemIds = this.GameplayBank.GetDefinition("CoreUnitStatic")?.GetChildren().Select(item => item.Id).ToArray() ?? Array.Empty<ulong>();
                     break;
                 case ConstructKind.SPACE:
-                    itemIds = this.GameplayBank.GetDefinition("CoreUnitSpace").GetChildren().Select(item => item.Id).ToArray();
+                    itemIds = this.GameplayBank.GetDefinition("CoreUnitSpace")?.GetChildren().Select(item => item.Id).ToArray() ?? Array.Empty<ulong>();
                     break;
                 default:
                     itemIds = Array.Empty<ulong>();
                     break;
             }
 
-            ElementInfo coreUnit = blueprint.Elements.FirstOrDefault(item => itemIds.Contains(item.elementType));
+            ElementInfo? coreUnit = blueprint.Elements.FirstOrDefault(item => itemIds.Contains(item.elementType));
 
             if (coreUnit == null)
             {
                 return Task.FromResult(Failed("core Unit doesn't match kind of bp"));
             }
 
-            long coreSize = this.GameplayBank.GetDefinition(coreUnit.elementType).GetStaticProperty("constructSize").intValue;
+            long coreSize = this.GameplayBank.GetDefinition(coreUnit.elementType)?.GetStaticProperty("constructSize").intValue ?? 0;
             long blueprintSize = Convert.ToInt64(blueprint.Model.JsonProperties.size);
 
             if (coreSize != blueprintSize)

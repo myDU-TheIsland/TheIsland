@@ -47,7 +47,7 @@ namespace TheIsland.BlueprintChecker.Sanitizers.Element
 
                 elementsChecked.Add(element.elementType);
 
-                IGameplayDefinition elementData = this.GameplayBank.GetDefinition(element.elementType);
+                IGameplayDefinition? elementData = this.GameplayBank.GetDefinition(element.elementType);
 
                 if (elementData == null)
                 {

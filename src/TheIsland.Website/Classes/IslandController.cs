@@ -7,7 +7,7 @@ namespace TheIsland.Website.Classes
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Http;
     using Microsoft.AspNetCore.Mvc;
-    using TheIsland.Core.Services;
+    using TheIsland.Framework.Services;
 
     [ApiExplorerSettings(IgnoreApi = true)]
     public class IslandController : Controller
@@ -46,7 +46,7 @@ namespace TheIsland.Website.Classes
                 return currentPlayer;
             }
 
-            IEnumerable<Core.Entities.UserMapping> players = this.PlayerLinkingService.GetPlayerMapping(this.DiscordId).GetAwaiter().GetResult();
+            IEnumerable<Data.Entities.UserMapping> players = this.PlayerLinkingService.GetPlayerMapping(this.DiscordId).GetAwaiter().GetResult();
 
             if (players.Any())
             {

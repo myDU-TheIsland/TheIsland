@@ -7,7 +7,7 @@ namespace TheIsland.Website.Areas.Admin.Controllers
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
     using StackExchange.Exceptional;
-    using TheIsland.Core.Services;
+    using TheIsland.Framework.Services;
     using TheIsland.Website.Classes;
 
     [Area("Admin")]

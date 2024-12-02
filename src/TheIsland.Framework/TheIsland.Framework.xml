@@ -1,0 +1,46 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>TheIsland.Framework</name>
+    </assembly>
+    <members>
+        <member name="M:TheIsland.Framework.Bots.MarketBot.GetListOfSellableItems">
+            <summary>
+            Gets a list of all sellible items on the market.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:TheIsland.Framework.Helpers.ParallelizationHelpers.ForEachAsync``1(System.Collections.Generic.IEnumerable{``0},System.Int32,System.Func{``0,System.Threading.Tasks.Task},System.Threading.CancellationToken)">
+            <summary>
+            The for each async.
+            </summary>
+            <param name="source">
+            The source.
+            </param>
+            <param name="dop">
+            The dop.
+            </param>
+            <param name="body">
+            The body.
+            </param>
+            <param name="cancellationToken">
+            The cancellation token.
+            </param>
+            <typeparam name="T">
+            </typeparam>
+            <returns>
+            The <see cref="T:System.Threading.Tasks.Task"/>.
+            </returns>
+            <remarks>Referenced from https://blogs.msdn.microsoft.com/pfxteam/2012/03/05/implementing-a-simple-foreachasync-part-2/.</remarks>
+        </member>
+        <member name="M:TheIsland.Framework.Services.BuildService.CraftItem(System.UInt64,System.Double)">
+            <summary>
+            Gets the recipe results with talents applied for recipe provided.
+            </summary>
+            <param name="recipeId"></param>
+            <param name="playerId"></param>
+            <returns></returns>
+            <remarks>Duplicated from Orleans IndustryUnitGrain.cs.</remarks>
+        </member>
+    </members>
+</doc>

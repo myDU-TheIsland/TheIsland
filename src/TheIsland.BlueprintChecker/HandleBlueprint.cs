@@ -20,10 +20,15 @@ namespace TheIsland.BlueprintChecker
 
         public static (bool IsGood, List<SanitizationResult> sanitizationResult, List<ValidationResult> validationResults) IsBlueprintGood(byte[] jsondata)
         {
-            BlueprintDataExtended blueprint = JsonConvert.DeserializeObject<BlueprintDataExtended>(Encoding.UTF8.GetString(jsondata));
+            BlueprintDataExtended? blueprint = JsonConvert.DeserializeObject<BlueprintDataExtended>(Encoding.UTF8.GetString(jsondata));
 
             List<SanitizationResult> sanitizationResult = new List<SanitizationResult>();
             List<ValidationResult> validationResults = new List<ValidationResult>();
+
+            if (blueprint == null)
+            {
+                return (true, new List<SanitizationResult>(), new List<ValidationResult>());
+            }
 
             foreach (ISanitize sanitizer in Sanitizers)
             {

@@ -1,6 +1,6 @@
 ﻿@inject IMarketBot _marketBot
 @inject IGeneralBot _generalBot
-@inject DualMarketRepository _marketRepo
+@inject IDualMarketRepository _marketRepo
 @inject MarketService _marketService
 @model MarketModel
 @{
@@ -74,8 +74,8 @@
 
                 var orders = itemExists ? await this._marketService.GetAllActiveAsync(Model.MarketId,
                 Model.ItemId).ConfigureAwait(false) : Enumerable.Empty<MarketTransaction>();
-                var buyOrders = orders.Where(item => item.type == TheIsland.Core.Entities.TransactionType.BuyOrder);
-                var sellOrders = orders.Where(item => item.type == TheIsland.Core.Entities.TransactionType.SellOrder);
+                var buyOrders = orders.Where(item => item.type == TransactionType.BuyOrder);
+                var sellOrders = orders.Where(item => item.type == TransactionType.SellOrder);
 
                 @* <!-- Chart Section --> *@
                 <div class="bg-darkBlue rounded-lg shadow-lg px-2 py-3 border border-purple-500/30">

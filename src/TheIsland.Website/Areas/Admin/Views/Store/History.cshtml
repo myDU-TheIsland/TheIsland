@@ -1,4 +1,4 @@
-﻿@inject DualPlayerRepository playerRepo
+﻿@inject IDualPlayerRepository playerRepo
 @model StorePurchaseHistory[]
 @{
     ViewData["Title"] = "Purchase History";
@@ -25,6 +25,8 @@
                     @foreach (var po in Model)
                     {
                         var playerName = (await playerRepo.GetAsync(po.player_id).ConfigureAwait(false)).display_name;
+
+                        string hello = string.Empty;
                         <tr class="border-b border-gray-700">
                             <td class="py-4 font-semibold">@po.id</td>
                             <td class="py-4">@po.timestamp.ToString("MMM d, yyyy")</td>

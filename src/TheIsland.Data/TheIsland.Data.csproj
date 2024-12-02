@@ -1,0 +1,51 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<CodeAnalysisRuleSet>../../theisland.ruleset</CodeAnalysisRuleSet>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Platforms>x64</Platforms>
+		<OutputType>Library</OutputType>
+		<TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+		<GenerateDocumentationFile>true</GenerateDocumentationFile>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+		<DocumentationFile>TheIsland.Data.xml</DocumentationFile>
+		<Optimize>false</Optimize>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+		<DocumentationFile>TheIsland.Data.xml</DocumentationFile>
+		<Optimize>true</Optimize>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<AdditionalFiles Include="..\..\stylecop.json" Link="stylecop.json">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</AdditionalFiles>
+		<AdditionalFiles Include="..\..\theisland.ruleset" Link="theisland.ruleset">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</AdditionalFiles>
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="AsyncFixer" Version="1.6.0">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="ConfigureAwaitChecker.Analyzer" Version="5.0.0.1">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+		</PackageReference>
+		<PackageReference Include="Dapper" Version="2.1.35" />
+		<PackageReference Include="Dapper.Contrib" Version="2.0.78" />
+		<PackageReference Include="StyleCop.Analyzers" Version="1.1.118">
+			<PrivateAssets>all</PrivateAssets>
+			<IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
+		</PackageReference>
+	</ItemGroup>
+	<ItemGroup>
+	  <ProjectReference Include="..\TheIsland.Core\TheIsland.Core.csproj" />
+	</ItemGroup>
+
+</Project>

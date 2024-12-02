@@ -6,9 +6,9 @@ namespace TheIsland.Website.Areas.Admin.Controllers.API
 {
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
-    using TheIsland.Core.Bots;
-    using TheIsland.Core.Services;
-    using TheIsland.Core.Services.SQL;
+    using TheIsland.Data.Repositories;
+    using TheIsland.Framework.Bots;
+    using TheIsland.Framework.Services;
     using TheIsland.Website.Classes;
     using TheIsland.Website.Framework.Attributes;
 
@@ -18,13 +18,13 @@ namespace TheIsland.Website.Areas.Admin.Controllers.API
     public class MarketController : IslandController
     {
         private readonly IMarketBot _marketBot;
-        private readonly DualMarketRepository _dualMarketRepository;
+        private readonly IDualMarketRepository _dualMarketRepository;
 
         public MarketController(
             IMarketBot marketBot,
             PlayerLinkingService playerLinkingService,
             IAuthorizationService authorizationService,
-            DualMarketRepository dualMarketRepository) : base(playerLinkingService, authorizationService)
+            IDualMarketRepository dualMarketRepository) : base(playerLinkingService, authorizationService)
         {
             this._marketBot = marketBot;
             this._dualMarketRepository = dualMarketRepository;
@@ -66,7 +66,7 @@ namespace TheIsland.Website.Areas.Admin.Controllers.API
         [ApiKey]
         public async Task<IActionResult> SetPricesToAllMarkets([FromBody] IEnumerable<PriceEntry> entries)
         {
-            var markets = (await this._dualMarketRepository.GetAsync().ConfigureAwait(false))
+            List<Data.Entities.DualMarket> markets = (await this._dualMarketRepository.GetAsync().ConfigureAwait(false))
                 .ToList();
 
             if (markets.Count == 0)
@@ -74,9 +74,9 @@ namespace TheIsland.Website.Areas.Admin.Controllers.API
                 return this.BadRequest("No Markets Found");
             }
 
-            foreach (var entry in entries)
+            foreach (PriceEntry entry in entries)
             {
-                foreach (var market in markets)
+                foreach (Data.Entities.DualMarket? market in markets)
                 {
                     await this._marketBot.SetItemMultiplierRecursiveAsync(
                         (ulong)market.id,
@@ -96,7 +96,7 @@ namespace TheIsland.Website.Areas.Admin.Controllers.API
         [ApiKey]
         public async Task<IActionResult> SetPricesToSingleMarket(ulong marketId, [FromBody] IEnumerable<PriceEntry> entries)
         {
-            foreach (var entry in entries)
+            foreach (PriceEntry entry in entries)
             {
                 await this._marketBot.SetItemMultiplierRecursiveAsync(
                     marketId,

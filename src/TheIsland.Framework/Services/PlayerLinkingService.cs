@@ -1,0 +1,111 @@
+﻿// <copyright file="PlayerLinkingService.cs" company="Paul Layne">
+// Copyright (c) Paul Layne. All rights reserved.
+// </copyright>
+
+namespace TheIsland.Framework.Services
+{
+    using System;
+    using System.Collections.Generic;
+    using System.Threading.Tasks;
+    using TheIsland.Core.Interfaces;
+    using TheIsland.Data.Entities;
+    using TheIsland.Data.Repositories;
+
+    public class PlayerLinkingService : IAppService
+    {
+        private readonly IDualPlayerRepository _playerRepository;
+        private readonly ILinkTokenRepository _linkTokenRepository;
+        private readonly IUserMappingRepository _userMappingRepository;
+        private readonly IIngameMessaging _ingameMessaging;
+
+        public PlayerLinkingService(IIngameMessaging ingameMessaging, IDualPlayerRepository playerRepository, ILinkTokenRepository linkTokenRepository, IUserMappingRepository userMappingRepository)
+        {
+            this._playerRepository = playerRepository;
+            this._linkTokenRepository = linkTokenRepository;
+            this._userMappingRepository = userMappingRepository;
+            this._ingameMessaging = ingameMessaging;
+        }
+
+        public async Task<bool> SendToken(double playerId, string discordId)
+        {
+            // check for existing token
+            LinkToken? token = await this._linkTokenRepository.FindByPlayerId(playerId).ConfigureAwait(false);
+
+            if (token == null)
+            {
+                // no token found generate new one
+                token = new LinkToken { discord_id = discordId, player_id = playerId };
+                token.token = Guid.NewGuid().ToString().Substring(0, 8);
+
+                await this._linkTokenRepository.AddAsync(token).ConfigureAwait(false);
+            }
+
+            // verify player is online
+            DualPlayer player = await this._playerRepository.GetAsync(playerId).ConfigureAwait(false);
+
+            if (player.connected)
+            {
+                //send message
+                await this._ingameMessaging.SendMessage(Convert.ToUInt64(token.player_id), @$"Your Token is: {token.token}").ConfigureAwait(false);
+            }
+
+            return player.connected;
+        }
+
+        public async Task<bool> VerifyToken(string token)
+        {
+            // find the token
+            LinkToken? result = await this._linkTokenRepository.FindByToken(token).ConfigureAwait(false);
+
+            if (result == null)
+            {
+                return false;
+            }
+
+            UserMapping newEntry = new UserMapping { discord_id = result.discord_id, dual_id = result.player_id };
+
+            await this._userMappingRepository.AddAsync(newEntry).ConfigureAwait(false);
+            await this._linkTokenRepository.RemoveAsync(result.id).ConfigureAwait(false);
+
+            return true;
+        }
+
+        public Task<DualPlayer?> FindPlayer(string playerName)
+        {
+            return this._playerRepository.FindByDisplayName(playerName);
+        }
+
+        public async Task<bool> HasPlayerMapping(string discordId)
+        {
+            IEnumerable<UserMapping> result = await this._userMappingRepository.FindByDiscordId(discordId).ConfigureAwait(false);
+
+            if (result != null && result.Any())
+            {
+                foreach (UserMapping userMapping in result)
+                {
+                    LinkToken? linkResult = await this._linkTokenRepository.FindByPlayerId(userMapping.dual_id).ConfigureAwait(false);
+
+                    if (linkResult != null)
+                    {
+                        // clean up result.
+                        await this._linkTokenRepository.RemoveAsync(linkResult.id).ConfigureAwait(false);
+                    }
+                }
+            }
+
+            return result != null && result.Any();
+        }
+
+        public async Task<IEnumerable<UserMapping>> GetPlayerMapping(string discordId)
+        {
+            IEnumerable<UserMapping> results = await this._userMappingRepository.FindByDiscordId(discordId).ConfigureAwait(false);
+
+            foreach (UserMapping result in results)
+            {
+                result.player_name = (await this._playerRepository.GetAsync(result.dual_id).ConfigureAwait(false)).display_name;
+            }
+
+            return results;
+        }
+    }
+}

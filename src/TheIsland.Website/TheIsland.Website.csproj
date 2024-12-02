@@ -93,6 +93,9 @@
 	</ItemGroup>
 	<ItemGroup>
 	  <ProjectReference Include="..\TheIsland.Core\TheIsland.Core.csproj" />
+	  <ProjectReference Include="..\TheIsland.Data.PostgreSQL\TheIsland.Data.PostgreSQL.csproj" />
+	  <ProjectReference Include="..\TheIsland.Data\TheIsland.Data.csproj" />
+	  <ProjectReference Include="..\TheIsland.Framework\TheIsland.Framework.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 	  <Content Update="Views\Store\FailedPurchase.cshtml">

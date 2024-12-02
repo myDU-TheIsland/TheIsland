@@ -6,8 +6,8 @@ namespace TheIsland.Website.Controllers
 {
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
-    using TheIsland.Core.Entities;
-    using TheIsland.Core.Services;
+    using TheIsland.Data.Entities;
+    using TheIsland.Framework.Services;
     using TheIsland.Website.Classes;
     using TheIsland.Website.Models;
 
