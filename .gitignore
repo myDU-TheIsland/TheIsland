@@ -269,4 +269,4 @@ src/TheIsland.Website/websiteSettings.json
 src/TheIsland.Website/dual.yaml
 dual.yaml
 src/TheIsland.Website/output.json
-!tests/TheIsland.Core.Tests/dual.yaml
+!tests/TheIsland.Framework.Tests/dual.yaml
