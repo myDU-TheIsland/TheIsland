@@ -11,7 +11,7 @@ namespace TheIsland.BlueprintChecker
 
     public static class Initializer
     {
-        public static void Initialize(IGameplayBank gameplayBank)
+        public static void InitializeBlueprintChecker(IGameplayBank gameplayBank)
         {
             HandleBlueprint.Sanitizers.Add(new BlueprintSanitizer(gameplayBank));
             HandleBlueprint.Sanitizers.Add(new ElementSanitizer(gameplayBank));

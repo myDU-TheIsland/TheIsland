@@ -11,7 +11,7 @@ namespace TheIsland.BlueprintChecker.Classes
     {
         public DateTime created_at { get; set; }
 
-        public VoxelMetadata metadata { get; set; }
+        public VoxelMetadata? metadata { get; set; }
 
         public long h { get; set; }
 
@@ -19,7 +19,7 @@ namespace TheIsland.BlueprintChecker.Classes
 
         public long oid { get; set; }
 
-        public Dictionary<string, VoxelData> records { get; set; }
+        public Dictionary<string, VoxelData>? records { get; set; }
 
         public DateTime updated_at { get; set; }
 

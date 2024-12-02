@@ -6,8 +6,6 @@ namespace TheIsland.Core.Settings
 {
     public class DualUniverseSettings
     {
-        public string QueueingURL { get; set; } = "http://localhost:9630";
-
         public string ExportPath { get; set; } = string.Empty;
 
         public string ConfigPath { get; set; } = string.Empty;

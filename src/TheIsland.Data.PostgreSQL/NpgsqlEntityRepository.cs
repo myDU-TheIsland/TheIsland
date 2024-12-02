@@ -8,7 +8,6 @@ namespace TheIsland.Data.PostgreSQL
     using Dapper.Contrib.Extensions;
     using Npgsql;
     using TheIsland.Data.Entities;
-    using TheIsland.Data.PostgreSQL.Repositories;
     using TheIsland.Data.PostgreSQL.Settings;
     using TheIsland.Data.Repositories;
 

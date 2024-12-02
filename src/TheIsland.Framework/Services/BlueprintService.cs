@@ -4,6 +4,7 @@
 
 namespace TheIsland.Framework.Services
 {
+    using System;
     using System.Threading.Tasks;
     using Backend;
     using Backend.Business;
@@ -13,12 +14,12 @@ namespace TheIsland.Framework.Services
     using NQ.Interfaces;
     using NQutils.Sql;
     using Orleans;
+    using TheIsland.BlueprintChecker;
     using TheIsland.Core.Interfaces;
     using TheIsland.Core.Settings;
     using TheIsland.Data.Entities;
     using TheIsland.Data.Repositories;
     using TheIsland.Framework.Bots;
-    using TheIsland.Framework.Services.Blueprint;
 
     public interface IBlueprintService : IAppService
     {
@@ -58,6 +59,8 @@ namespace TheIsland.Framework.Services
             this._orleans = bot.Orleans;
             this._settings = settings;
             this._blueprintExportRepository = blueprintExportRepository;
+
+            TheIsland.BlueprintChecker.Initializer.InitializeBlueprintChecker(this._gameplayBank);
         }
 
         internal bool IsBlueprint(StorageSlot slot)
@@ -138,33 +141,15 @@ namespace TheIsland.Framework.Services
             return true;
         }
 
-        private bool IsBlueprintSanitationEnabled()
-          => Environment.GetEnvironmentVariable("BP_SANITATION_ENABLED") == "true";
-
         public async Task<string> ImportBP(ulong playerId, byte[] bp)
         {
             await this.ConnectionTest().ConfigureAwait(false);
 
-            if (this.IsBlueprintSanitationEnabled())
+            var results = HandleBlueprint.IsBlueprintGood(bp);
+
+            if (!results.IsGood)
             {
-                BlueprintSanitizerService sanitizer = new BlueprintSanitizerService();
-
-                try
-                {
-                    BlueprintSanitationResult result = await sanitizer.SanitizeAsync(this._gameplayBank, bp, CancellationToken.None)
-                        .ConfigureAwait(false);
-
-                    if (!result.Success)
-                    {
-                        return result.Message;
-                    }
-
-                    bp = result.BlueprintBytes;
-                }
-                catch (Exception e)
-                {
-                    return e.Message;
-                }
+                return @$"Failed to import BP. Failed to pass validation.";
             }
 
             BlueprintId blueprintId = 0;

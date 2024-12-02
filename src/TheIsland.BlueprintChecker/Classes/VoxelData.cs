@@ -8,9 +8,9 @@ namespace TheIsland.BlueprintChecker.Classes
 
     public class VoxelData
     {
-        public byte[] data { get; set; }
+        required public byte[] data { get; set; }
 
-        public object actualCellData { get; set; }
+        public object? actualCellData { get; set; }
 
         public long hash { get; set; }
 
