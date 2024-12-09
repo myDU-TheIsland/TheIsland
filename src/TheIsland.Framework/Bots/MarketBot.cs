@@ -15,7 +15,6 @@ namespace TheIsland.Framework.Bots
     using StackExchange.Redis;
     using TheIsland.Core.Settings;
     using TheIsland.Core.ThreadSafe;
-    using TheIsland.Data.Classes;
     using TheIsland.Data.Entities;
     using TheIsland.Data.Repositories;
 

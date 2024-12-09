@@ -4,7 +4,6 @@
 
 namespace TheIsland.Framework.Helpers
 {
-    using TheIsland.Data.Classes;
     using TheIsland.Data.Entities;
 
     public static class StoreItemExtensions

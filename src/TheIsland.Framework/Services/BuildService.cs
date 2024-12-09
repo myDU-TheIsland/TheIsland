@@ -13,7 +13,6 @@ namespace TheIsland.Framework.Services
     using NQ.Interfaces;
     using NQutils.Def;
     using TheIsland.Core.Interfaces;
-    using TheIsland.Data.Classes;
     using TheIsland.Data.Entities;
     using TheIsland.Data.Repositories;
     using TheIsland.Framework.Bots;

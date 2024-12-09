@@ -6,7 +6,6 @@ namespace TheIsland.Data.Entities
 {
     using System.ComponentModel.DataAnnotations;
     using System.ComponentModel.DataAnnotations.Schema;
-    using TheIsland.Data.Classes;
 
     public class StoreItem : StoreItemEntity
     {

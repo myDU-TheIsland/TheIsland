@@ -8,7 +8,7 @@ namespace TheIsland.Website.Controllers.Api
     using System.Text;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
-    using TheIsland.Data.Classes;
+    using TheIsland.Data.Entities;
     using TheIsland.Framework.Bots;
     using TheIsland.Framework.Helpers;
     using TheIsland.Framework.Services;

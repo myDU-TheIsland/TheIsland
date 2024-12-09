@@ -2,7 +2,7 @@
 // Copyright (c) Paul Layne. All rights reserved.
 // </copyright>
 
-namespace TheIsland.Data.Classes
+namespace TheIsland.Data.Entities
 {
     using System.Text.Json.Serialization;
 

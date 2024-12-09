@@ -8,7 +8,6 @@ namespace TheIsland.Data.PostgreSQL
     using Dapper;
     using Microsoft.Extensions.DependencyInjection;
     using TheIsland.Core.Interfaces;
-    using TheIsland.Data.Classes;
     using TheIsland.Data.Entities;
     using TheIsland.Data.PostgreSQL.Repositories;
     using TheIsland.Data.PostgreSQL.TypeHandlers;
