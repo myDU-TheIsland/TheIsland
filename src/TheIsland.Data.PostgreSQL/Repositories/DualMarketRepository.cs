@@ -9,13 +9,13 @@ namespace TheIsland.Data.PostgreSQL.Repositories
     using System.Threading;
     using System.Threading.Tasks;
     using Dapper;
+    using TheIsland.Core.Interfaces;
     using TheIsland.Data.Entities;
-    using TheIsland.Data.PostgreSQL.Settings;
     using TheIsland.Data.Repositories;
 
     public class DualMarketRepository : NpgsqlEntityRepository<DualMarket>, IDualMarketRepository
     {
-        public DualMarketRepository(PostgresSettings settings) : base(settings, settings.DualDatabase)
+        public DualMarketRepository(IDatabaseSettings settings) : base(settings, settings.DualDatabase)
         {
         }
 

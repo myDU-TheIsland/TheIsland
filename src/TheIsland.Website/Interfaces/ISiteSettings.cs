@@ -5,21 +5,26 @@
 namespace TheIsland.Website.Interfaces
 {
     using TheIsland.Core.Settings;
-    using TheIsland.Data.PostgreSQL.Settings;
     using TheIsland.Website.Classes;
 
     public interface ISiteSettings
     {
+        DiscordSettings Discord { get; set; }
+
+        DualUniverseSettings DualUniverse { get; set; }
+
+        BotSettings WebsiteBot { get; set; }
+
+        BotSettings MarketBot { get; set; }
+
         string[] Admins { get; set; }
 
         string[] ApiKey { get; set; }
 
         string RedisServer { get; set; }
 
-        DiscordSettings Discord { get; set; }
+        bool BackgroundBuy { get; set; }
 
-        DualUniverseSettings DualUniverse { get; set; }
-
-        PostgresSettings Postgres { get; set; }
+        bool BackgroundHotTime { get; set; }
     }
 }

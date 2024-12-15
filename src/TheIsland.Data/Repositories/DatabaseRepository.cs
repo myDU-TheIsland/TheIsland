@@ -5,10 +5,8 @@
 namespace TheIsland.Data.Repositories
 {
     using System.Collections.Generic;
-    using System.Data.Common;
     using System.Threading;
     using System.Threading.Tasks;
-    using Dapper.Contrib.Extensions;
     using TheIsland.Data.Entities;
 
     public interface IEntityRepository<TValue> where TValue : DatabaseEntity, new()

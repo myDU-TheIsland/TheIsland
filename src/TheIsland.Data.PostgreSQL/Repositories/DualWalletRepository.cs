@@ -8,15 +8,15 @@ namespace TheIsland.Data.PostgreSQL.Repositories
     using Dapper;
     using StackExchange.Redis;
     using TheIsland.Core.Caching;
+    using TheIsland.Core.Interfaces;
     using TheIsland.Data.Entities;
-    using TheIsland.Data.PostgreSQL.Settings;
     using TheIsland.Data.Repositories;
 
     public class DualWalletRepository : NpgsqlEntityRepository<DualWalletTransaction>, IDualWalletRepository
     {
         private readonly RedisCache<List<MarketStatistics>> _marketStatistics;
 
-        public DualWalletRepository(IDatabase redisDatabase, PostgresSettings settings) : base(settings, settings.DualDatabase)
+        public DualWalletRepository(IDatabase redisDatabase, IDatabaseSettings settings) : base(settings, settings.DualDatabase)
         {
             this._marketStatistics = new RedisCache<List<MarketStatistics>>(redisDatabase);
         }

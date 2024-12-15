@@ -6,12 +6,12 @@ namespace TheIsland.Data.PostgreSQL.Repositories
 {
     using System.Data.Common;
     using Dapper;
+    using TheIsland.Core.Interfaces;
     using TheIsland.Data.Entities;
-    using TheIsland.Data.PostgreSQL.Settings;
     using TheIsland.Data.Repositories;
 
     [System.Diagnostics.CodeAnalysis.SuppressMessage("StyleCop.CSharp.SpacingRules", "SA1009:Closing parenthesis should be spaced correctly", Justification = "Duplicate rules overlapping")]
-    public class StorePurchaseHistoryRepository(PostgresSettings settings) : NpgsqlEntityRepository<StorePurchaseHistory>(settings, settings.Database), IStorePurchaseHistoryRepository
+    public class StorePurchaseHistoryRepository(IDatabaseSettings settings) : NpgsqlEntityRepository<StorePurchaseHistory>(settings, settings.Database), IStorePurchaseHistoryRepository
     {
         public async Task<IEnumerable<StorePurchaseHistory>> GetPlayerPurchaseHistory(double playerId)
         {

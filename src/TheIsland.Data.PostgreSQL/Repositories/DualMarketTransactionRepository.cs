@@ -6,13 +6,13 @@ namespace TheIsland.Data.PostgreSQL.Repositories
 {
     using System.Data.Common;
     using Dapper;
+    using TheIsland.Core.Interfaces;
     using TheIsland.Data.Entities;
-    using TheIsland.Data.PostgreSQL.Settings;
     using TheIsland.Data.Repositories;
 
     public class DualMarketTransactionRepository : NpgsqlEntityRepository<DualMarketTransaction>, IDualMarketTransactionRepository
     {
-        public DualMarketTransactionRepository(PostgresSettings settings) : base(settings, settings.DualDatabase)
+        public DualMarketTransactionRepository(IDatabaseSettings settings) : base(settings, settings.DualDatabase)
         {
         }
 

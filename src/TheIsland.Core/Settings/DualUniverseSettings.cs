@@ -16,6 +16,8 @@ namespace TheIsland.Core.Settings
 
         public ulong[] MarketHeaderIds { get; set; } = { };
 
+        public ulong[] Markets { get; set; } = { };
+
         public BotSettings WebsiteBot { get; set; } = new BotSettings();
 
         public BotSettings MarketBot { get; set; } = new BotSettings();

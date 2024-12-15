@@ -96,6 +96,7 @@ namespace TheIsland.Framework.Bots
         private readonly IPlayerMarketBuyLimitRepository _playerMarketBuyLimitRepository;
         private readonly IFactoryLedgerRepository _factoryLedgerRepository;
         private readonly IDualMarketItemEntryRepository _dualMarketItemEntryRepository;
+        private readonly IDualMarketOrderRepository _dualMarketOrderRepository;
 
         public MarketBot(
             IDualPlayerRepository dualPlayerRepository,
@@ -103,6 +104,7 @@ namespace TheIsland.Framework.Bots
             IPlayerMarketBuyLimitRepository playerMarketBuyLimitRepository,
             IFactoryLedgerRepository factoryLedgerRepository,
             IDualMarketItemEntryRepository dualMarketItemEntryRepository,
+            IDualMarketOrderRepository dualMarketOrderRepository,
             MarketBotConfig marketBotConfig,
             DualUniverseSettings settings,
             ILogger<IMarketBot> logger) : base(settings.MarketBot, logger)
@@ -112,6 +114,7 @@ namespace TheIsland.Framework.Bots
             this._playerMarketBuyLimitRepository = playerMarketBuyLimitRepository;
             this._factoryLedgerRepository = factoryLedgerRepository;
             this._dualMarketItemEntryRepository = dualMarketItemEntryRepository;
+            this._dualMarketOrderRepository = dualMarketOrderRepository;
 
             this._marketBotConfig = marketBotConfig;
             this._settings = settings;
@@ -226,42 +229,39 @@ namespace TheIsland.Framework.Bots
                 logMessage(@$"Items to Buy ({itemTypes.Count()})");
             }
 
-            // get all markets on alioth (ALioths ID (Construct) is 2)
-            MarketList marketList = await this.Bot.Req.MarketGetList(parent).ConfigureAwait(false);
+            ulong[] markets;
 
-            logMessage(@$"Found Markets ({marketList.markets.Count()})");
+            if (this._settings.Markets.Length > 0)
+            {
+                markets = this._settings.Markets;
+            }
+            else
+            {
+                MarketList marketList = await this.Bot.Req.MarketGetList(parent).ConfigureAwait(false);
+                markets = marketList.markets.Select(item => item.marketId).ToArray();
+            }
+
+            logMessage(@$"Found Markets ({markets.Count()})");
 
             // loop over each market
-            foreach (MarketInfo? market in marketList.markets)
+            foreach (ulong marketId in markets)
             {
-                logMessage(@$"Starting Market '{market.name}'");
+                logMessage(@$"Starting Market '{marketId}'");
 
-                double marketId = Convert.ToDouble(market.marketId);
+                double doubleMarketId = Convert.ToDouble(marketId);
 
                 List<ulong> doneIds = new List<ulong>();
                 int itemsPurchase = 0;
 
                 // get my orders for this market
-                MarketOrders orders = await this.Bot.Req.MarketSelectItem(
-                    new MarketSelectRequest
-                    {
-                        marketIds = new List<ulong> { market.marketId },
-                        itemTypes = itemTypes,
-                    }).ConfigureAwait(false);
-
-                logMessage(@$"Found orders ({orders.orders.Count()})");
+                DualMarketOrder[] marketOrders = (await this._dualMarketOrderRepository.GetByMarketIdAsync(doubleMarketId).ConfigureAwait(false)).ToArray();
+                logMessage(@$"Found orders ({marketOrders.Count()})");
 
                 // loop over all my orders in this market
-                foreach (MarketOrder? order in orders.orders)
+                foreach (DualMarketOrder order in marketOrders)
                 {
-                    if (order.ownerId.IsOrg())
-                    {
-                        // we don't buy from orgs.
-                        continue;
-                    }
-
-                    double playerId = Convert.ToDouble(order.ownerId.playerId);
-                    double itemId = Convert.ToDouble(order.itemType);
+                    double playerId = Convert.ToDouble(order.player_id);
+                    double itemId = Convert.ToDouble(order.item_type_id);
                     ItemEntry itemData = this.GetAllItemsMarketEntries().First(item => item.Id == itemId);
                     double marketLimit = await this.GetItemLimitAsync(itemId).ConfigureAwait(false);
 
@@ -273,7 +273,7 @@ namespace TheIsland.Framework.Bots
                     }
 
                     //gets the difference in time between now and the expiration date of the order.
-                    TimeSpan diff = order.expirationDate.ToDateTime() - DateTime.UtcNow;
+                    TimeSpan diff = order.expiration_date - DateTime.UtcNow;
 
                     if (diff.TotalDays > this._marketBotConfig.DaysToWaitBeforeExpiration)
                     {
@@ -282,7 +282,7 @@ namespace TheIsland.Framework.Bots
                         continue;
                     }
 
-                    PlayerMarketBuyLimit? getPlayersLimit = await this.GetPlayerItemLimitAsync(playerId, marketId, itemId).ConfigureAwait(false);
+                    PlayerMarketBuyLimit? getPlayersLimit = await this.GetPlayerItemLimitAsync(playerId, doubleMarketId, itemId).ConfigureAwait(false);
 
                     if (getPlayersLimit == null)
                     {
@@ -292,17 +292,17 @@ namespace TheIsland.Framework.Bots
                     if (getPlayersLimit.quantity >= marketLimit)
                     {
                         //skipping this, player over purchase limit.
-                        logMessage(@$"Skipping order ({order.orderId}) because {getPlayersLimit.quantity} greater then limit({marketLimit})!");
+                        logMessage(@$"Skipping order ({order.id}) because {getPlayersLimit.quantity} greater then limit({marketLimit})!");
                         continue;
                     }
 
-                    double budget = this.GetItemPrice(market.marketId, order.itemType);
+                    double budget = this.GetItemPrice(marketId, Convert.ToUInt64(order.item_type_id));
 
-                    logMessage(@$"Using Budget {budget} on {order.itemType} ({order.orderId}@{order.unitPrice})");
+                    logMessage(@$"Using Budget {budget} on {order.item_type_id} ({order.id}@{order.price})");
 
-                    if (order.unitPrice > budget)
+                    if (order.price > budget)
                     {
-                        logMessage(@$"Skipping order ({order.orderId}) because over priced!");
+                        logMessage(@$"Skipping order ({order.id}) because over priced!");
 
                         // over priced, don't touch;
                         continue;
@@ -310,7 +310,7 @@ namespace TheIsland.Framework.Bots
 
                     Currency wallet = await this.Bot.Req.GetWallet().ConfigureAwait(false);
 
-                    long buyQuantity = Math.Abs(order.buyQuantity);
+                    long buyQuantity = Math.Abs((long)order.buy_quantity);
                     long allowedQuantity = Convert.ToInt64(marketLimit - getPlayersLimit.quantity);
 
                     if (buyQuantity > allowedQuantity)
@@ -321,7 +321,7 @@ namespace TheIsland.Framework.Bots
                         buyQuantity = allowedQuantity;
                     }
 
-                    long totalCost = buyQuantity * order.unitPrice;
+                    long totalCost = buyQuantity * (long)order.price;
 
                     if (wallet != null && wallet.amount > totalCost)
                     {
@@ -331,12 +331,13 @@ namespace TheIsland.Framework.Bots
                     MarketOrders boughtItems = await this.Bot.Req.MarketInstantOrder(
                         new MarketRequest
                         {
-                            itemOwner = order.ownerId,
-                            marketId = order.marketId,
-                            itemType = order.itemType,
+                            itemOwner = EntityId.Player(Convert.ToUInt64(order.player_id)),
+                            marketId = Convert.ToUInt64(order.market_id),
+                            itemType = Convert.ToUInt64(order.item_type_id),
                             buyQuantity = buyQuantity,
-                            unitPrice = order.unitPrice,
+                            unitPrice = (long)order.price,
                         }).ConfigureAwait(false);
+
                     itemsPurchase++;
                     getPlayersLimit.quantity += buyQuantity;
 
@@ -351,19 +352,19 @@ namespace TheIsland.Framework.Bots
 
                     await this._factoryLedgerRepository.AddAsync(new FactoryLedgerEntry
                     {
-                        item_id = Convert.ToDouble(order.itemType),
+                        item_id = itemId,
                         quantity = buyQuantity,
                         price = totalCost,
                     }).ConfigureAwait(false);
 
-                    IEnumerable<DualMarketItemEntry> marketBox = await this._dualMarketItemEntryRepository.GetByPlayerIdByMarketIdAsync(this.Bot.PlayerId.id, order.marketId).ConfigureAwait(false);
-                    double marketBoxID = marketBox.FirstOrDefault(item => item.item_type_id == order.itemType)?.id ?? 0;
+                    IEnumerable<DualMarketItemEntry> marketBox = await this._dualMarketItemEntryRepository.GetByPlayerIdByMarketIdAsync(this.Bot.PlayerId.id, order.market_id).ConfigureAwait(false);
+                    double marketBoxID = marketBox.FirstOrDefault(item => item.item_type_id == order.item_type_id)?.id ?? 0;
 
                     //delete the ore
                     await this._dualMarketItemEntryRepository.RemoveAsync(marketBoxID).ConfigureAwait(false);
                 }
 
-                logMessage(@$"Purchased {itemsPurchase} orders @ '{market.name}'!");
+                logMessage(@$"Purchased {itemsPurchase} orders @ '{marketId}'!");
             }
 
             return log;

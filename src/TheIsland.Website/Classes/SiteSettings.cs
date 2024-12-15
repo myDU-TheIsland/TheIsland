@@ -5,7 +5,6 @@
 namespace TheIsland.Website.Classes
 {
     using TheIsland.Core.Settings;
-    using TheIsland.Data.PostgreSQL.Settings;
     using TheIsland.Website.Interfaces;
 
     public class SiteSettings : ISiteSettings
@@ -18,12 +17,14 @@ namespace TheIsland.Website.Classes
 
         public BotSettings MarketBot { get; set; } = new BotSettings();
 
-        public PostgresSettings Postgres { get; set; } = new PostgresSettings();
-
         public string[] Admins { get; set; } = { };
 
         public string[] ApiKey { get; set; } = { "5108b23c-9fec-497e-88a6-07f9d3032dcc" };
 
         public string RedisServer { get; set; } = "10.10.42.169";
+
+        public bool BackgroundBuy { get; set; } = true;
+
+        public bool BackgroundHotTime { get; set; } = true;
     }
 }

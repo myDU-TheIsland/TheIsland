@@ -7,13 +7,13 @@ namespace TheIsland.Data.PostgreSQL.Repositories
     using System.Data.Common;
     using Dapper;
     using Dapper.Contrib.Extensions;
+    using TheIsland.Core.Interfaces;
     using TheIsland.Data.Entities;
-    using TheIsland.Data.PostgreSQL.Settings;
     using TheIsland.Data.Repositories;
 
     public class PlayerMarketBuyLimitRepository : NpgsqlEntityRepository<PlayerMarketBuyLimit>, IPlayerMarketBuyLimitRepository
     {
-        public PlayerMarketBuyLimitRepository(PostgresSettings settings) : base(settings, settings.Database)
+        public PlayerMarketBuyLimitRepository(IDatabaseSettings settings) : base(settings, settings.Database)
         {
         }
 

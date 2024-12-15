@@ -8,7 +8,6 @@ namespace TheIsland.Framework
     using Microsoft.Extensions.DependencyInjection;
     using TheIsland.Core.Interfaces;
     using TheIsland.Framework.Bots;
-    using TheIsland.Framework.Services;
 
     public static class Initializer
     {

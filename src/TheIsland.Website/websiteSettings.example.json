@@ -33,7 +33,7 @@
         "QueueingUri": "https://dev-queueing.theisle.online"
       }
     },
-    "Postgres": {
+    "Database": {
       "Server": "dev-postgre-1.servers.v0.design",
       "Port": 5432,
       "UserName": "",

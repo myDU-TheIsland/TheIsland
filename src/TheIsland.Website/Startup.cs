@@ -20,6 +20,7 @@ namespace TheIsland.Website
     using Microsoft.OpenApi.Models;
     using StackExchange.Exceptional.Stores;
     using StackExchange.Redis;
+    using TheIsland.Core.Interfaces;
     using TheIsland.Core.Settings;
     using TheIsland.Data.PostgreSQL;
     using TheIsland.Framework;
@@ -99,9 +100,11 @@ namespace TheIsland.Website
         {
             string appName = this.HostingEnvironment.IsDevelopment() ? ".dev" : string.Empty;
 
+            IDatabaseSettings databaseSettings = TheIsland.Data.PostgreSQL.Initializer.GetDatabaseSettings(this.Configuration);
+
             services.AddExceptional(settings =>
             {
-                settings.DefaultStore = new PostgreSqlErrorStore($@"{SiteSettings.Postgres.GetConnectionString()}Database={SiteSettings.Postgres.Database};", this.AppName);
+                settings.DefaultStore = new PostgreSqlErrorStore($@"{databaseSettings.GetConnectionString()}Database={databaseSettings.Database};", this.AppName);
             });
 
             services.Configure<KestrelServerOptions>(options =>
@@ -195,14 +198,13 @@ namespace TheIsland.Website
             // settings
             services.AddSingleton(SiteSettings);
             services.AddSingleton(SiteSettings.DualUniverse);
-            services.AddSingleton(SiteSettings.Postgres);
             services.AddSingleton(MarketBotConfig);
             services.AddSingleton<ApiKeyAuthorizationFilter>();
             services.AddSingleton(redis.GetDatabase(2));
 
             // repositories
             services.AddFrameworkDependencies();
-            services.AddPostgreDependencies();
+            services.AddPostgreDependencies(this.Configuration);
 
             if (this.HostingEnvironment.IsDevelopment())
             {
@@ -295,8 +297,15 @@ namespace TheIsland.Website
 
             if (!this.HostingEnvironment.IsDevelopment())
             {
-                RecurringJob.AddOrUpdate("buyStuff", (IMarketBot client) => client.BuyStuffAsync(0), Cron.Minutely, options: recurringJobOptions);
-                RecurringJob.AddOrUpdate("hotTime", (MarketService service) => service.HotTimeEvent(), "0 */3 * * *", options: recurringJobOptions);
+                if (SiteSettings.BackgroundBuy)
+                {
+                    RecurringJob.AddOrUpdate("buyStuff", (IMarketBot client) => client.BuyStuffAsync(0), Cron.Minutely, options: recurringJobOptions);
+                }
+
+                if (SiteSettings.BackgroundHotTime)
+                {
+                    RecurringJob.AddOrUpdate("hotTime", (MarketService service) => service.HotTimeEvent(), "0 */3 * * *", options: recurringJobOptions);
+                }
             }
         }
     }

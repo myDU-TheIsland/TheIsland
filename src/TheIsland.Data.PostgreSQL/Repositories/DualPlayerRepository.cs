@@ -6,13 +6,13 @@ namespace TheIsland.Data.PostgreSQL.Repositories
 {
     using System.Data.Common;
     using Dapper;
+    using TheIsland.Core.Interfaces;
     using TheIsland.Data.Entities;
-    using TheIsland.Data.PostgreSQL.Settings;
     using TheIsland.Data.Repositories;
 
     public class DualPlayerRepository : NpgsqlEntityRepository<DualPlayer>, IDualPlayerRepository
     {
-        public DualPlayerRepository(PostgresSettings settings) : base(settings, settings.DualDatabase)
+        public DualPlayerRepository(IDatabaseSettings settings) : base(settings, settings.DualDatabase)
         {
         }
 

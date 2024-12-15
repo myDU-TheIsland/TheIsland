@@ -4,7 +4,9 @@
 
 namespace TheIsland.Data.PostgreSQL.Settings
 {
-    public class PostgresSettings
+    using TheIsland.Core.Interfaces;
+
+    public class PostgresSettings : IDatabaseSettings
     {
         public string Server { get; set; } = "localhost";
 

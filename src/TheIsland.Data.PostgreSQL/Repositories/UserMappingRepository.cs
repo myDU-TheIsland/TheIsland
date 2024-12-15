@@ -7,13 +7,13 @@ namespace TheIsland.Data.PostgreSQL.Repositories
     using System.Collections.Generic;
     using System.Data.Common;
     using Dapper;
+    using TheIsland.Core.Interfaces;
     using TheIsland.Data.Entities;
-    using TheIsland.Data.PostgreSQL.Settings;
     using TheIsland.Data.Repositories;
 
     public class UserMappingRepository : NpgsqlEntityRepository<UserMapping>, IUserMappingRepository
     {
-        public UserMappingRepository(PostgresSettings settings) : base(settings, settings.Database)
+        public UserMappingRepository(IDatabaseSettings settings) : base(settings, settings.Database)
         {
         }
 

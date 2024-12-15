@@ -7,17 +7,17 @@ namespace TheIsland.Data.PostgreSQL
     using System.Data.Common;
     using Dapper.Contrib.Extensions;
     using Npgsql;
+    using TheIsland.Core.Interfaces;
     using TheIsland.Data.Entities;
-    using TheIsland.Data.PostgreSQL.Settings;
     using TheIsland.Data.Repositories;
 
     public abstract class NpgsqlEntityRepository<TValue> : IEntityRepository<TValue> where TValue : DatabaseEntity, new()
     {
-        protected PostgresSettings Settings { get; }
+        protected IDatabaseSettings Settings { get; }
 
         protected string DatabaseName { get; }
 
-        public NpgsqlEntityRepository(PostgresSettings settings, string databaseName)
+        public NpgsqlEntityRepository(IDatabaseSettings settings, string databaseName)
         {
             this.Settings = settings;
             this.DatabaseName = databaseName;
