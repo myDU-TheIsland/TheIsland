@@ -32,14 +32,14 @@
         "PlayerName": "",
         "QueueingUri": "https://dev-queueing.theisle.online"
       }
-    },
-    "Database": {
-      "Server": "dev-postgre-1.servers.v0.design",
-      "Port": 5432,
-      "UserName": "",
-      "Password": "",
-      "Database": "TheIsland"
     }
+  },
+  "Database": {
+    "Server": "dev-postgre-1.servers.v0.design",
+    "Port": 5432,
+    "UserName": "",
+    "Password": "",
+    "Database": "TheIsland"
   },
   "Logging": {
     "LogLevel": {
