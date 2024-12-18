@@ -257,6 +257,11 @@ namespace TheIsland.Framework.Bots
                 DualMarketOrder[] marketOrders = (await this._dualMarketOrderRepository.GetByMarketIdAsync(doubleMarketId).ConfigureAwait(false)).ToArray();
                 logMessage(@$"Found orders ({marketOrders.Count()})");
 
+                if (marketOrders.Length == 0)
+                {
+                    continue;
+                }
+
                 // loop over all my orders in this market
                 foreach (DualMarketOrder order in marketOrders)
                 {
