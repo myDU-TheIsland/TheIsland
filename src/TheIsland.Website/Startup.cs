@@ -301,11 +301,6 @@ namespace TheIsland.Website
                 {
                     RecurringJob.AddOrUpdate("buyStuff", (IMarketBot client) => client.BuyStuffAsync(0), Cron.Minutely, options: recurringJobOptions);
                 }
-
-                if (SiteSettings.BackgroundHotTime)
-                {
-                    RecurringJob.AddOrUpdate("hotTime", (MarketService service) => service.HotTimeEvent(), "0 */3 * * *", options: recurringJobOptions);
-                }
             }
         }
     }
