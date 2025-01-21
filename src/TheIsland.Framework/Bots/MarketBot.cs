@@ -241,7 +241,18 @@ namespace TheIsland.Framework.Bots
                 markets = marketList.markets.Select(item => item.marketId).ToArray();
             }
 
-            logMessage(@$"Found Markets ({markets.Count()})");
+            logMessage($"Found Markets ({markets.Length})");
+
+            //ALL ITEMS
+            var items = this.GetAllItemsMarketEntries();
+
+            if (items.Count == 0)
+            {
+                logMessage("No Items found!");
+                return log;
+            }
+
+            logMessage($"{items.Count} Items found!");
 
             // loop over each market
             foreach (ulong marketId in markets)
@@ -267,7 +278,14 @@ namespace TheIsland.Framework.Bots
                 {
                     double playerId = Convert.ToDouble(order.player_id);
                     double itemId = Convert.ToDouble(order.item_type_id);
-                    ItemEntry itemData = this.GetAllItemsMarketEntries().First(item => item.Id == itemId);
+                    ItemEntry? itemData = items.FirstOrDefault(item => item.Id == itemId);
+
+                    if (itemData == null)
+                    {
+                        logMessage(@$"Couldn't find item ({itemId})");
+                        return log;
+                    }
+
                     double marketLimit = await this.GetItemLimitAsync(itemId).ConfigureAwait(false);
 
                     logMessage(@$"This item ({itemData.Name}) limit is {marketLimit}!");
