@@ -282,8 +282,8 @@ namespace TheIsland.Framework.Bots
 
                     if (itemData == null)
                     {
-                        logMessage(@$"Couldn't find item ({itemId})");
-                        return log;
+                        logMessage($"Couldn't find item ({itemId})");
+                        continue;
                     }
 
                     double marketLimit = await this.GetItemLimitAsync(itemId).ConfigureAwait(false);
