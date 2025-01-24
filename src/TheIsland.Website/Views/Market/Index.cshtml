@@ -5,6 +5,9 @@
 @model MarketModel
 @{
     ViewData["Title"] = "Market Data";
+
+    Model.MarketId = Model.MarketId == 0 ? 20 : Model.MarketId;
+
     var items = _marketBot.GetListOfSellableItems().OrderBy(items => items.Value).ToDictionary(); 
     bool itemExists = items.ContainsKey(Model.ItemId);
 
@@ -44,7 +47,6 @@
                         <!-- Market Dropdown using Select2 -->
                         <select asp-for="MarketId" id="marketSearch" name="MarketId"
                                 class="block w-full px-4 py-2 text-white bg-gray-700 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-600">
-                            <option value="0">All Markets</option> <!-- Default option for All Markets -->
                             @foreach (var market in markets.OrderBy(item => item.Value).ToArray())
                             {
                                 <option value="@market.Key">@market.Value</option>
