@@ -8,11 +8,11 @@
     var items = _marketBot.GetListOfSellableItems().OrderBy(items => items.Value).ToDictionary(); 
     bool itemExists = items.ContainsKey(Model.ItemId);
 
-    var markets = (await _marketRepo.GetAsync().ConfigureAwait(false)).ToDictionary(key => key.id, value =>
-    value.name.Replace("Market", string.Empty).Replace("District", string.Empty).Trim());
-    markets.Add(0, "All Markets");
-       
-    var selectedMarket = markets[Model.MarketId];
+    Dictionary<double, string> markets = new Dictionary<double, string>();
+    markets.Add(20, "Aegis");
+    markets.Add(140, "Skipper's Delight");
+
+    var selectedMarket = markets[Model.MarketId] ?? "Aegis";
     var selectedItem = itemExists ? items[Model.ItemId] : string.Empty;
 
     double botPurchasePrice = _marketBot.GetItemPrice(Convert.ToUInt64(Model.MarketId), Convert.ToUInt64(Model.ItemId)) / 100;
@@ -72,8 +72,7 @@
             {
                 string varyByString = $@"{Model.ItemId}/{Model.MarketId}";
 
-                var orders = itemExists ? await this._marketService.GetAllActiveAsync(Model.MarketId,
-                Model.ItemId).ConfigureAwait(false) : Enumerable.Empty<MarketTransaction>();
+                var orders = itemExists ? await this._marketService.GetAllActiveAsync(Model.MarketId, Model.ItemId).ConfigureAwait(false) : Enumerable.Empty<MarketTransaction>();
                 var buyOrders = orders.Where(item => item.type == TransactionType.BuyOrder);
                 var sellOrders = orders.Where(item => item.type == TransactionType.SellOrder);
 
