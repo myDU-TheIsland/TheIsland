@@ -145,11 +145,20 @@ namespace TheIsland.Framework.Bots
                     }
 
                     var getPrevTransactions = await this._dualWalletRepository.GetAllTransactionsBetween(this.Bot.PlayerId, player.id).ConfigureAwait(false);
+                    var transactions = getPrevTransactions.Where(item => item.time > pastHour && (item.amount == giveToPlayer || item.amount == -giveToPlayer)).ToArray();
 
-                    if (getPrevTransactions.Any(item => item.time > pastHour && item.amount == giveToPlayer))
+                    if (transactions.Count() > 0)
                     {
+                        if (transactions.Count() > 1)
+                        {
+                            var deduct = (transactions.Count() - 1) * amount;
+                            var playerWallet = await this._dualPlayerRepository.GetAsync(player.id).ConfigureAwait(false);
+                            await this.DataAccessor.PlayerWalletUpdateAsync(Convert.ToUInt64(player.id), Convert.ToInt64(playerWallet.wallet - deduct)).ConfigureAwait(false);
+                            logMessage(@$"Deducting from user '{player.display_name}', got multiple payments.");
+                        }
+
                         //transaction in the last hour
-                        logMessage(@$"Skipping user '{player.display_name}', wallet has transaction in the last hour({hours}).");
+                        logMessage(@$"Skipping user '{player.display_name}', w allet has transaction in the last hour({hours}).");
                         continue;
                     }
 
@@ -164,6 +173,8 @@ namespace TheIsland.Framework.Bots
                         fromWallet = new EntityId() { playerId = this.Bot.PlayerId },
                         reason = reason,
                     }).ConfigureAwait(false);
+
+                    await Task.Delay(100).ConfigureAwait(false);
                 }
 
                 logMessage(@$"GiveAllUsers Complete!");
