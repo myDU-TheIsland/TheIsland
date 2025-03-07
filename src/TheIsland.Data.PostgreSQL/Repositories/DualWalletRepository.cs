@@ -29,7 +29,7 @@ FROM public.wallet_operation wo
 inner join public.ownership origin
  	ON origin.id = wo.entity_id
 		and origin.organization_id is null
-		and dest.player_id = @fromId
+		and origin.player_id = @fromId
 Inner join public.ownership dest
 	ON dest.id = wo.peer_id
 		and dest.organization_id is null
