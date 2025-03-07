@@ -11,5 +11,7 @@ namespace TheIsland.Data.Repositories
         Task<IEnumerable<DualWalletTransaction>> GetAllBotTransactionOnMarket(double marketId, double entity_id = 43453);
 
         Task<IEnumerable<MarketStatistics>> GetDailyStats(double item, double marketId = -1);
+
+        Task<IEnumerable<DualWalletTransaction>> GetAllTransactionsBetween(double fromId, double toId);
     }
 }

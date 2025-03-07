@@ -43,9 +43,9 @@ namespace TheIsland.Website.Areas.Admin.Controllers.API
 
         [HttpPost]
         [ApiKey]
-        public async Task<IActionResult> GiveQuantaToAll(double amount, string note)
+        public async Task<IActionResult> GiveQuantaToAll(double amount, string note, double hours = 1)
         {
-            return this.Json(await this._generalBot.GiveAllQuanta(amount, note).ConfigureAwait(false));
+            return this.Json(await this._generalBot.GiveAllQuanta(amount, note, hours).ConfigureAwait(false));
         }
 
         [HttpPost]

@@ -20,7 +20,7 @@ namespace TheIsland.Framework.Bots
         #region Admin Functions
         Task<List<string>> GiveTalentPoints(double amount);
 
-        Task<List<string>> GiveAllQuanta(double amount, string note);
+        Task<List<string>> GiveAllQuanta(double amount, string note, double hours = 1);
 
         Task<List<string>> RespecEntireCategoryForAllPlayers(string category);
         #endregion
@@ -32,10 +32,17 @@ namespace TheIsland.Framework.Bots
 
         private readonly DualUniverseSettings _dualUniverseSettings;
 
-        public GeneralBot(IDualPlayerRepository dualPlayerRepository, DualUniverseSettings settings, ILogger<IGeneralBot> logger) : base(settings.WebsiteBot, logger)
+        private readonly IDualWalletRepository _dualWalletRepository;
+
+        public GeneralBot(
+            IDualWalletRepository dualWalletRepository,
+            IDualPlayerRepository dualPlayerRepository,
+            DualUniverseSettings settings,
+            ILogger<IGeneralBot> logger) : base(settings.WebsiteBot, logger)
         {
             this._dualUniverseSettings = settings;
             this._dualPlayerRepository = dualPlayerRepository;
+            this._dualWalletRepository = dualWalletRepository;
         }
 
         public override Task BotConnectionTestAsync()
@@ -87,9 +94,14 @@ namespace TheIsland.Framework.Bots
             }
         }
 
-        public async Task<List<string>> GiveAllQuanta(double amount, string note)
+        public async Task<List<string>> GiveAllQuanta(double amount, string note, double hours = 1)
         {
             List<string> log = new List<string>();
+
+            hours = hours * -1;
+
+            DateTime startTime = DateTime.Now;
+            DateTime pastHour = startTime.AddHours(hours);
 
             void logMessage(string input)
             {
@@ -129,6 +141,14 @@ namespace TheIsland.Framework.Bots
                     if (player.admin || player.is_bot)
                     {
                         logMessage(@$"Skipping user '{player.display_name}', is a bot or admin!");
+                        continue;
+                    }
+
+                    var getPrevTransactions = await this._dualWalletRepository.GetAllTransactionsBetween(this.Bot.PlayerId, player.id).ConfigureAwait(false);
+
+                    if (getPrevTransactions.Any(item => item.time > pastHour && item.amount == giveToPlayer))
+                    {
+                        //transaction in the last hour
                         continue;
                     }
 

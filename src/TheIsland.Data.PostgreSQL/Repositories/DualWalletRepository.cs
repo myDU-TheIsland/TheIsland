@@ -21,6 +21,28 @@ namespace TheIsland.Data.PostgreSQL.Repositories
             this._marketStatistics = new RedisCache<List<MarketStatistics>>(redisDatabase);
         }
 
+        public async Task<IEnumerable<DualWalletTransaction>> GetAllTransactionsBetween(double fromId, double toId)
+        {
+            string query = $@"
+SELECT wo.*
+FROM public.wallet_operation wo
+inner join public.ownership origin
+ 	ON origin.id = wo.entity_id
+		and origin.organization_id is null
+		and dest.player_id = @fromId
+Inner join public.ownership dest
+	ON dest.id = wo.peer_id
+		and dest.organization_id is null
+		and dest.player_id = @toId
+WHERE peer_id IS NOT NULL
+	AND operation_type = 6
+";
+            using (DbConnection databaseConnection = this.GetConnection())
+            {
+                return await databaseConnection.QueryAsync<DualWalletTransaction>(query, new { fromId = fromId, toId = toId }).ConfigureAwait(false);
+            }
+        }
+
         public async Task<IEnumerable<DualWalletTransaction>> GetAllBotTransactionOnMarket(double marketId, double entity_id = 43453)
         {
             using (DbConnection databaseConnection = this.GetConnection())
