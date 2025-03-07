@@ -149,7 +149,7 @@ namespace TheIsland.Framework.Bots
                     if (getPrevTransactions.Any(item => item.time > pastHour && item.amount == giveToPlayer))
                     {
                         //transaction in the last hour
-                        logMessage(@$"Wallet has transaction in the last hour({hours}).");
+                        logMessage(@$"Skipping user '{player.display_name}', wallet has transaction in the last hour({hours}).");
                         continue;
                     }
 
