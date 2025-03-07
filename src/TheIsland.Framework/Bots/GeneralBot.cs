@@ -13,6 +13,7 @@ namespace TheIsland.Framework.Bots
     using TheIsland.Core.Settings;
     using TheIsland.Core.ThreadSafe;
     using TheIsland.Data.Entities;
+    using TheIsland.Data.PostgreSQL.Repositories;
     using TheIsland.Data.Repositories;
 
     public interface IGeneralBot : IBotClient
@@ -151,9 +152,10 @@ namespace TheIsland.Framework.Bots
                     {
                         if (transactions.Count() > 1)
                         {
-                            var deduct = (transactions.Count() - 1) * amount;
+                            var deduct = -((transactions.Count() - 1) * amount);
                             var playerWallet = await this._dualPlayerRepository.GetAsync(player.id).ConfigureAwait(false);
-                            await this.DataAccessor.PlayerWalletUpdateAsync(Convert.ToUInt64(player.id), Convert.ToInt64(playerWallet.wallet - deduct)).ConfigureAwait(false);
+                            await this._dualPlayerRepository.UpdateWallet(player.id, deduct).ConfigureAwait(false);
+                            await this.DataAccessor.PlayerDisconnectAsync(Convert.ToUInt64(player.id)).ConfigureAwait(false);
                             logMessage(@$"Deducting from user '{player.display_name}', got multiple payments.");
                         }
 
